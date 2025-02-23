@@ -1,0 +1,12 @@
+<node>
+    <interface name="org.freedesktop.GeoClue2.Location">
+        <property type="d" name="Latitude" access="read"/>
+        <property type="d" name="Longitude" access="read"/>
+        <property type="d" name="Accuracy" access="read"/>
+        <property type="d" name="Altitude" access="read"/>
+        <property type="d" name="Speed" access="read"/>
+        <property type="d" name="Heading" access="read"/>
+        <property type="s" name="Description" access="read"/>
+        <property type="(tt)" name="Timestamp" access="read"/>
+    </interface>
+</node>

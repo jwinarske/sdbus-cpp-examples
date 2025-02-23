@@ -1,0 +1,40 @@
+<node>
+    <interface name="org.freedesktop.timedate1">
+        <property name="Timezone" type="s" access="read"></property>
+        <property name="LocalRTC" type="b" access="read"></property>
+        <property name="CanNTP" type="b" access="read">
+            <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
+        </property>
+        <property name="NTP" type="b" access="read"></property>
+        <property name="NTPSynchronized" type="b" access="read">
+            <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
+        </property>
+        <property name="TimeUSec" type="t" access="read">
+            <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
+        </property>
+        <property name="RTCTimeUSec" type="t" access="read">
+            <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
+        </property>
+        <method name="SetTime">
+            <arg type="x" name="usec_utc" direction="in"/>
+            <arg type="b" name="relative" direction="in"/>
+            <arg type="b" name="interactive" direction="in"/>
+        </method>
+        <method name="SetTimezone">
+            <arg type="s" name="timezone" direction="in"/>
+            <arg type="b" name="interactive" direction="in"/>
+        </method>
+        <method name="SetLocalRTC">
+            <arg type="b" name="local_rtc" direction="in"/>
+            <arg type="b" name="fix_system" direction="in"/>
+            <arg type="b" name="interactive" direction="in"/>
+        </method>
+        <method name="SetNTP">
+            <arg type="b" name="use_ntp" direction="in"/>
+            <arg type="b" name="interactive" direction="in"/>
+        </method>
+        <method name="ListTimezones">
+            <arg type="as" name="timezones" direction="out"/>
+        </method>
+    </interface>
+</node>

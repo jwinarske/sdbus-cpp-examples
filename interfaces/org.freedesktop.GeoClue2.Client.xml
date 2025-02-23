@@ -1,0 +1,21 @@
+<node>
+    <interface name="org.freedesktop.GeoClue2.Client">
+        <method name="Start"/>
+        <method name="Stop"/>
+        <signal name="LocationUpdated">
+            <arg type="o" name="old"/>
+            <arg type="o" name="new"/>
+        </signal>
+        <property type="o" name="Location" access="read"/>
+        <property type="u" name="DistanceThreshold" access="readwrite">
+            <annotation name="org.freedesktop.Accounts.DefaultValue" value="0"/>
+        </property>
+        <property type="u" name="TimeThreshold" access="readwrite">
+            <annotation name="org.freedesktop.Accounts.DefaultValue" value="0"/>
+        </property>
+        <property type="s" name="DesktopId" access="readwrite"/>
+        <property type="u" name="RequestedAccuracyLevel" access="readwrite"/>
+        <property type="b" name="Active" access="read"/>
+    </interface>
+    <node name="Location"/>
+</node>

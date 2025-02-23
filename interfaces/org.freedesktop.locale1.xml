@@ -1,0 +1,29 @@
+<node>
+    <interface name="org.freedesktop.locale1">
+        <property name="Locale" type="as" access="read"></property>
+        <property name="X11Layout" type="s" access="read"></property>
+        <property name="X11Model" type="s" access="read"></property>
+        <property name="X11Variant" type="s" access="read"></property>
+        <property name="X11Options" type="s" access="read"></property>
+        <property name="VConsoleKeymap" type="s" access="read"></property>
+        <property name="VConsoleKeymapToggle" type="s" access="read"></property>
+        <method name="SetLocale">
+            <arg type="as" name="locale" direction="in"/>
+            <arg type="b" name="interactive" direction="in"/>
+        </method>
+        <method name="SetVConsoleKeyboard">
+            <arg type="s" name="keymap" direction="in"/>
+            <arg type="s" name="keymap_toggle" direction="in"/>
+            <arg type="b" name="convert" direction="in"/>
+            <arg type="b" name="interactive" direction="in"/>
+        </method>
+        <method name="SetX11Keyboard">
+            <arg type="s" name="layout" direction="in"/>
+            <arg type="s" name="model" direction="in"/>
+            <arg type="s" name="variant" direction="in"/>
+            <arg type="s" name="options" direction="in"/>
+            <arg type="b" name="convert" direction="in"/>
+            <arg type="b" name="interactive" direction="in"/>
+        </method>
+    </interface>
+</node>

@@ -1,0 +1,18 @@
+<node>
+    <interface name="org.freedesktop.GeoClue2.Manager">
+        <method name="GetClient">
+            <arg type="o" name="client" direction="out"/>
+        </method>
+        <method name="CreateClient">
+            <arg type="o" name="client" direction="out"/>
+        </method>
+        <method name="DeleteClient">
+            <arg type="o" name="client" direction="in"/>
+        </method>
+        <method name="AddAgent">
+            <arg type="s" name="id" direction="in"/>
+        </method>
+        <property type="b" name="InUse" access="read"/>
+        <property type="u" name="AvailableAccuracyLevel" access="read"/>
+    </interface>
+</node>

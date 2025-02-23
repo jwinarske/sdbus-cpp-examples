@@ -1,0 +1,6 @@
+[submodule "third_party/sdbus-cpp"]
+	path = third_party/sdbus-cpp
+	url = https://github.com/Kistler-Group/sdbus-cpp.git
+[submodule "third_party/spdlog"]
+	path = third_party/spdlog
+	url = https://github.com/gabime/spdlog.git
