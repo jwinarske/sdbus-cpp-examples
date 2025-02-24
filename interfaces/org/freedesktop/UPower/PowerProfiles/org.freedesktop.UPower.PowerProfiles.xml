@@ -1,0 +1,16 @@
+<node>
+    <interface name="org.freedesktop.UPower.PowerProfiles">
+        <method name="HoldProfile">
+            <arg direction="in" type="s" name="profile"/>
+            <arg direction="in" type="s" name="reason"/>
+            <arg direction="in" type="s" name="app_id"/>
+            <arg direction="out" type="u"/>
+        </method>
+        <method name="ReleaseProfile">
+            <arg direction="in" type="u" name="cookie"/>
+        </method>
+        <signal name="ProfileReleased">
+            <arg type="u" name="cookie"/>
+        </signal>
+    </interface>
+</node>
