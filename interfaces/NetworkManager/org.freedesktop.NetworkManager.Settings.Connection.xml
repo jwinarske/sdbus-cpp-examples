@@ -1,0 +1,32 @@
+<node>
+    <interface name="org.freedesktop.NetworkManager.Settings.Connection">
+        <method name="Update">
+            <arg type="a{sa{sv}}" name="properties" direction="in"/>
+        </method>
+        <method name="UpdateUnsaved">
+            <arg type="a{sa{sv}}" name="properties" direction="in"/>
+        </method>
+        <method name="Delete"/>
+        <method name="GetSettings">
+            <arg type="a{sa{sv}}" name="settings" direction="out"/>
+        </method>
+        <method name="GetSecrets">
+            <arg type="s" name="setting_name" direction="in"/>
+            <arg type="a{sa{sv}}" name="secrets" direction="out"/>
+        </method>
+        <method name="ClearSecrets"/>
+        <method name="Save"/>
+        <method name="Update2">
+            <arg type="a{sa{sv}}" name="settings" direction="in"/>
+            <arg type="u" name="flags" direction="in"/>
+            <arg type="a{sv}" name="args" direction="in"/>
+            <arg type="a{sv}" name="result" direction="out"/>
+        </method>
+        <signal name="Updated"/>
+        <signal name="Removed"/>
+        <property type="b" name="Unsaved" access="read"/>
+        <property type="u" name="Flags" access="read"/>
+        <property type="s" name="Filename" access="read"/>
+        <property type="t" name="VersionId" access="read"/>
+    </interface>
+</node>

@@ -1,0 +1,46 @@
+<node>
+    <interface name="org.freedesktop.NetworkManager.Settings">
+        <method name="ListConnections">
+            <arg type="ao" name="connections" direction="out"/>
+        </method>
+        <method name="GetConnectionByUuid">
+            <arg type="s" name="uuid" direction="in"/>
+            <arg type="o" name="connection" direction="out"/>
+        </method>
+        <method name="AddConnection">
+            <arg type="a{sa{sv}}" name="connection" direction="in"/>
+            <arg type="o" name="path" direction="out"/>
+        </method>
+        <method name="AddConnectionUnsaved">
+            <arg type="a{sa{sv}}" name="connection" direction="in"/>
+            <arg type="o" name="path" direction="out"/>
+        </method>
+        <method name="AddConnection2">
+            <arg type="a{sa{sv}}" name="settings" direction="in"/>
+            <arg type="u" name="flags" direction="in"/>
+            <arg type="a{sv}" name="args" direction="in"/>
+            <arg type="o" name="path" direction="out"/>
+            <arg type="a{sv}" name="result" direction="out"/>
+        </method>
+        <method name="LoadConnections">
+            <arg type="as" name="filenames" direction="in"/>
+            <arg type="b" name="status" direction="out"/>
+            <arg type="as" name="failures" direction="out"/>
+        </method>
+        <method name="ReloadConnections">
+            <arg type="b" name="status" direction="out"/>
+        </method>
+        <method name="SaveHostname">
+            <arg type="s" name="hostname" direction="in"/>
+        </method>
+        <signal name="NewConnection">
+            <arg type="o" name="connection"/>
+        </signal>
+        <signal name="ConnectionRemoved">
+            <arg type="o" name="connection"/>
+        </signal>
+        <property type="ao" name="Connections" access="read"/>
+        <property type="s" name="Hostname" access="read"/>
+        <property type="b" name="CanModify" access="read"/>
+    </interface>
+</node>

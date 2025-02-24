@@ -1,0 +1,25 @@
+<node>
+    <interface name="org.freedesktop.NetworkManager.IP4Config">
+        <property type="aau" name="Addresses" access="read">
+            <annotation name="org.freedesktop.DBus.Deprecated" value="true"/>
+        </property>
+        <property type="aa{sv}" name="AddressData" access="read"/>
+        <property type="s" name="Gateway" access="read"/>
+        <property type="aau" name="Routes" access="read">
+            <annotation name="org.freedesktop.DBus.Deprecated" value="true"/>
+        </property>
+        <property type="aa{sv}" name="RouteData" access="read"/>
+        <property type="aa{sv}" name="NameserverData" access="read"/>
+        <property type="au" name="Nameservers" access="read">
+            <annotation name="org.freedesktop.DBus.Deprecated" value="true"/>
+        </property>
+        <property type="as" name="Domains" access="read"/>
+        <property type="as" name="Searches" access="read"/>
+        <property type="as" name="DnsOptions" access="read"/>
+        <property type="i" name="DnsPriority" access="read"/>
+        <property type="as" name="WinsServerData" access="read"/>
+        <property type="au" name="WinsServers" access="read">
+            <annotation name="org.freedesktop.DBus.Deprecated" value="true"/>
+        </property>
+    </interface>
+</node>

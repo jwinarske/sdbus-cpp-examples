@@ -41,3 +41,17 @@ ${XML2CPP} --verbose --proxy=${PROXY}/UDisks2Filesystem_proxy.h interfaces/org.f
 ${XML2CPP} --verbose --proxy=${PROXY}/UDisks2Partition_proxy.h interfaces/org.freedesktop.UDisks2.Partition.xml
 ${XML2CPP} --verbose --proxy=${PROXY}/UDisks2PartitionTable_proxy.h interfaces/org.freedesktop.UDisks2.PartitionTable.xml
 ${XML2CPP} --verbose --proxy=${PROXY}/UDisks2NvmeNamespace_proxy.h interfaces/org.freedesktop.UDisks2.NVMe.Namespace.xml
+
+mkdir -p ${PROXY}/NetworkManager |true
+${XML2CPP} --verbose --proxy=${PROXY}/NetworkManager/NetworkManagerAgentManager_proxy.h interfaces/NetworkManager/org.freedesktop.NetworkManager.AgentManager.xml
+${XML2CPP} --verbose --proxy=${PROXY}/NetworkManager/NetworkManagerConnectionActive_proxy.h interfaces/NetworkManager/org.freedesktop.NetworkManager.Connection.Active.xml
+${XML2CPP} --verbose --proxy=${PROXY}/NetworkManager/NetworkManagerDeviceLoopback_proxy.h interfaces/NetworkManager/org.freedesktop.NetworkManager.Device.Loopback.xml
+${XML2CPP} --verbose --proxy=${PROXY}/NetworkManager/NetworkManagerDeviceStatistics_proxy.h interfaces/NetworkManager/org.freedesktop.NetworkManager.Device.Statistics.xml
+${XML2CPP} --verbose --proxy=${PROXY}/NetworkManager/NetworkManagerDevice_proxy.h interfaces/NetworkManager/org.freedesktop.NetworkManager.Device.xml
+${XML2CPP} --verbose --proxy=${PROXY}/NetworkManager/NetworkManagerDHCP4Config_proxy.h interfaces/NetworkManager/org.freedesktop.NetworkManager.DHCP4Config.xml
+${XML2CPP} --verbose --proxy=${PROXY}/NetworkManager/NetworkManagerDnsManager_proxy.h interfaces/NetworkManager/org.freedesktop.NetworkManager.DnsManager.xml
+${XML2CPP} --verbose --proxy=${PROXY}/NetworkManager/NetworkManagerIP4Config_proxy.h interfaces/NetworkManager/org.freedesktop.NetworkManager.IP4Config.xml
+${XML2CPP} --verbose --proxy=${PROXY}/NetworkManager/NetworkManagerIP6Config_proxy.h interfaces/NetworkManager/org.freedesktop.NetworkManager.IP6Config.xml
+${XML2CPP} --verbose --proxy=${PROXY}/NetworkManager/NetworkManagerSettingsConnection_proxy.h interfaces/NetworkManager/org.freedesktop.NetworkManager.Settings.Connection.xml
+${XML2CPP} --verbose --proxy=${PROXY}/NetworkManager/NetworkManagerSettings_proxy.h interfaces/NetworkManager/org.freedesktop.NetworkManager.Settings.xml
+${XML2CPP} --verbose --proxy=${PROXY}/NetworkManager/NetworkManager_proxy.h interfaces/NetworkManager/org.freedesktop.NetworkManager.xml

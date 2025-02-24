@@ -1,0 +1,18 @@
+<node>
+    <interface name="org.freedesktop.NetworkManager.IP6Config">
+        <property type="a(ayuay)" name="Addresses" access="read">
+            <annotation name="org.freedesktop.DBus.Deprecated" value="true"/>
+        </property>
+        <property type="aa{sv}" name="AddressData" access="read"/>
+        <property type="s" name="Gateway" access="read"/>
+        <property type="a(ayuayu)" name="Routes" access="read">
+            <annotation name="org.freedesktop.DBus.Deprecated" value="true"/>
+        </property>
+        <property type="aa{sv}" name="RouteData" access="read"/>
+        <property type="aay" name="Nameservers" access="read"/>
+        <property type="as" name="Domains" access="read"/>
+        <property type="as" name="Searches" access="read"/>
+        <property type="as" name="DnsOptions" access="read"/>
+        <property type="i" name="DnsPriority" access="read"/>
+    </interface>
+</node>

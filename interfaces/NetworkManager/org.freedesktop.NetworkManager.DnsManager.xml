@@ -1,0 +1,7 @@
+<node>
+    <interface name="org.freedesktop.NetworkManager.DnsManager">
+        <property type="s" name="Mode" access="read"/>
+        <property type="s" name="RcManager" access="read"/>
+        <property type="aa{sv}" name="Configuration" access="read"/>
+    </interface>
+</node>

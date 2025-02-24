@@ -1,0 +1,7 @@
+<node>
+    <interface name="org.freedesktop.NetworkManager.Device.Statistics">
+        <property type="u" name="RefreshRateMs" access="readwrite"/>
+        <property type="t" name="TxBytes" access="read"/>
+        <property type="t" name="RxBytes" access="read"/>
+    </interface>
+</node>
