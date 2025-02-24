@@ -20,7 +20,6 @@ mkdir -p ${PROXY}/org/freedesktop/UPower/DisplayDevice |true
 ${XML2CPP} --verbose --proxy=${PROXY}/org/freedesktop/UPower/upower_proxy.h interfaces/org/freedesktop/UPower/UPower.xml
 ${XML2CPP} --verbose --proxy=${PROXY}/org/freedesktop/UPower/DisplayDevice/display_device_proxy.h interfaces/org/freedesktop/UPower/DisplayDevice/DisplayDevice.xml
 
-
 mkdir -p ${PROXY}/org/freedesktop/login1/{Manager,Seat,Session,User} |true
 
 ${XML2CPP} --verbose --proxy=${PROXY}/org/freedesktop/login1/Manager/manager_proxy.h interfaces/org/freedesktop/login1/Manager/Manager.xml
@@ -85,6 +84,12 @@ ${XML2CPP} --verbose --proxy=${PROXY}/org/freedesktop/NetworkManager/IP6Config/i
 ${XML2CPP} --verbose --proxy=${PROXY}/org/freedesktop/NetworkManager/Settings/Connection/connection_proxy.h interfaces/org/freedesktop/NetworkManager/Settings/Connection/Connection.xml
 ${XML2CPP} --verbose --proxy=${PROXY}/org/freedesktop/NetworkManager/Settings/settings_proxy.h interfaces/org/freedesktop/NetworkManager/Settings/Settings.xml
 
+mkdir -p ${PROXY}/org/freedesktop/network1/{Link,Manager,Network} |true
+
+${XML2CPP} --verbose --proxy=${PROXY}/org/freedesktop/network1/Link/link_proxy.h interfaces/org/freedesktop/network1/Link/Link.xml
+${XML2CPP} --verbose --proxy=${PROXY}/org/freedesktop/network1/Network/network_proxy.h interfaces/org/freedesktop/network1/Network/Network.xml
+${XML2CPP} --verbose --proxy=${PROXY}/org/freedesktop/network1/Manager/manager_proxy.h interfaces/org/freedesktop/network1/Manager/Manager.xml
+
 mkdir -p ${PROXY}/org/freedesktop/PolicyKit1/Authority |true
 
 ${XML2CPP} --verbose --proxy=${PROXY}/org/freedesktop/PolicyKit1/Authority/authority_proxy.h interfaces/org/freedesktop/PolicyKit1/Authority/Authority.xml
@@ -106,8 +111,8 @@ ${XML2CPP} --verbose --proxy=${PROXY}/net/connman/Manager/manager_proxy.h interf
 ${XML2CPP} --verbose --proxy=${PROXY}/net/connman/Service/service_proxy.h interfaces/net/connman/Service/Service.xml
 ${XML2CPP} --verbose --proxy=${PROXY}/net/connman/Technology/technology_proxy.h interfaces/net/connman/Technology/Technology.xml
 
-
 mkdir -p ${PROXY}/org/ofono/{HandsfreeAudioManager,Manager} |true
 
 ${XML2CPP} --verbose --proxy=${PROXY}/org/ofono/HandsfreeAudioManager/handsfree_audio_manager_proxy.h interfaces/org/ofono/HandsfreeAudioManager/HandsfreeAudioManager.xml
 ${XML2CPP} --verbose --proxy=${PROXY}/org/ofono/Manager/manager_proxy.h interfaces/org/ofono/Manager/Manager.xml
+
