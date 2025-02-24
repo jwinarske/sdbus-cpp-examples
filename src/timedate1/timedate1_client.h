@@ -15,7 +15,7 @@
 #ifndef SRC_TIMEDATE1_TIMEDATE1_CLIENT_H
 #define SRC_TIMEDATE1_TIMEDATE1_CLIENT_H
 
-#include "../proxy/Timedate1_proxy.h"
+#include "../proxy/org/freedesktop/timedate1/timedate1_proxy.h"
 
 static constexpr auto kServiceName = "org.freedesktop.timedate1";
 static constexpr auto kInterfaceName = "/org/freedesktop/timedate1";

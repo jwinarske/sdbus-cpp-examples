@@ -15,7 +15,7 @@
 #ifndef SRC_LOGIN1_LOGIN1_MANAGER_CLIENT_H
 #define SRC_LOGIN1_LOGIN1_MANAGER_CLIENT_H
 
-#include "../proxy/Login1Manager_proxy.h"
+#include "../proxy/org/freedesktop/login1/Manager/manager_proxy.h"
 
 #include "login1_seat.h"
 #include "login1_session.h"

@@ -15,7 +15,7 @@
 #ifndef SRC_UDISK2_UDISK2_DRIVE_H
 #define SRC_UDISK2_UDISK2_DRIVE_H
 
-#include "../proxy/UDisks2Drive_proxy.h"
+#include "../proxy/org/freedesktop/UDisks2/Drive/drive_proxy.h"
 #include "../utils.h"
 
 class UDisks2Drive final

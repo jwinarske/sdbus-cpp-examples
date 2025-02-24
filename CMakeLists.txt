@@ -120,3 +120,14 @@ target_link_libraries(udisks2_client
         sdbus-c++
         spdlog::spdlog
 )
+
+add_executable(networkmanager_client
+        src/networkmanager/networkmanager_client.cc
+        src/networkmanager/networkmanager_client.h
+        src/networkmanager/main.cc
+)
+target_link_libraries(networkmanager_client
+        PUBLIC
+        sdbus-c++
+        spdlog::spdlog
+)

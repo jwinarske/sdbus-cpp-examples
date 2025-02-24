@@ -15,7 +15,7 @@
 #ifndef SRC_UPOWER_UPOWER_CLIENT_H
 #define SRC_UPOWER_UPOWER_CLIENT_H
 
-#include "../proxy/UPower_proxy.h"
+#include "../proxy/org/freedesktop/UPower/upower_proxy.h"
 #include "upower_display_device.h"
 
 class UPowerDisplayDevice;

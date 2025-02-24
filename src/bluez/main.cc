@@ -14,14 +14,11 @@
 
 #include "bluez_client.h"
 
-#include <thread>
-
 int main() {
   const auto connection = sdbus::createSystemBusConnection();
   connection->enterEventLoopAsync();
 
   BluezClient client(*connection);
-  client.handleExistingObjects();
 
   using namespace std::chrono_literals;
   std::this_thread::sleep_for(120000ms);

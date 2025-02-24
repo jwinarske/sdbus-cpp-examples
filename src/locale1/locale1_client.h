@@ -15,7 +15,7 @@
 #ifndef SRC_LOCALE1_LOCALE1_CLIENT_H
 #define SRC_LOCALE1_LOCALE1_CLIENT_H
 
-#include "../proxy/Locale1_proxy.h"
+#include "../proxy/org/freedesktop/locale1/locale1_proxy.h"
 
 static constexpr auto kServiceName = "org.freedesktop.locale1";
 static constexpr auto kInterfaceName = "/org/freedesktop/locale1";

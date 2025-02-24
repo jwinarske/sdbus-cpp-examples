@@ -15,7 +15,7 @@
 #ifndef SRC_RESOLVE1_RESOLVE1_MANAGER_H
 #define SRC_RESOLVE1_RESOLVE1_MANAGER_H
 
-#include "../proxy/Resolve1Manager_proxy.h"
+#include "../proxy/org/freedesktop/resolve1/Manager/manager_proxy.h"
 
 static constexpr auto kServiceName = "org.freedesktop.resolve1";
 static constexpr auto kInterfaceName = "/org/freedesktop/resolve1";

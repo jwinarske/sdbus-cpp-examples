@@ -15,7 +15,7 @@
 #ifndef SRC_BLUEZ_ADAPTER1_H
 #define SRC_BLUEZ_ADAPTER1_H
 
-#include "../proxy/Adapter1_proxy.h"
+#include "../proxy/org/bluez/Adapter1/adapter1_proxy.h"
 
 #include "../utils.h"
 

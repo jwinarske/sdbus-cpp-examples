@@ -15,7 +15,7 @@
 #ifndef SRC_UDISK2_UDISK2_NVME_CONTROLLER_H
 #define SRC_UDISK2_UDISK2_NVME_CONTROLLER_H
 
-#include "../proxy/UDisks2NvmeController_proxy.h"
+#include "../proxy/org/freedesktop/UDisks2/NVMe/controller_proxy.h"
 #include "../utils.h"
 
 class UDisks2NvmeController final

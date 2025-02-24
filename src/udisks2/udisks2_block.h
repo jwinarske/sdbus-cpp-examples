@@ -15,7 +15,7 @@
 #ifndef SRC_UDISK2_UDISK2_BLOCK_H
 #define SRC_UDISK2_UDISK2_BLOCK_H
 
-#include "../proxy/UDisks2Block_proxy.h"
+#include "../proxy/org/freedesktop/UDisks2/Block/block_proxy.h"
 #include "../utils.h"
 
 class UDisks2Block final

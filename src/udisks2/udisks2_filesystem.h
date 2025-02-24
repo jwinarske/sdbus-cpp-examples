@@ -15,7 +15,7 @@
 #ifndef SRC_UDISK2_UDISK2_FILESYSTEM_H
 #define SRC_UDISK2_UDISK2_FILESYSTEM_H
 
-#include "../proxy/UDisks2Filesystem_proxy.h"
+#include "../proxy/org/freedesktop/UDisks2/Filesystem/filesystem_proxy.h"
 #include "../utils.h"
 
 class UDisks2Filesystem final

@@ -15,7 +15,7 @@
 #ifndef SRC_BLUEZ_DEVICE1_H
 #define SRC_BLUEZ_DEVICE1_H
 
-#include "../proxy/Device1_proxy.h"
+#include "../proxy/org/bluez/Device1/device1_proxy.h"
 
 #include "../utils.h"
 

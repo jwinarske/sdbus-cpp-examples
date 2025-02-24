@@ -20,16 +20,13 @@ BluezClient::BluezClient(sdbus::IConnection& connection)
                       sdbus::ObjectPath("/")),
       connection_(connection) {
   registerProxy();
+  for (const auto& [object, interfacesAndProperties] : GetManagedObjects()) {
+    onInterfacesAdded(object, interfacesAndProperties);
+  }
 }
 
 BluezClient::~BluezClient() {
   unregisterProxy();
-}
-
-void BluezClient::handleExistingObjects() {
-  for (const auto& [object, interfacesAndProperties] : GetManagedObjects()) {
-    onInterfacesAdded(object, interfacesAndProperties);
-  }
 }
 
 void BluezClient::onInterfacesAdded(

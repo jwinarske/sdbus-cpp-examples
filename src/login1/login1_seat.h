@@ -15,7 +15,7 @@
 #ifndef SRC_LOGIN1_LOGIN1_SEAT_H
 #define SRC_LOGIN1_LOGIN1_SEAT_H
 
-#include "../proxy/Login1Seat_proxy.h"
+#include "../proxy/org/freedesktop/login1/Seat/seat_proxy.h"
 #include "../utils.h"
 
 class Login1Seat final

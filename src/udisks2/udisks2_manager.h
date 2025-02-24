@@ -15,7 +15,7 @@
 #ifndef SRC_UDISKS2_UDISKS_MANAGER_H
 #define SRC_UDISKS2_UDISKS_MANAGER_H
 
-#include "../proxy/UDisks2Manager_proxy.h"
+#include "../proxy/org/freedesktop/UDisks2/Manager/manager_proxy.h"
 #include "udisks2_block.h"
 #include "udisks2_drive.h"
 #include "udisks2_filesystem.h"

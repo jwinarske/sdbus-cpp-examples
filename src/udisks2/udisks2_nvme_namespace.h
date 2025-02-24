@@ -15,7 +15,7 @@
 #ifndef SRC_UDISK2_UDISK2_NVME_NAMESPACE_H
 #define SRC_UDISK2_UDISK2_NVME_NAMESPACE_H
 
-#include "../proxy/UDisks2NvmeNamespace_proxy.h"
+#include "../proxy/org/freedesktop/UDisks2/NVMe/Namespace/namespace_proxy.h"
 #include "../utils.h"
 
 class UDisks2NvmeNamespace final

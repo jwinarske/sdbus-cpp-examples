@@ -15,7 +15,7 @@
 #ifndef SRC_AVAHI_AVAHI_SERVER_CLIENT_H
 #define SRC_AVAHI_AVAHI_SERVER_CLIENT_H
 
-#include "../proxy/AvahiServer2_proxy.h"
+#include "../proxy/org/freedesktop/Avahi/Server2/server2_proxy.h"
 
 class AvahiServer2 final
     : public sdbus::ProxyInterfaces<org::freedesktop::Avahi::Server2_proxy> {

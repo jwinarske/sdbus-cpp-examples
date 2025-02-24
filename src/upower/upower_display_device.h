@@ -15,7 +15,7 @@
 #ifndef SRC_UPOWER_UPOWER_DISPLAY_DEVICE_H
 #define SRC_UPOWER_UPOWER_DISPLAY_DEVICE_H
 
-#include "../proxy/UPowerDisplayDevice_proxy.h"
+#include "../proxy/org/freedesktop/UPower/DisplayDevice/display_device_proxy.h"
 
 class UPowerDisplayDevice final
     : public sdbus::ProxyInterfaces<org::freedesktop::UPower::Device_proxy,

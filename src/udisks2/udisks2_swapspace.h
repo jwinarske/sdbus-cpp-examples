@@ -15,7 +15,7 @@
 #ifndef SRC_UDISK2_UDISK2_SWAPSPACE_H
 #define SRC_UDISK2_UDISK2_SWAPSPACE_H
 
-#include "../proxy/UDisks2Swapspace_proxy.h"
+#include "../proxy/org/freedesktop/UDisks2/Swapspace/swapspace_proxy.h"
 #include "../utils.h"
 
 class UDisks2Swapspace final : public sdbus::ProxyInterfaces<

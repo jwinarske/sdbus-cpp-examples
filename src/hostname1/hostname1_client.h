@@ -15,7 +15,7 @@
 #ifndef SRC_LOGIN1_LOGIN1_MANAGER_CLIENT_H
 #define SRC_LOGIN1_LOGIN1_MANAGER_CLIENT_H
 
-#include "../proxy/Hostname1_proxy.h"
+#include "../proxy/org/freedesktop/hostname1/hostname1_proxy.h"
 
 static constexpr auto kServiceName = "org.freedesktop.hostname1";
 static constexpr auto kInterfaceName = "/org/freedesktop/hostname1";

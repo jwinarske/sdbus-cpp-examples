@@ -15,7 +15,7 @@
 #ifndef SRC_LOGIN1_LOGIN1_USER_H
 #define SRC_LOGIN1_LOGIN1_USER_H
 
-#include "../proxy/Login1User_proxy.h"
+#include "../proxy/org/freedesktop/login1/User/user_proxy.h"
 #include "../utils.h"
 
 class Login1User final

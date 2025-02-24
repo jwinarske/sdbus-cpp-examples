@@ -15,7 +15,7 @@
 #ifndef SRC_UDISK2_UDISK2_PARTITION_TABLE_H
 #define SRC_UDISK2_UDISK2_PARTITION_TABLE_H
 
-#include "../proxy/UDisks2PartitionTable_proxy.h"
+#include "../proxy/org/freedesktop/UDisks2/PartitionTable/partition_table_proxy.h"
 #include "../utils.h"
 
 class UDisks2PartitionTable final

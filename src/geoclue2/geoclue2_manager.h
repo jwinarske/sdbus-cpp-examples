@@ -15,7 +15,7 @@
 #ifndef SRC_GEOCLUE2_GEOCLUE2_MANAGER_H
 #define SRC_GEOCLUE2_GEOCLUE2_MANAGER_H
 
-#include "../proxy/GeoClue2Manager_proxy.h"
+#include "../proxy/org/freedesktop/GeoClue2/Manager/manager_proxy.h"
 #include "geoclue2_client.h"
 #include "geoclue2_location.h"
 

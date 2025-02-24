@@ -15,24 +15,25 @@
 #ifndef SRC_UDISK2_UDISK2_MANAGER_NVME_H
 #define SRC_UDISK2_UDISK2_MANAGER_NVME_H
 
-#include "../proxy/UDisks2ManagerNvme_proxy.h"
+#include "../proxy/org/freedesktop/UDisks2/Manager/NVMe/nvme_proxy.h"
 #include "../utils.h"
 
 class UDisks2ManagerNvme final
-    : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,
-                                    org::freedesktop::UDisks2::Manager::NVMe_proxy> {
+    : public sdbus::ProxyInterfaces<
+          sdbus::Properties_proxy,
+          org::freedesktop::UDisks2::Manager::NVMe_proxy> {
  public:
   UDisks2ManagerNvme(sdbus::IConnection& connection,
-             const sdbus::ObjectPath& objectPath)
-      : ProxyInterfaces{connection,
-                        sdbus::ServiceName(kBusName),
-                        objectPath},
+                     const sdbus::ObjectPath& objectPath)
+      : ProxyInterfaces{connection, sdbus::ServiceName(kBusName), objectPath},
         connection_(connection),
         object_path_(objectPath) {
     registerProxy();
-    const auto properties = this->GetAll("org.freedesktop.UDisks2.Manager.NVMe");
+    const auto properties =
+        this->GetAll("org.freedesktop.UDisks2.Manager.NVMe");
     UDisks2ManagerNvme::onPropertiesChanged(
-        sdbus::InterfaceName("org.freedesktop.UDisks2.Manager.NVMe"), properties, {});
+        sdbus::InterfaceName("org.freedesktop.UDisks2.Manager.NVMe"),
+        properties, {});
   }
 
   ~UDisks2ManagerNvme() { unregisterProxy(); }

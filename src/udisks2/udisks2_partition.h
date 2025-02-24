@@ -15,7 +15,7 @@
 #ifndef SRC_UDISK2_UDISK2_PARTITION_H
 #define SRC_UDISK2_UDISK2_PARTITION_H
 
-#include "../proxy/UDisks2Partition_proxy.h"
+#include "../proxy/org/freedesktop/UDisks2/Partition/partition_proxy.h"
 #include "../utils.h"
 
 class UDisks2Partition final : public sdbus::ProxyInterfaces<
