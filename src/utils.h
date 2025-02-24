@@ -129,6 +129,33 @@ struct Utils {
         ss << "\t" << key << ": ";
         append_property(value, ss);
       }
+    } else if (type == "a(sa{sv})") {
+      ss << std::endl;
+      auto v = value.get<std::vector<
+          sdbus::Struct<std::string, std::map<std::string, sdbus::Variant>>>>();
+      for (const auto& tuple : v) {
+        ss << "\t" << std::get<0>(tuple) << ": ";
+        for (const auto& [key, value] : std::get<1>(tuple)) {
+          ss << key << ": ";
+          append_property(value, ss);
+        }
+      }
+    } else if (type == "(qqy)") {
+      ss << std::endl;
+      auto v =
+          value
+              .get<sdbus::Struct<std::uint16_t, std::uint16_t, std::uint8_t>>();
+      ss << "\t" << std::get<0>(v) << ": " << std::get<1>(v) << ": "
+         << std::get<2>(v);
+    } else if (type == "a(qqy)") {
+      ss << std::endl;
+      auto v = value.get<std::vector<
+          sdbus::Struct<std::uint16_t, std::uint16_t, std::uint8_t>>>();
+      for (const auto& tuple : v) {
+        ss << "\t";
+        ss << std::get<0>(tuple) << ": " << std::get<1>(tuple) << ": "
+           << std::get<2>(tuple) << std::endl;
+      }
     } else if (type == "a(ayuay)") {
       ss << std::endl;
       try {

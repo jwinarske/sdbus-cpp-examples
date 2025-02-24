@@ -1,0 +1,18 @@
+<node>
+    <interface name="org.freedesktop.UDisks2.NVMe.Namespace">
+        <method name="FormatNamespace">
+            <arg type="a{sv}" name="options" direction="in"/>
+        </method>
+        <property type="u" name="NSID" access="read"/>
+        <property type="s" name="NGUID" access="read"/>
+        <property type="s" name="EUI64" access="read"/>
+        <property type="s" name="UUID" access="read"/>
+        <property type="s" name="WWN" access="read"/>
+        <property type="a(qqy)" name="LBAFormats" access="read"/>
+        <property type="(qqy)" name="FormattedLBASize" access="read"/>
+        <property type="t" name="NamespaceSize" access="read"/>
+        <property type="t" name="NamespaceCapacity" access="read"/>
+        <property type="t" name="NamespaceUtilization" access="read"/>
+        <property type="i" name="FormatPercentRemaining" access="read"/>
+    </interface>
+</node>

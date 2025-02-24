@@ -109,3 +109,14 @@ target_link_libraries(avahi_server2_client
         sdbus-c++
         spdlog::spdlog
 )
+
+add_executable(udisks2_client
+        src/udisks2/main.cc
+        src/udisks2/udisks2_manager.cc
+        src/udisks2/udisks2_manager.h
+)
+target_link_libraries(udisks2_client
+        PUBLIC
+        sdbus-c++
+        spdlog::spdlog
+)

@@ -15,6 +15,7 @@ The basics
 * resolve1 - resolve a hostname to an IP address
 * timedate1 - get the current time and get runtime updates
 * UPower - get the current battery status and get runtime updates
+* UDisks2 - get all disk info and runtime updates
 
 ## Building
 

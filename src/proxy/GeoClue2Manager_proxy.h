@@ -14,69 +14,68 @@ namespace org {
 namespace freedesktop {
 namespace GeoClue2 {
 
-class Manager_proxy {
- public:
-  static constexpr const char* INTERFACE_NAME =
-      "org.freedesktop.GeoClue2.Manager";
+class Manager_proxy
+{
+public:
+    static constexpr const char* INTERFACE_NAME = "org.freedesktop.GeoClue2.Manager";
 
- protected:
-  Manager_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
+protected:
+    Manager_proxy(sdbus::IProxy& proxy)
+        : m_proxy(proxy)
+    {
+    }
 
-  Manager_proxy(const Manager_proxy&) = delete;
-  Manager_proxy& operator=(const Manager_proxy&) = delete;
-  Manager_proxy(Manager_proxy&&) = delete;
-  Manager_proxy& operator=(Manager_proxy&&) = delete;
+    Manager_proxy(const Manager_proxy&) = delete;
+    Manager_proxy& operator=(const Manager_proxy&) = delete;
+    Manager_proxy(Manager_proxy&&) = delete;
+    Manager_proxy& operator=(Manager_proxy&&) = delete;
 
-  ~Manager_proxy() = default;
+    ~Manager_proxy() = default;
 
-  void registerProxy() {}
+    void registerProxy()
+    {
+    }
 
- public:
-  sdbus::ObjectPath GetClient() {
-    sdbus::ObjectPath result;
-    m_proxy.callMethod("GetClient")
-        .onInterface(INTERFACE_NAME)
-        .storeResultsTo(result);
-    return result;
-  }
+public:
+    sdbus::ObjectPath GetClient()
+    {
+        sdbus::ObjectPath result;
+        m_proxy.callMethod("GetClient").onInterface(INTERFACE_NAME).storeResultsTo(result);
+        return result;
+    }
 
-  sdbus::ObjectPath CreateClient() {
-    sdbus::ObjectPath result;
-    m_proxy.callMethod("CreateClient")
-        .onInterface(INTERFACE_NAME)
-        .storeResultsTo(result);
-    return result;
-  }
+    sdbus::ObjectPath CreateClient()
+    {
+        sdbus::ObjectPath result;
+        m_proxy.callMethod("CreateClient").onInterface(INTERFACE_NAME).storeResultsTo(result);
+        return result;
+    }
 
-  void DeleteClient(const sdbus::ObjectPath& client) {
-    m_proxy.callMethod("DeleteClient")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(client);
-  }
+    void DeleteClient(const sdbus::ObjectPath& client)
+    {
+        m_proxy.callMethod("DeleteClient").onInterface(INTERFACE_NAME).withArguments(client);
+    }
 
-  void AddAgent(const std::string& id) {
-    m_proxy.callMethod("AddAgent")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(id);
-  }
+    void AddAgent(const std::string& id)
+    {
+        m_proxy.callMethod("AddAgent").onInterface(INTERFACE_NAME).withArguments(id);
+    }
 
- public:
-  bool InUse() {
-    return m_proxy.getProperty("InUse").onInterface(INTERFACE_NAME).get<bool>();
-  }
+public:
+    bool InUse()
+    {
+        return m_proxy.getProperty("InUse").onInterface(INTERFACE_NAME).get<bool>();
+    }
 
-  uint32_t AvailableAccuracyLevel() {
-    return m_proxy.getProperty("AvailableAccuracyLevel")
-        .onInterface(INTERFACE_NAME)
-        .get<uint32_t>();
-  }
+    uint32_t AvailableAccuracyLevel()
+    {
+        return m_proxy.getProperty("AvailableAccuracyLevel").onInterface(INTERFACE_NAME).get<uint32_t>();
+    }
 
- private:
-  sdbus::IProxy& m_proxy;
+private:
+    sdbus::IProxy& m_proxy;
 };
 
-}  // namespace GeoClue2
-}  // namespace freedesktop
-}  // namespace org
+}}} // namespaces
 
 #endif

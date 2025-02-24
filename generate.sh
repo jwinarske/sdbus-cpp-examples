@@ -30,3 +30,14 @@ ${XML2CPP} --verbose --proxy=${PROXY}/Resolve1Link_proxy.h interfaces/org.freede
 
 ${XML2CPP} --verbose --proxy=${PROXY}/AvahiServer_proxy.h interfaces/org.freedesktop.Avahi.Server.xml
 ${XML2CPP} --verbose --proxy=${PROXY}/AvahiServer2_proxy.h interfaces/org.freedesktop.Avahi.Server2.xml
+
+${XML2CPP} --verbose --proxy=${PROXY}/UDisks2Block_proxy.h interfaces/org.freedesktop.UDisks2.Block.xml
+${XML2CPP} --verbose --proxy=${PROXY}/UDisks2Drive_proxy.h interfaces/org.freedesktop.UDisks2.Drive.xml
+${XML2CPP} --verbose --proxy=${PROXY}/UDisks2ManagerNvme_proxy.h interfaces/org.freedesktop.UDisks2.Manager.NVMe.xml
+${XML2CPP} --verbose --proxy=${PROXY}/UDisks2Manager_proxy.h interfaces/org.freedesktop.UDisks2.Manager.xml
+${XML2CPP} --verbose --proxy=${PROXY}/UDisks2NvmeController_proxy.h interfaces/org.freedesktop.UDisks2.NVMe.Controller.xml
+${XML2CPP} --verbose --proxy=${PROXY}/UDisks2Swapspace_proxy.h interfaces/org.freedesktop.UDisks2.Swapspace.xml
+${XML2CPP} --verbose --proxy=${PROXY}/UDisks2Filesystem_proxy.h interfaces/org.freedesktop.UDisks2.Filesystem.xml
+${XML2CPP} --verbose --proxy=${PROXY}/UDisks2Partition_proxy.h interfaces/org.freedesktop.UDisks2.Partition.xml
+${XML2CPP} --verbose --proxy=${PROXY}/UDisks2PartitionTable_proxy.h interfaces/org.freedesktop.UDisks2.PartitionTable.xml
+${XML2CPP} --verbose --proxy=${PROXY}/UDisks2NvmeNamespace_proxy.h interfaces/org.freedesktop.UDisks2.NVMe.Namespace.xml

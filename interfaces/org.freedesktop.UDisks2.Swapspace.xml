@@ -1,0 +1,21 @@
+<node>>
+    <interface name="org.freedesktop.UDisks2.Swapspace">
+        <method name="Start">
+            <arg type="a{sv}" name="options" direction="in"/>
+        </method>
+        <method name="Stop">
+            <arg type="a{sv}" name="options" direction="in"/>
+        </method>
+        <method name="SetLabel">
+            <arg type="s" name="label" direction="in"/>
+            <arg type="a{sv}" name="options"
+                 direction="in"/>
+        </method>
+        <method name="SetUUID">>
+            <arg type="s" name="uuid" direction="in"/>
+            <arg type="a{sv}" name="options"
+                 direction="in"/>
+        </method>
+        <property type="b" name="Active" access="read"/>
+    </interface>
+</node>

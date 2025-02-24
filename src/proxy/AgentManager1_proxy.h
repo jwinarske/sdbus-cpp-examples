@@ -13,47 +13,48 @@
 namespace org {
 namespace bluez {
 
-class AgentManager1_proxy {
- public:
-  static constexpr const char* INTERFACE_NAME = "org.bluez.AgentManager1";
+class AgentManager1_proxy
+{
+public:
+    static constexpr const char* INTERFACE_NAME = "org.bluez.AgentManager1";
 
- protected:
-  AgentManager1_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
+protected:
+    AgentManager1_proxy(sdbus::IProxy& proxy)
+        : m_proxy(proxy)
+    {
+    }
 
-  AgentManager1_proxy(const AgentManager1_proxy&) = delete;
-  AgentManager1_proxy& operator=(const AgentManager1_proxy&) = delete;
-  AgentManager1_proxy(AgentManager1_proxy&&) = delete;
-  AgentManager1_proxy& operator=(AgentManager1_proxy&&) = delete;
+    AgentManager1_proxy(const AgentManager1_proxy&) = delete;
+    AgentManager1_proxy& operator=(const AgentManager1_proxy&) = delete;
+    AgentManager1_proxy(AgentManager1_proxy&&) = delete;
+    AgentManager1_proxy& operator=(AgentManager1_proxy&&) = delete;
 
-  ~AgentManager1_proxy() = default;
+    ~AgentManager1_proxy() = default;
 
-  void registerProxy() {}
+    void registerProxy()
+    {
+    }
 
- public:
-  void RegisterAgent(const sdbus::ObjectPath& agent,
-                     const std::string& capability) {
-    m_proxy.callMethod("RegisterAgent")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(agent, capability);
-  }
+public:
+    void RegisterAgent(const sdbus::ObjectPath& agent, const std::string& capability)
+    {
+        m_proxy.callMethod("RegisterAgent").onInterface(INTERFACE_NAME).withArguments(agent, capability);
+    }
 
-  void UnregisterAgent(const sdbus::ObjectPath& agent) {
-    m_proxy.callMethod("UnregisterAgent")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(agent);
-  }
+    void UnregisterAgent(const sdbus::ObjectPath& agent)
+    {
+        m_proxy.callMethod("UnregisterAgent").onInterface(INTERFACE_NAME).withArguments(agent);
+    }
 
-  void RequestDefaultAgent(const sdbus::ObjectPath& agent) {
-    m_proxy.callMethod("RequestDefaultAgent")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(agent);
-  }
+    void RequestDefaultAgent(const sdbus::ObjectPath& agent)
+    {
+        m_proxy.callMethod("RequestDefaultAgent").onInterface(INTERFACE_NAME).withArguments(agent);
+    }
 
- private:
-  sdbus::IProxy& m_proxy;
+private:
+    sdbus::IProxy& m_proxy;
 };
 
-}  // namespace bluez
-}  // namespace org
+}} // namespaces
 
 #endif

@@ -13,234 +13,205 @@
 namespace org {
 namespace freedesktop {
 
-class hostname1_proxy {
- public:
-  static constexpr const char* INTERFACE_NAME = "org.freedesktop.hostname1";
+class hostname1_proxy
+{
+public:
+    static constexpr const char* INTERFACE_NAME = "org.freedesktop.hostname1";
 
- protected:
-  hostname1_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
+protected:
+    hostname1_proxy(sdbus::IProxy& proxy)
+        : m_proxy(proxy)
+    {
+    }
 
-  hostname1_proxy(const hostname1_proxy&) = delete;
-  hostname1_proxy& operator=(const hostname1_proxy&) = delete;
-  hostname1_proxy(hostname1_proxy&&) = delete;
-  hostname1_proxy& operator=(hostname1_proxy&&) = delete;
+    hostname1_proxy(const hostname1_proxy&) = delete;
+    hostname1_proxy& operator=(const hostname1_proxy&) = delete;
+    hostname1_proxy(hostname1_proxy&&) = delete;
+    hostname1_proxy& operator=(hostname1_proxy&&) = delete;
 
-  ~hostname1_proxy() = default;
+    ~hostname1_proxy() = default;
 
-  void registerProxy() {}
+    void registerProxy()
+    {
+    }
 
- public:
-  void SetHostname(const std::string& hostname, const bool& interactive) {
-    m_proxy.callMethod("SetHostname")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(hostname, interactive);
-  }
+public:
+    void SetHostname(const std::string& hostname, const bool& interactive)
+    {
+        m_proxy.callMethod("SetHostname").onInterface(INTERFACE_NAME).withArguments(hostname, interactive);
+    }
 
-  void SetStaticHostname(const std::string& hostname, const bool& interactive) {
-    m_proxy.callMethod("SetStaticHostname")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(hostname, interactive);
-  }
+    void SetStaticHostname(const std::string& hostname, const bool& interactive)
+    {
+        m_proxy.callMethod("SetStaticHostname").onInterface(INTERFACE_NAME).withArguments(hostname, interactive);
+    }
 
-  void SetPrettyHostname(const std::string& hostname, const bool& interactive) {
-    m_proxy.callMethod("SetPrettyHostname")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(hostname, interactive);
-  }
+    void SetPrettyHostname(const std::string& hostname, const bool& interactive)
+    {
+        m_proxy.callMethod("SetPrettyHostname").onInterface(INTERFACE_NAME).withArguments(hostname, interactive);
+    }
 
-  void SetIconName(const std::string& icon, const bool& interactive) {
-    m_proxy.callMethod("SetIconName")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(icon, interactive);
-  }
+    void SetIconName(const std::string& icon, const bool& interactive)
+    {
+        m_proxy.callMethod("SetIconName").onInterface(INTERFACE_NAME).withArguments(icon, interactive);
+    }
 
-  void SetChassis(const std::string& chassis, const bool& interactive) {
-    m_proxy.callMethod("SetChassis")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(chassis, interactive);
-  }
+    void SetChassis(const std::string& chassis, const bool& interactive)
+    {
+        m_proxy.callMethod("SetChassis").onInterface(INTERFACE_NAME).withArguments(chassis, interactive);
+    }
 
-  void SetDeployment(const std::string& deployment, const bool& interactive) {
-    m_proxy.callMethod("SetDeployment")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(deployment, interactive);
-  }
+    void SetDeployment(const std::string& deployment, const bool& interactive)
+    {
+        m_proxy.callMethod("SetDeployment").onInterface(INTERFACE_NAME).withArguments(deployment, interactive);
+    }
 
-  void SetLocation(const std::string& location, const bool& interactive) {
-    m_proxy.callMethod("SetLocation")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(location, interactive);
-  }
+    void SetLocation(const std::string& location, const bool& interactive)
+    {
+        m_proxy.callMethod("SetLocation").onInterface(INTERFACE_NAME).withArguments(location, interactive);
+    }
 
-  std::vector<uint8_t> GetProductUUID(const bool& interactive) {
-    std::vector<uint8_t> result;
-    m_proxy.callMethod("GetProductUUID")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(interactive)
-        .storeResultsTo(result);
-    return result;
-  }
+    std::vector<uint8_t> GetProductUUID(const bool& interactive)
+    {
+        std::vector<uint8_t> result;
+        m_proxy.callMethod("GetProductUUID").onInterface(INTERFACE_NAME).withArguments(interactive).storeResultsTo(result);
+        return result;
+    }
 
-  std::string GetHardwareSerial() {
-    std::string result;
-    m_proxy.callMethod("GetHardwareSerial")
-        .onInterface(INTERFACE_NAME)
-        .storeResultsTo(result);
-    return result;
-  }
+    std::string GetHardwareSerial()
+    {
+        std::string result;
+        m_proxy.callMethod("GetHardwareSerial").onInterface(INTERFACE_NAME).storeResultsTo(result);
+        return result;
+    }
 
-  std::string Describe() {
-    std::string result;
-    m_proxy.callMethod("Describe")
-        .onInterface(INTERFACE_NAME)
-        .storeResultsTo(result);
-    return result;
-  }
+    std::string Describe()
+    {
+        std::string result;
+        m_proxy.callMethod("Describe").onInterface(INTERFACE_NAME).storeResultsTo(result);
+        return result;
+    }
 
- public:
-  std::string Hostname() {
-    return m_proxy.getProperty("Hostname")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+public:
+    std::string Hostname()
+    {
+        return m_proxy.getProperty("Hostname").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::string StaticHostname() {
-    return m_proxy.getProperty("StaticHostname")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string StaticHostname()
+    {
+        return m_proxy.getProperty("StaticHostname").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::string PrettyHostname() {
-    return m_proxy.getProperty("PrettyHostname")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string PrettyHostname()
+    {
+        return m_proxy.getProperty("PrettyHostname").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::string DefaultHostname() {
-    return m_proxy.getProperty("DefaultHostname")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string DefaultHostname()
+    {
+        return m_proxy.getProperty("DefaultHostname").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::string HostnameSource() {
-    return m_proxy.getProperty("HostnameSource")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string HostnameSource()
+    {
+        return m_proxy.getProperty("HostnameSource").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::string IconName() {
-    return m_proxy.getProperty("IconName")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string IconName()
+    {
+        return m_proxy.getProperty("IconName").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::string Chassis() {
-    return m_proxy.getProperty("Chassis")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string Chassis()
+    {
+        return m_proxy.getProperty("Chassis").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::string Deployment() {
-    return m_proxy.getProperty("Deployment")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string Deployment()
+    {
+        return m_proxy.getProperty("Deployment").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::string Location() {
-    return m_proxy.getProperty("Location")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string Location()
+    {
+        return m_proxy.getProperty("Location").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::string KernelName() {
-    return m_proxy.getProperty("KernelName")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string KernelName()
+    {
+        return m_proxy.getProperty("KernelName").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::string KernelRelease() {
-    return m_proxy.getProperty("KernelRelease")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string KernelRelease()
+    {
+        return m_proxy.getProperty("KernelRelease").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::string KernelVersion() {
-    return m_proxy.getProperty("KernelVersion")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string KernelVersion()
+    {
+        return m_proxy.getProperty("KernelVersion").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::string OperatingSystemPrettyName() {
-    return m_proxy.getProperty("OperatingSystemPrettyName")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string OperatingSystemPrettyName()
+    {
+        return m_proxy.getProperty("OperatingSystemPrettyName").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::string OperatingSystemCPEName() {
-    return m_proxy.getProperty("OperatingSystemCPEName")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string OperatingSystemCPEName()
+    {
+        return m_proxy.getProperty("OperatingSystemCPEName").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  uint64_t OperatingSystemSupportEnd() {
-    return m_proxy.getProperty("OperatingSystemSupportEnd")
-        .onInterface(INTERFACE_NAME)
-        .get<uint64_t>();
-  }
+    uint64_t OperatingSystemSupportEnd()
+    {
+        return m_proxy.getProperty("OperatingSystemSupportEnd").onInterface(INTERFACE_NAME).get<uint64_t>();
+    }
 
-  std::string HomeURL() {
-    return m_proxy.getProperty("HomeURL")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string HomeURL()
+    {
+        return m_proxy.getProperty("HomeURL").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::string HardwareVendor() {
-    return m_proxy.getProperty("HardwareVendor")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string HardwareVendor()
+    {
+        return m_proxy.getProperty("HardwareVendor").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::string HardwareModel() {
-    return m_proxy.getProperty("HardwareModel")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string HardwareModel()
+    {
+        return m_proxy.getProperty("HardwareModel").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::string FirmwareVersion() {
-    return m_proxy.getProperty("FirmwareVersion")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string FirmwareVersion()
+    {
+        return m_proxy.getProperty("FirmwareVersion").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::string FirmwareVendor() {
-    return m_proxy.getProperty("FirmwareVendor")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string FirmwareVendor()
+    {
+        return m_proxy.getProperty("FirmwareVendor").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  uint64_t FirmwareDate() {
-    return m_proxy.getProperty("FirmwareDate")
-        .onInterface(INTERFACE_NAME)
-        .get<uint64_t>();
-  }
+    uint64_t FirmwareDate()
+    {
+        return m_proxy.getProperty("FirmwareDate").onInterface(INTERFACE_NAME).get<uint64_t>();
+    }
 
-  std::vector<uint8_t> MachineID() {
-    return m_proxy.getProperty("MachineID")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<uint8_t>>();
-  }
+    std::vector<uint8_t> MachineID()
+    {
+        return m_proxy.getProperty("MachineID").onInterface(INTERFACE_NAME).get<std::vector<uint8_t>>();
+    }
 
-  std::vector<uint8_t> BootID() {
-    return m_proxy.getProperty("BootID")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<uint8_t>>();
-  }
+    std::vector<uint8_t> BootID()
+    {
+        return m_proxy.getProperty("BootID").onInterface(INTERFACE_NAME).get<std::vector<uint8_t>>();
+    }
 
- private:
-  sdbus::IProxy& m_proxy;
+private:
+    sdbus::IProxy& m_proxy;
 };
 
-}  // namespace freedesktop
-}  // namespace org
+}} // namespaces
 
 #endif

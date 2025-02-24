@@ -1,0 +1,36 @@
+<node>
+    <interface name="org.freedesktop.UDisks2.NVMe.Controller">
+        <method name="SmartUpdate">
+            <arg type="a{sv}" name="options" direction="in"/>
+        </method>
+        <method name="SmartGetAttributes">
+            <arg type="a{sv}" name="options" direction="in"/>
+            <arg type="a{sv}" name="attributes" direction="out"/>
+        </method>
+        <method name="SmartSelftestStart">
+            <arg type="s" name="type" direction="in"/>
+            <arg type="a{sv}" name="options" direction="in"/>
+        </method>
+        <method name="SmartSelftestAbort">
+            <arg type="a{sv}" name="options" direction="in"/>
+        </method>
+        <method name="SanitizeStart">
+            <arg type="s" name="action" direction="in"/>
+            <arg type="a{sv}" name="options" direction="in"/>
+        </method>
+        <property type="s" name="State" access="read"/>
+        <property type="q" name="ControllerID" access="read"/>
+        <property type="ay" name="SubsystemNQN" access="read"/>
+        <property type="s" name="FGUID" access="read"/>
+        <property type="s" name="NVMeRevision" access="read"/>
+        <property type="t" name="UnallocatedCapacity" access="read"/>
+        <property type="t" name="SmartUpdated" access="read"/>
+        <property type="as" name="SmartCriticalWarning" access="read"/>
+        <property type="t" name="SmartPowerOnHours" access="read"/>
+        <property type="q" name="SmartTemperature" access="read"/>
+        <property type="s" name="SmartSelftestStatus" access="read"/>
+        <property type="i" name="SmartSelftestPercentRemaining" access="read"/>
+        <property type="s" name="SanitizeStatus" access="read"/>
+        <property type="i" name="SanitizePercentRemaining" access="read"/>
+    </interface>
+</node>
