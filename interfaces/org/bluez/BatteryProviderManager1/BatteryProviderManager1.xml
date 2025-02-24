@@ -1,0 +1,10 @@
+<node>
+    <interface name="org.bluez.BatteryProviderManager1">
+        <method name="RegisterBatteryProvider">
+            <arg name="provider" type="o" direction="in"/>
+        </method>
+        <method name="UnregisterBatteryProvider">
+            <arg name="provider" type="o" direction="in"/>
+        </method>
+    </interface>
+</node>
