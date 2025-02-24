@@ -48,6 +48,6 @@ Install d-spy, run as root
 
     sudo d-spy
 
-Select Bus Names `v` `Connecto to Other Bus` using:
+Select Bus Names `v` `Connect to Other Bus` adding
 
     unix:path=/root/dbus_on_local
