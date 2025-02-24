@@ -31,9 +31,23 @@ The basics
 
 ## Updating proxy files
 
-Build project once for artifact `sdbus-c++-xml2cpp`.
+Build this project once for artifact `sdbus-c++-xml2cpp`.
 
     ./generate.sh
 
-If you re-generate interfaces with different version of sdbus-cpp, likely you will need to make source code changes.
+If you re-generate interfaces with a different version of sdbus-cpp, likely you will need to make source code changes.
 This is the primary reason for using sdbus-cpp as a submodule.
+
+## Connecting to the system bus of a remote target
+
+Share unix socket of remote device
+
+    ssh -nNT -L /root/dbus_on_local:/run/dbus/system_bus_socket root@raspberrypi5.lan
+
+Install d-spy, run as root
+
+    sudo d-spy
+
+Select Bus Names `v` `Connecto to Other Bus` using:
+
+    unix:path=/root/dbus_on_local
