@@ -1,0 +1,22 @@
+<node>
+    <interface name="org.ofono.HandsfreeAudioManager">
+        <method name="GetCards">
+            <arg name="cards" type="a{oa{sv}}" direction="out"/>
+        </method>
+        <method name="Register">
+            <arg name="path" type="o" direction="in"/>
+            <arg name="codecs" type="ay" direction="in"/>
+        </method>
+        <method name="Unregister">
+            <arg name="path" type="o" direction="in"/>
+        </method>
+        <signal name="CardAdded">
+            <arg name="path" type="o"/>
+            <arg name="properties" type="a{sv}"/>
+        </signal>
+        <signal name="CardRemoved">
+            <arg name="path" type="o"/>
+        </signal>
+    </interface>
+    <node name="bluetooth"/>
+</node>

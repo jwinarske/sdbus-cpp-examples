@@ -1,0 +1,14 @@
+<node>
+    <interface name="org.ofono.Manager">
+        <method name="GetModems">
+            <arg name="modems" type="a(oa{sv})" direction="out"/>
+        </method>
+        <signal name="ModemAdded">
+            <arg name="path" type="o"/>
+            <arg name="properties" type="a{sv}"/>
+        </signal>
+        <signal name="ModemRemoved">
+            <arg name="path" type="o"/>
+        </signal>
+    </interface>
+</node>

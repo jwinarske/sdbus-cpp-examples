@@ -1,0 +1,14 @@
+<node>
+    <interface name="org.bluez.Profile1">
+        <method name="NewConnection">
+            <arg name="device" type="o" direction="in"/>
+            <arg name="fd" type="h" direction="in"/>
+            <arg name="fd_properties" type="a{sv}" direction="in"/>
+        </method>
+        <method name="Release"></method>
+        <method name="Cancel"></method>
+        <method name="RequestDisconnection">
+            <arg name="device" type="o" direction="in"/>
+        </method>
+    </interface>
+</node>

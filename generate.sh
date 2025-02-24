@@ -3,7 +3,7 @@
 PROXY=src/proxy
 XML2CPP=$(find -iname sdbus-c++-xml2cpp)
 
-mkdir -p ${PROXY}/org/bluez/{Adapter1,AgentManager,BatteryProviderManager1,Device1,GattManager1,LEAdvertisingManager1,Media1,NetworkServer1} |true
+mkdir -p ${PROXY}/org/bluez/{Adapter1,AgentManager,BatteryProviderManager1,Device1,GattManager1,LEAdvertisingManager1,Media1,NetworkServer1,Profile1} |true
 
 ${XML2CPP} --verbose --proxy=${PROXY}/org/bluez/Adapter1/adapter1_proxy.h interfaces/org/bluez/Adapter1/Adapter1.xml
 ${XML2CPP} --verbose --proxy=${PROXY}/org/bluez/AgentManager/agent_manager1_proxy.h interfaces/org/bluez/AgentManager1/AgentManager1.xml
@@ -13,6 +13,7 @@ ${XML2CPP} --verbose --proxy=${PROXY}/org/bluez/GattManager1/gatt_manager1_proxy
 ${XML2CPP} --verbose --proxy=${PROXY}/org/bluez/LEAdvertisingManager1/le_advertising_manager1_proxy.h interfaces/org/bluez/LEAdvertisingManager1/LEAdvertisingManager1.xml
 ${XML2CPP} --verbose --proxy=${PROXY}/org/bluez/Media1/media1_proxy.h interfaces/org/bluez/Media1/Media1.xml
 ${XML2CPP} --verbose --proxy=${PROXY}/org/bluez/NetworkServer1/network_server1_proxy.h interfaces/org/bluez/NetworkServer1/NetworkServer1.xml
+${XML2CPP} --verbose --proxy=${PROXY}/org/bluez/Profile1/profile1_proxy.h interfaces/org/bluez/Profile1/Profile1.xml
 
 mkdir -p ${PROXY}/org/freedesktop/UPower/DisplayDevice |true
 
@@ -104,3 +105,9 @@ ${XML2CPP} --verbose --proxy=${PROXY}/net/connman/Clock/clock_proxy.h interfaces
 ${XML2CPP} --verbose --proxy=${PROXY}/net/connman/Manager/manager_proxy.h interfaces/net/connman/Manager/Manager.xml
 ${XML2CPP} --verbose --proxy=${PROXY}/net/connman/Service/service_proxy.h interfaces/net/connman/Service/Service.xml
 ${XML2CPP} --verbose --proxy=${PROXY}/net/connman/Technology/technology_proxy.h interfaces/net/connman/Technology/Technology.xml
+
+
+mkdir -p ${PROXY}/org/ofono/{HandsfreeAudioManager,Manager} |true
+
+${XML2CPP} --verbose --proxy=${PROXY}/org/ofono/HandsfreeAudioManager/handsfree_audio_manager_proxy.h interfaces/org/ofono/HandsfreeAudioManager/HandsfreeAudioManager.xml
+${XML2CPP} --verbose --proxy=${PROXY}/org/ofono/Manager/manager_proxy.h interfaces/org/ofono/Manager/Manager.xml
