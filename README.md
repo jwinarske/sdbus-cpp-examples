@@ -2,6 +2,9 @@
 
 Examples using the sdbus-cpp library to communicate with the system bus.
 
+This approach uses XML interface files to create proxy classes. All members, signals, and properties are available. No
+introspection is used at runtime.
+
 ## Examples
 
 The basics
@@ -12,6 +15,7 @@ The basics
 * hostname1 - get the current hostname and get runtime updates
 * locale1 - get the current locale and get runtime updates
 * login1 - access the login1 interface and get runtime updates
+* NetworkManager - access objects and properties
 * resolve1 - resolve a hostname to an IP address
 * timedate1 - get the current time and get runtime updates
 * UPower - get the current battery status and get runtime updates
@@ -24,3 +28,12 @@ The basics
     mkdir build && cd build
     cmake .. -GNinja
     ninja
+
+## Updating proxy files
+
+Build project once for artifact `sdbus-c++-xml2cpp`.
+
+    ./generate.sh
+
+If you re-generate interfaces with different version of sdbus-cpp, likely you will need to make source code changes.
+This is the primary reason for using sdbus-cpp as a submodule.
