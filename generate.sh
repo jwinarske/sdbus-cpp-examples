@@ -50,6 +50,10 @@ mkdir -p ${PROXY}/org/freedesktop/resolve1/{Manager,Link} |true
 ${XML2CPP} --verbose --proxy=${PROXY}/org/freedesktop/resolve1/Manager/manager_proxy.h interfaces/org/freedesktop/resolve1/Manager/Manager.xml
 ${XML2CPP} --verbose --proxy=${PROXY}/org/freedesktop/resolve1/Manager/link_proxy.h interfaces/org/freedesktop/resolve1/Link/Link.xml
 
+mkdir -p ${PROXY}/org/freedesktop/fwupd |true
+
+${XML2CPP} --verbose --proxy=${PROXY}/org/freedesktop/fwupd/fwupd_proxy.h interfaces/org/freedesktop/fwupd/fwupd.xml
+
 mkdir -p ${PROXY}/org/freedesktop/Avahi/{Server,Server2} |true
 
 ${XML2CPP} --verbose --proxy=${PROXY}/org/freedesktop/Avahi/Server/server_proxy.h interfaces/org/freedesktop/Avahi/Server/Server.xml

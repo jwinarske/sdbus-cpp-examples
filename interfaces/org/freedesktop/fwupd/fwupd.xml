@@ -1,0 +1,160 @@
+<node>
+    <interface name="org.freedesktop.fwupd">
+        <method name="GetDevices">
+            <arg type="aa{sv}" name="devices" direction="out"></arg>
+        </method>
+        <method name="GetPlugins">
+            <arg type="aa{sv}" name="plugins" direction="out"></arg>
+        </method>
+        <method name="GetReleases">
+            <arg type="s" name="device_id" direction="in"></arg>
+            <arg type="aa{sv}" name="releases" direction="out"></arg>
+        </method>
+        <method name="GetDowngrades">
+            <arg type="s" name="device_id" direction="in"></arg>
+            <arg type="aa{sv}" name="releases" direction="out"></arg>
+        </method>
+        <method name="GetUpgrades">
+            <arg type="s" name="device_id" direction="in"></arg>
+            <arg type="aa{sv}" name="releases" direction="out"></arg>
+        </method>
+        <method name="GetDetails">
+            <arg type="h" name="handle" direction="in"></arg>
+            <arg type="aa{sv}" name="results" direction="out"></arg>
+        </method>
+        <method name="GetHistory">
+            <arg type="aa{sv}" name="devices" direction="out"></arg>
+        </method>
+        <method name="GetHostSecurityAttrs">
+            <arg type="aa{sv}" name="attrs" direction="out"></arg>
+        </method>
+        <method name="GetHostSecurityEvents">
+            <arg type="u" name="limit" direction="in"></arg>
+            <arg type="aa{sv}" name="attrs" direction="out"></arg>
+        </method>
+        <method name="GetReportMetadata">
+            <arg type="a{ss}" name="attrs" direction="out"></arg>
+        </method>
+        <method name="SetHints">
+            <arg type="a{ss}" name="hints" direction="in"></arg>
+        </method>
+        <method name="Install">
+            <arg type="s" name="id" direction="in"></arg>
+            <arg type="h" name="handle" direction="in"></arg>
+            <arg type="a{sv}" name="options" direction="in"></arg>
+        </method>
+        <method name="Verify">
+            <arg type="s" name="id" direction="in"></arg>
+        </method>
+        <method name="VerifyUpdate">
+            <arg type="s" name="id" direction="in"></arg>
+        </method>
+        <method name="Unlock">
+            <arg type="s" name="id" direction="in"></arg>
+        </method>
+        <method name="Activate">
+            <arg type="s" name="id" direction="in"></arg>
+        </method>
+        <method name="GetResults">
+            <arg type="s" name="id" direction="in"></arg>
+            <arg type="a{sv}" name="results" direction="out"></arg>
+        </method>
+        <method name="GetRemotes">
+            <arg type="aa{sv}" name="results" direction="out"></arg>
+        </method>
+        <method name="GetApprovedFirmware">
+            <arg type="as" name="checksums" direction="out"></arg>
+        </method>
+        <method name="SetApprovedFirmware">
+            <arg type="as" name="checksums" direction="in"></arg>
+        </method>
+        <method name="GetBlockedFirmware">
+            <arg type="as" name="checksums" direction="out"></arg>
+        </method>
+        <method name="SetBlockedFirmware">
+            <arg type="as" name="checksums" direction="in"></arg>
+        </method>
+        <method name="SetFeatureFlags">
+            <arg type="t" name="feature_flags" direction="in"></arg>
+        </method>
+        <method name="ClearResults">
+            <arg type="s" name="id" direction="in"></arg>
+        </method>
+        <method name="ModifyDevice">
+            <arg type="s" name="device_id" direction="in"></arg>
+            <arg type="s" name="key" direction="in"></arg>
+            <arg type="s" name="value" direction="in"></arg>
+        </method>
+        <method name="ModifyConfig">
+            <arg type="s" name="key" direction="in"></arg>
+            <arg type="s" name="value" direction="in"></arg>
+        </method>
+        <method name="UpdateMetadata">
+            <arg type="s" name="remote_id" direction="in"></arg>
+            <arg type="h" name="data" direction="in"></arg>
+            <arg type="h" name="signature" direction="in"></arg>
+        </method>
+        <method name="ModifyRemote">
+            <arg type="s" name="remote_id" direction="in"></arg>
+            <arg type="s" name="key" direction="in"></arg>
+            <arg type="s" name="value" direction="in"></arg>
+        </method>
+        <method name="FixHostSecurityAttr">
+            <arg type="s" name="appstream_id" direction="in"></arg>
+        </method>
+        <method name="UndoHostSecurityAttr">
+            <arg type="s" name="appstream_id" direction="in"></arg>
+        </method>
+        <method name="SelfSign">
+            <arg type="s" name="data" direction="in"></arg>
+            <arg type="a{sv}" name="options" direction="in"></arg>
+            <arg type="s" name="sig" direction="out"></arg>
+        </method>
+        <method name="SetBiosSettings">
+            <arg type="a{ss}" name="settings" direction="in"></arg>
+        </method>
+        <method name="GetBiosSettings">
+            <arg type="aa{sv}" name="attrs" direction="out"></arg>
+        </method>
+        <method name="Inhibit">
+            <arg type="s" name="reason" direction="in"></arg>
+            <arg type="s" name="inhibit_id" direction="out"></arg>
+        </method>
+        <method name="Uninhibit">
+            <arg type="s" name="inhibit_id" direction="in"></arg>
+        </method>
+        <method name="Quit"></method>
+        <method name="EmulationLoad">
+            <arg type="ay" name="data" direction="in"></arg>
+        </method>
+        <method name="EmulationSave">
+            <arg type="ay" name="data" direction="out"></arg>
+        </method>
+        <signal name="Changed"></signal>
+        <signal name="DeviceAdded">
+            <arg type="a{sv}" name="device"></arg>
+        </signal>
+        <signal name="DeviceRemoved">
+            <arg type="a{sv}" name="device"></arg>
+        </signal>
+        <signal name="DeviceChanged">
+            <arg type="a{sv}" name="device"></arg>
+        </signal>
+        <signal name="DeviceRequest">
+            <arg type="a{sv}" name="request"></arg>
+        </signal>
+        <property type="s" name="DaemonVersion" access="read"></property>
+        <property type="s" name="HostBkc" access="read"></property>
+        <property type="s" name="HostVendor" access="read"></property>
+        <property type="s" name="HostProduct" access="read"></property>
+        <property type="s" name="HostMachineId" access="read"></property>
+        <property type="s" name="HostSecurityId" access="read"></property>
+        <property type="b" name="Tainted" access="read"></property>
+        <property type="b" name="Interactive" access="read"></property>
+        <property type="u" name="Status" access="read"></property>
+        <property type="u" name="Percentage" access="read"></property>
+        <property type="u" name="BatteryLevel" access="read"></property>
+        <property type="u" name="BatteryThreshold" access="read"></property>
+        <property type="b" name="OnlyTrusted" access="read"></property>
+    </interface>
+</node>
