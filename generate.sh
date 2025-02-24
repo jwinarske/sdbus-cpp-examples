@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PROXY=src/proxy
-XML2CPP=./cmake-build-debug/third_party/sdbus-cpp/tools/sdbus-c++-xml2cpp
+XML2CPP=$(find -iname sdbus-c++-xml2cpp)
 
 mkdir -p ${PROXY} |true
 
