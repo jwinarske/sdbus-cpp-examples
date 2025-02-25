@@ -42,7 +42,7 @@ This is the primary reason for using sdbus-cpp as a submodule.
 
 Share unix socket of remote device
 
-    ssh -nNT -L /root/dbus_on_local:/run/dbus/system_bus_socket root@raspberrypi5.lan
+    sudo ssh -nNT -L /root/dbus_on_local:/run/dbus/system_bus_socket root@raspberrypi5.lan
 
 Install d-spy, run as root
 
