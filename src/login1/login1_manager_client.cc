@@ -19,10 +19,10 @@
 #include "../utils.h"
 
 Login1ManagerClient::Login1ManagerClient(sdbus::IConnection& connection)
-    : ProxyInterfaces{connection, sdbus::ServiceName(kServiceName),
-                      sdbus::ObjectPath(kInterfaceName)},
+    : ProxyInterfaces{connection, sdbus::ServiceName(kBusName),
+                      sdbus::ObjectPath(kObjectPath)},
       connection_(connection),
-      object_path_(sdbus::ObjectPath(kInterfaceName)) {
+      object_path_(sdbus::ObjectPath(kObjectPath)) {
   const auto properties = this->GetAll("org.freedesktop.login1.Manager");
   Login1ManagerClient::onPropertiesChanged(
       sdbus::InterfaceName("org.freedesktop.login1.Manager"), properties, {});

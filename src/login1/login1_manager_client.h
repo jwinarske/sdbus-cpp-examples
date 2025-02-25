@@ -21,9 +21,6 @@
 #include "login1_session.h"
 #include "login1_user.h"
 
-static constexpr auto kServiceName = "org.freedesktop.login1";
-static constexpr auto kInterfaceName = "/org/freedesktop/login1";
-
 class Login1ManagerClient final
     : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,
                                     org::freedesktop::login1::Manager_proxy> {
@@ -33,6 +30,9 @@ class Login1ManagerClient final
   virtual ~Login1ManagerClient();
 
  private:
+  static constexpr auto kBusName = "org.freedesktop.login1";
+  static constexpr auto kObjectPath = "/org/freedesktop/login1";
+
   sdbus::IConnection& connection_;
   sdbus::ObjectPath object_path_;
 
