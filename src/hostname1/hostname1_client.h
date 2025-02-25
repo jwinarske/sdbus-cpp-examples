@@ -17,20 +17,54 @@
 
 #include "../proxy/org/freedesktop/hostname1/hostname1_proxy.h"
 
-static constexpr auto kServiceName = "org.freedesktop.hostname1";
-static constexpr auto kInterfaceName = "/org/freedesktop/hostname1";
+#include <chrono>
 
 class Hostname1Client final
     : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,
                                     org::freedesktop::hostname1_proxy> {
  public:
+  static constexpr auto INTERFACE_NAME = "org.freedesktop.hostname1";
+  static constexpr auto OBJECT_PATH = "/org/freedesktop/hostname1";
+
   explicit Hostname1Client(sdbus::IConnection& connection);
 
   ~Hostname1Client();
 
+  void updateHostname1(
+      const std::map<sdbus::PropertyName, sdbus::Variant>& changedProperties);
+
+  void printHostname1() const;
+
+  struct hostname1 {
+    std::string Hostname;
+    std::string StaticHostname;
+    std::string PrettyHostname;
+    std::string DefaultHostname;
+    std::string HostnameSource;
+    std::string IconName;
+    std::string Chassis;
+    std::string Deployment;
+    std::string Location;
+    std::string KernelName;
+    std::string KernelRelease;
+    std::string KernelVersion;
+    std::string OperatingSystemPrettyName;
+    std::string OperatingSystemCPEName;
+    std::optional<uint64_t> OperatingSystemSupportEnd;
+    std::string HomeURL;
+    std::string HardwareVendor;
+    std::string HardwareModel;
+    std::string FirmwareVersion;
+    std::string FirmwareVendor;
+    std::optional<uint64_t> FirmwareDate;
+    std::optional<std::vector<uint8_t>> MachineID;
+    std::optional<std::vector<uint8_t>> BootID;
+  };
+
+  [[nodiscard]] const hostname1& getHostname1() const { return hostname1_; }
+
  private:
-  sdbus::IConnection& connection_;
-  sdbus::ObjectPath object_path_;
+  hostname1 hostname1_{};
 
   void onPropertiesChanged(
       const sdbus::InterfaceName& interfaceName,

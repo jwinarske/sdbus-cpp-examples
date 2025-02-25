@@ -20,8 +20,24 @@ int main() {
 
   Hostname1Client client(*connection);
 
-  using namespace std::chrono_literals;
-  std::this_thread::sleep_for(120000ms);
+  std::promise<std::map<sdbus::PropertyName, sdbus::Variant>> promise;
+  auto future = promise.get_future();
+
+  client.GetAllAsync(
+      Hostname1Client::INTERFACE_NAME,
+      [&](std::optional<sdbus::Error> error,
+          std::map<sdbus::PropertyName, sdbus::Variant> values) {
+        if (!error)
+          promise.set_value(std::move(values));
+        else
+          promise.set_exception(std::make_exception_ptr(*std::move(error)));
+      });
+
+  const auto properties = future.get();
+  client.updateHostname1(properties);
+
+  client.printHostname1();
+
   connection->leaveEventLoop();
 
   return 0;

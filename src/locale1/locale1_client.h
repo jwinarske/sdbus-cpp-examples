@@ -17,20 +17,36 @@
 
 #include "../proxy/org/freedesktop/locale1/locale1_proxy.h"
 
-static constexpr auto kServiceName = "org.freedesktop.locale1";
-static constexpr auto kInterfaceName = "/org/freedesktop/locale1";
-
 class Locale1Client final
     : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,
                                     org::freedesktop::locale1_proxy> {
  public:
+  static constexpr auto INTERFACE_NAME = "org.freedesktop.locale1";
+  static constexpr auto OBJECT_PATH = "/org/freedesktop/locale1";
+
   explicit Locale1Client(sdbus::IConnection& connection);
 
   ~Locale1Client();
 
+  void updateLocale1(
+      const std::map<sdbus::PropertyName, sdbus::Variant>& changedProperties);
+
+  void printLocale1() const;
+
+  struct locale1 {
+    std::vector<std::string> Locale;
+    std::string X11Layout;
+    std::string X11Model;
+    std::string X11Variant;
+    std::string X11Options;
+    std::string VConsoleKeymap;
+    std::string VConsoleKeymapToggle;
+  };
+
+  [[nodiscard]] const locale1& getLocale1() const { return locale1_; }
+
  private:
-  sdbus::IConnection& connection_;
-  sdbus::ObjectPath object_path_;
+  locale1 locale1_{};
 
   void onPropertiesChanged(
       const sdbus::InterfaceName& interfaceName,

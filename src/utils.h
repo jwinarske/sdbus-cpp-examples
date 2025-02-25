@@ -336,6 +336,21 @@ struct Utils {
       append_property(value, ss);
     }
   }
+
+  static void print_changed_properties(
+      const sdbus::InterfaceName& interfaceName,
+      const std::map<sdbus::PropertyName, sdbus::Variant>& changedProperties,
+      const std::vector<sdbus::PropertyName>& invalidatedProperties) {
+    std::stringstream ss;
+    ss << std::endl;
+    ss << "[" << interfaceName << "] Properties changed" << std::endl;
+    append_properties(changedProperties, ss);
+    for (const auto& name : invalidatedProperties) {
+      ss << "[" << interfaceName << "] Invalidated property: " << name
+         << std::endl;
+    }
+    spdlog::info("{}", ss.str());
+  }
 };
 
 #endif  // SRC_UTILS_H

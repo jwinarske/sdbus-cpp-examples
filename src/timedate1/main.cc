@@ -14,14 +14,41 @@
 
 #include "timedate1_client.h"
 
+#include "../utils.h"
+
 int main() {
   const auto connection = sdbus::createSystemBusConnection();
   connection->enterEventLoopAsync();
 
   Timedate1Client client(*connection);
 
-  using namespace std::chrono_literals;
-  std::this_thread::sleep_for(120000ms);
+  std::future<std::map<sdbus::PropertyName, sdbus::Variant>> futures[4];
+  std::promise<std::map<sdbus::PropertyName, sdbus::Variant>> promises[4];
+
+  for (int i = 0; i < 4; ++i) {
+    futures[i] = promises[i].get_future();
+    client.GetAllAsync(
+        Timedate1Client::INTERFACE_NAME,
+        [&, i](std::optional<sdbus::Error> error,
+               std::map<sdbus::PropertyName, sdbus::Variant> values) {
+          if (!error)
+            promises[i].set_value(std::move(values));
+          else
+            promises[i].set_exception(
+                std::make_exception_ptr(std::move(*error)));
+        });
+  }
+
+  for (auto& future : futures) {
+    try {
+      const auto properties = future.get();
+      client.updateTimedate1(properties);
+      client.printTimedate1();
+    } catch (const std::exception& e) {
+      spdlog::error("Error: {}", e.what());
+    }
+  }
+
   connection->leaveEventLoop();
 
   return 0;

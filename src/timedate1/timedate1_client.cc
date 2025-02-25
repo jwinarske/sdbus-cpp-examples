@@ -17,13 +17,8 @@
 #include "../utils.h"
 
 Timedate1Client::Timedate1Client(sdbus::IConnection& connection)
-    : ProxyInterfaces{connection, sdbus::ServiceName(kServiceName),
-                      sdbus::ObjectPath(kInterfaceName)},
-      connection_(connection),
-      object_path_(sdbus::ObjectPath(kInterfaceName)) {
-  const auto properties = this->GetAll("org.freedesktop.timedate1");
-  Timedate1Client::onPropertiesChanged(
-      sdbus::InterfaceName("org.freedesktop.timedate1"), properties, {});
+    : ProxyInterfaces{connection, sdbus::ServiceName(INTERFACE_NAME),
+                      sdbus::ObjectPath(OBJECT_PATH)} {
   registerProxy();
 }
 
@@ -35,14 +30,55 @@ void Timedate1Client::onPropertiesChanged(
     const sdbus::InterfaceName& interfaceName,
     const std::map<sdbus::PropertyName, sdbus::Variant>& changedProperties,
     const std::vector<sdbus::PropertyName>& invalidatedProperties) {
-  std::stringstream ss;
-  ss << std::endl;
-  ss << "[" << interfaceName << "] Timedate1Client Properties changed"
-     << std::endl;
-  Utils::append_properties(changedProperties, ss);
-  for (const auto& name : invalidatedProperties) {
-    ss << "[" << interfaceName << "] Invalidated property: " << name
-       << std::endl;
+  Utils::print_changed_properties(interfaceName, changedProperties,
+                                  invalidatedProperties);
+}
+
+void Timedate1Client::updateTimedate1(
+    const std::map<sdbus::PropertyName, sdbus::Variant>& changedProperties) {
+  for (const auto& [key, value] : changedProperties) {
+    if (key == "Timezone") {
+      timedate1_.Timezone = value.get<std::string>();
+    } else if (key == "LocalRTC") {
+      timedate1_.LocalRTC = value.get<bool>();
+    } else if (key == "CanNTP") {
+      timedate1_.CanNTP = value.get<bool>();
+    } else if (key == "NTP") {
+      timedate1_.NTP = value.get<bool>();
+    } else if (key == "NTPSynchronized") {
+      timedate1_.NTPSynchronized = value.get<bool>();
+    } else if (key == "TimeUSec") {
+      timedate1_.TimeUSec = value.get<uint64_t>();
+    } else if (key == "RTCTimeUSec") {
+      timedate1_.RTCTimeUSec = value.get<uint64_t>();
+    }
   }
-  spdlog::info("{}", ss.str());
+}
+
+void appendTimeUSecAsDate(const uint64_t timeUSec, std::stringstream& ss) {
+  const auto timePoint = std::chrono::system_clock::time_point(
+      std::chrono::microseconds(timeUSec));
+  const std::time_t timeT = std::chrono::system_clock::to_time_t(timePoint);
+  const std::tm* tm = std::localtime(&timeT);
+  ss << "\tDate: " << std::put_time(tm, "%d-%m-%Y %H:%M:%S") << std::endl;
+}
+
+void Timedate1Client::printTimedate1() const {
+  std::stringstream ss;
+
+  if (!timedate1_.Timezone.empty()) {
+    ss << "Timezone:" << timedate1_.Timezone << std::endl;
+  }
+  ss << "\tLocalRTC: " << (timedate1_.LocalRTC ? "True" : "False") << std::endl;
+  ss << "\tCanNTP: " << (timedate1_.CanNTP ? "True" : "False") << std::endl;
+  ss << "\tNTP: " << (timedate1_.NTP ? "True" : "False") << std::endl;
+  ss << "\tNTPSynchronized: " << (timedate1_.NTPSynchronized ? "True" : "False")
+     << std::endl;
+  ss << "\tNTP: " << (timedate1_.NTP ? "True" : "False") << std::endl;
+  ss << "\tTimeUSec: " << timedate1_.TimeUSec << std::endl;
+  appendTimeUSecAsDate(timedate1_.TimeUSec, ss);
+  ss << "\tRTCTimeUSec: " << timedate1_.RTCTimeUSec << std::endl;
+  appendTimeUSecAsDate(timedate1_.RTCTimeUSec, ss);
+
+  spdlog::info("\n{}", ss.str());
 }
