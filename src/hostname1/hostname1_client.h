@@ -28,7 +28,7 @@ class Hostname1Client final
 
   explicit Hostname1Client(sdbus::IConnection& connection);
 
-  ~Hostname1Client();
+  virtual ~Hostname1Client();
 
   void updateHostname1(
       const std::map<sdbus::PropertyName, sdbus::Variant>& changedProperties);

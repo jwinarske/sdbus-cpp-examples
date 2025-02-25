@@ -26,7 +26,7 @@ class Timedate1Client final
 
   explicit Timedate1Client(sdbus::IConnection& connection);
 
-  ~Timedate1Client();
+  virtual ~Timedate1Client();
 
   void updateTimedate1(
       const std::map<sdbus::PropertyName, sdbus::Variant>& changedProperties);

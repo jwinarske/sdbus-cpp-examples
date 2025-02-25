@@ -36,7 +36,7 @@ class UDisks2NvmeController final
         properties, {});
   }
 
-  ~UDisks2NvmeController() { unregisterProxy(); }
+  virtual ~UDisks2NvmeController() { unregisterProxy(); }
 
  private:
   static constexpr char kBusName[] = "org.freedesktop.UDisks2";

@@ -26,7 +26,7 @@ class Resolve1Manager final
  public:
   explicit Resolve1Manager(sdbus::IConnection& connection);
 
-  ~Resolve1Manager();
+  virtual ~Resolve1Manager();
 
  private:
   sdbus::IConnection& connection_;

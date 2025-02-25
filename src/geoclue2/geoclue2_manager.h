@@ -25,7 +25,7 @@ class GeoClue2Manager final
  public:
   explicit GeoClue2Manager(sdbus::IConnection& connection);
 
-  ~GeoClue2Manager();
+  virtual ~GeoClue2Manager();
 
   [[nodiscard]] auto getClient() const { return client_; }
 

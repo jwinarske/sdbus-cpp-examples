@@ -43,7 +43,7 @@ class UPowerClient final
     }
   }
 
-  ~UPowerClient() {
+  virtual ~UPowerClient() {
     unregisterProxy();
     for (auto devices = EnumerateDevices(); const auto& device : devices) {
       UPowerClient::onDeviceRemoved(device);

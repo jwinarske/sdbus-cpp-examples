@@ -35,7 +35,7 @@ class UDisks2Filesystem final
         {});
   }
 
-  ~UDisks2Filesystem() { unregisterProxy(); }
+  virtual ~UDisks2Filesystem() { unregisterProxy(); }
 
  private:
   static constexpr char kBusName[] = "org.freedesktop.UDisks2";

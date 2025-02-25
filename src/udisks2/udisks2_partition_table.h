@@ -36,7 +36,7 @@ class UDisks2PartitionTable final
         properties, {});
   }
 
-  ~UDisks2PartitionTable() { unregisterProxy(); }
+  virtual ~UDisks2PartitionTable() { unregisterProxy(); }
 
  private:
   static constexpr char kBusName[] = "org.freedesktop.UDisks2";

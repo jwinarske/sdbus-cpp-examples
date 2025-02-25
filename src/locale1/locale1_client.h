@@ -26,7 +26,7 @@ class Locale1Client final
 
   explicit Locale1Client(sdbus::IConnection& connection);
 
-  ~Locale1Client();
+  virtual ~Locale1Client();
 
   void updateLocale1(
       const std::map<sdbus::PropertyName, sdbus::Variant>& changedProperties);

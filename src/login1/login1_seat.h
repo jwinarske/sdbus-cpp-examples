@@ -35,7 +35,7 @@ class Login1Seat final
         sdbus::InterfaceName("org.freedesktop.login1.Seat"), properties, {});
   }
 
-  ~Login1Seat() { unregisterProxy(); }
+  virtual ~Login1Seat() { unregisterProxy(); }
 
  private:
   sdbus::IConnection& connection_;

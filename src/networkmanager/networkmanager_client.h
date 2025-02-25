@@ -23,7 +23,7 @@ class NetworkManagerClient
  public:
   explicit NetworkManagerClient(sdbus::IConnection& connection);
 
-  ~NetworkManagerClient();
+  virtual ~NetworkManagerClient();
 
  private:
   static constexpr auto kBusName = "org.freedesktop.NetworkManager";

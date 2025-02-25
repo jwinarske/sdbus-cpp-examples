@@ -23,9 +23,7 @@ class BluezClient final
  public:
   explicit BluezClient(sdbus::IConnection& connection);
 
-  ~BluezClient();
-
-  void handleExistingObjects();
+  virtual ~BluezClient();
 
  private:
   sdbus::IConnection& connection_;

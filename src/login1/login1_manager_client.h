@@ -30,7 +30,7 @@ class Login1ManagerClient final
  public:
   explicit Login1ManagerClient(sdbus::IConnection& connection);
 
-  ~Login1ManagerClient();
+  virtual ~Login1ManagerClient();
 
  private:
   sdbus::IConnection& connection_;

@@ -1,5 +1,11 @@
 
 set(SDBUSCPP_BUILD_CODEGEN ON)
 add_subdirectory(sdbus-cpp)
+if (ENABLE_LTO AND IPO_SUPPORT_RESULT)
+    set_property(TARGET sdbus-c++ PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+endif ()
 
 add_subdirectory(spdlog)
+if (ENABLE_LTO AND IPO_SUPPORT_RESULT)
+    set_property(TARGET spdlog PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+endif ()

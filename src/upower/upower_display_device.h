@@ -24,7 +24,7 @@ class UPowerDisplayDevice final
   explicit UPowerDisplayDevice(sdbus::IConnection& connection,
                                const sdbus::ObjectPath& objectPath);
 
-  ~UPowerDisplayDevice();
+  virtual ~UPowerDisplayDevice();
 
  private:
   sdbus::IConnection& connection_;

@@ -34,7 +34,7 @@ class Login1User final
         sdbus::InterfaceName("org.freedesktop.login1.User"), properties, {});
   }
 
-  ~Login1User() { unregisterProxy(); }
+  virtual ~Login1User() { unregisterProxy(); }
 
  private:
   sdbus::ObjectPath object_path_;

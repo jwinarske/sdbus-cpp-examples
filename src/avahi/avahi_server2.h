@@ -22,7 +22,7 @@ class AvahiServer2 final
  public:
   explicit AvahiServer2(sdbus::IConnection& connection);
 
-  ~AvahiServer2();
+  virtual ~AvahiServer2();
 
  private:
   static constexpr auto kServiceName = "org.freedesktop.Avahi";

@@ -33,7 +33,7 @@ class UDisks2Block final
         sdbus::InterfaceName("org.freedesktop.UDisks2.Block"), properties, {});
   }
 
-  ~UDisks2Block() { unregisterProxy(); }
+  virtual ~UDisks2Block() { unregisterProxy(); }
 
  private:
   static constexpr char kBusName[] = "org.freedesktop.UDisks2";

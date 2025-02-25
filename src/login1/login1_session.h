@@ -35,7 +35,7 @@ class Login1Session final
         sdbus::InterfaceName("org.freedesktop.login1.Session"), properties, {});
   }
 
-  ~Login1Session() { unregisterProxy(); }
+  virtual ~Login1Session() { unregisterProxy(); }
 
  private:
   sdbus::IConnection& connection_;

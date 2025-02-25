@@ -34,7 +34,7 @@ class UDisks2Swapspace final : public sdbus::ProxyInterfaces<
         {});
   }
 
-  ~UDisks2Swapspace() { unregisterProxy(); }
+  virtual ~UDisks2Swapspace() { unregisterProxy(); }
 
  private:
   static constexpr char kBusName[] = "org.freedesktop.UDisks2";

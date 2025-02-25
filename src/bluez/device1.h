@@ -30,7 +30,7 @@ class Device1 final : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,
     registerProxy();
   }
 
-  ~Device1() { unregisterProxy(); }
+  virtual ~Device1() { unregisterProxy(); }
 
  private:
   sdbus::ObjectPath object_path_;

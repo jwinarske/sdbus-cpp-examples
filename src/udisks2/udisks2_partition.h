@@ -34,7 +34,7 @@ class UDisks2Partition final : public sdbus::ProxyInterfaces<
         {});
   }
 
-  ~UDisks2Partition() { unregisterProxy(); }
+  virtual ~UDisks2Partition() { unregisterProxy(); }
 
  private:
   static constexpr char kBusName[] = "org.freedesktop.UDisks2";

@@ -35,7 +35,7 @@ class GeoClue2Client final
                                         properties, {});
   }
 
-  ~GeoClue2Client() { unregisterProxy(); }
+  virtual ~GeoClue2Client() { unregisterProxy(); }
 
   [[nodiscard]] auto getLocation() const { return location_; }
 

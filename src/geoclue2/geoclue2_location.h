@@ -34,7 +34,7 @@ class GeoClue2Location final : public sdbus::ProxyInterfaces<
                                           properties, {});
   }
 
-  ~GeoClue2Location() { unregisterProxy(); }
+  virtual ~GeoClue2Location() { unregisterProxy(); }
 
  private:
   static constexpr auto kBusName = "org.freedesktop.GeoClue2";

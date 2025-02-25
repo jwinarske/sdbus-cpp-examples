@@ -31,7 +31,7 @@ class UDisks2Manager final
                                     sdbus::ObjectManager_proxy> {
  public:
   explicit UDisks2Manager(sdbus::IConnection& connection);
-  ~UDisks2Manager();
+  virtual ~UDisks2Manager();
 
  private:
   static constexpr auto kBusName = "org.freedesktop.UDisks2";
