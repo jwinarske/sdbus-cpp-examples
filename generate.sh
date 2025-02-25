@@ -54,6 +54,11 @@ mkdir -p ${PROXY}/org/freedesktop/fwupd |true
 
 ${XML2CPP} --verbose --proxy=${PROXY}/org/freedesktop/fwupd/fwupd_proxy.h interfaces/org/freedesktop/fwupd/fwupd.xml
 
+mkdir -p ${PROXY}/org/freedesktop/PackageKit/Offline |true
+
+${XML2CPP} --verbose --proxy=${PROXY}/org/freedesktop/PackageKit/packagekit_proxy.h interfaces/org/freedesktop/PackageKit/PackageKit.xml
+${XML2CPP} --verbose --proxy=${PROXY}/org/freedesktop/PackageKit/Offline/offline_proxy.h interfaces/org/freedesktop/PackageKit/Offline/Offline.xml
+
 mkdir -p ${PROXY}/org/freedesktop/Avahi/{Server,Server2} |true
 
 ${XML2CPP} --verbose --proxy=${PROXY}/org/freedesktop/Avahi/Server/server_proxy.h interfaces/org/freedesktop/Avahi/Server/Server.xml

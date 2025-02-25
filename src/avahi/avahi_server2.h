@@ -27,7 +27,7 @@ class AvahiServer2 final
  private:
   static constexpr auto kServiceName = "org.freedesktop.Avahi";
   static constexpr auto kObjectPath = "/";
-  std::int32_t state_;
+  std::int32_t state_{};
 
   void onStateChanged(const int32_t& state, const std::string& error) override;
 };

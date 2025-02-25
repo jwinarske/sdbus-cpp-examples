@@ -1,0 +1,23 @@
+<node>
+    <interface name="org.freedesktop.PackageKit.Offline">
+        <method name="ClearResults"></method>
+        <method name="Trigger">
+            <arg type="s" name="action" direction="in"></arg>
+        </method>
+        <method name="TriggerUpgrade">
+            <arg type="s" name="action" direction="in"></arg>
+        </method>
+        <method name="Cancel"></method>
+        <method name="GetPrepared">
+            <arg type="as" name="package_ids" direction="out"></arg>
+        </method>
+        <property type="b" name="UpdatePrepared" access="read"></property>
+        <property type="b" name="UpdateTriggered" access="read"></property>
+        <property type="b" name="UpgradePrepared" access="read"></property>
+        <property type="b" name="UpgradeTriggered" access="read"></property>
+        <property type="a{sv}" name="PreparedUpgrade" access="read">
+            <annotation name="org.qtproject.QtDBus.QtTypeName" value="QVariantMap"></annotation>
+        </property>
+        <property type="s" name="TriggerAction" access="read"></property>
+    </interface>
+</node>
