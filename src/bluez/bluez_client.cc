@@ -48,9 +48,8 @@ void BluezClient::onInterfacesAdded(
     if (interface == org::bluez::Adapter1_proxy::INTERFACE_NAME) {
       std::scoped_lock lock(adapter_mutex_);
       if (!adapters_.contains(objectPath)) {
-        std::unique_ptr<Adapter1, Adapter1::Adapter1Deleter> adapter1(
-            new Adapter1(connection_, sdbus::ServiceName(INTERFACE_NAME),
-                         objectPath));
+        auto adapter1 = std::make_unique<Adapter1>(
+            connection_, sdbus::ServiceName(INTERFACE_NAME), objectPath);
         adapter1->Alias("bluez_ble_client");
         if (!adapter1->Discovering()) {
           adapter1->StartDiscovery();

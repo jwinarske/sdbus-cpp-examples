@@ -31,12 +31,7 @@ class Adapter1 final
     registerProxy();
   }
 
-  // custom deleter
-  struct Adapter1Deleter {
-    void operator()(const Adapter1* ptr) const { delete ptr; }
-  };
-
-  friend struct Adapter1Deleter;
+  virtual ~Adapter1() { unregisterProxy(); }
 
  private:
   sdbus::ObjectPath object_path_;

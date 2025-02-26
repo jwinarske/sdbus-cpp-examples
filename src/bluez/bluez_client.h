@@ -34,9 +34,7 @@ class BluezClient final
   static constexpr char INTERFACE_NAME[] = "org.bluez";
   sdbus::IConnection& connection_;
 
-  std::map<sdbus::ObjectPath,
-           std::unique_ptr<Adapter1, Adapter1::Adapter1Deleter>>
-      adapters_;
+  std::map<sdbus::ObjectPath, std::unique_ptr<Adapter1>> adapters_;
   std::map<sdbus::ObjectPath, std::unique_ptr<Device1>> devices_;
 
   std::mutex adapter_mutex_;

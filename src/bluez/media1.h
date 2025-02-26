@@ -28,8 +28,9 @@ class Media1 final : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,
       : ProxyInterfaces{connection, destination, objectPath},
         object_path_(objectPath) {
     registerProxy();
-    const auto props = this->GetAll("org.bluez.Media1");
-    onPropertiesChanged(sdbus::InterfaceName("org.bluez.Media1"), props, {});
+    const auto props = this->GetAll(Media1_proxy::INTERFACE_NAME);
+    onPropertiesChanged(sdbus::InterfaceName(Media1_proxy::INTERFACE_NAME),
+                        props, {});
   }
 
   virtual ~Media1() { unregisterProxy(); }

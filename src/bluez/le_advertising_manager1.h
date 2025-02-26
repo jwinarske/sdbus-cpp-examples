@@ -29,9 +29,11 @@ class LEAdvertisingManager1 final
       : ProxyInterfaces{connection, destination, objectPath},
         object_path_(objectPath) {
     registerProxy();
-    const auto props = this->GetAll("org.bluez.LEAdvertisingManager1");
-    onPropertiesChanged(sdbus::InterfaceName("org.bluez.LEAdvertisingManager1"),
-                        props, {});
+    const auto props =
+        this->GetAll(LEAdvertisingManager1_proxy::INTERFACE_NAME);
+    onPropertiesChanged(
+        sdbus::InterfaceName(LEAdvertisingManager1_proxy::INTERFACE_NAME),
+        props, {});
   }
 
   virtual ~LEAdvertisingManager1() { unregisterProxy(); }
