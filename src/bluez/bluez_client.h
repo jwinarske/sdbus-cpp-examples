@@ -16,7 +16,12 @@
 #define SRC_BLUEZ_BLUEZ_CLIENT_H
 
 #include "adapter1.h"
+#include "battery_provider_manager1.h"
 #include "device1.h"
+#include "gatt_manager1.h"
+#include "le_advertising_manager1.h"
+#include "media1.h"
+#include "network_server1.h"
 
 class BluezClient final
     : public sdbus::ProxyInterfaces<sdbus::ObjectManager_proxy> {
@@ -26,6 +31,7 @@ class BluezClient final
   virtual ~BluezClient();
 
  private:
+  static constexpr char INTERFACE_NAME[] = "org.bluez";
   sdbus::IConnection& connection_;
 
   std::map<sdbus::ObjectPath,
@@ -35,6 +41,12 @@ class BluezClient final
 
   std::mutex adapter_mutex_;
   std::mutex device_mutex_;
+
+  std::unique_ptr<BatteryProviderManager1> battery_provider_manager1_;
+  std::unique_ptr<GattManager1> gatt_manager1_;
+  std::unique_ptr<LEAdvertisingManager1> le_advertising_manager1_;
+  std::unique_ptr<Media1> media1_;
+  std::unique_ptr<NetworkServer1> network_server1_;
 
   void onInterfacesAdded(
       const sdbus::ObjectPath& objectPath,
