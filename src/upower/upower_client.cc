@@ -22,8 +22,8 @@ void UPowerClient::onDeviceAdded(const sdbus::ObjectPath& device) {
   spdlog::info("onDeviceAdded: {}", device);
   std::lock_guard lock(devices_mutex_);
   if (!devices_.contains(device)) {
-    devices_[device] =
-        std::make_shared<UPowerDisplayDevice>(connection_, device);
+    devices_[device] = std::make_shared<UPowerDisplayDevice>(
+        getProxy().getConnection(), device);
   }
 }
 

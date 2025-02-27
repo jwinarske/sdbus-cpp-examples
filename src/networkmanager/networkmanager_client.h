@@ -26,11 +26,8 @@ class NetworkManagerClient
   virtual ~NetworkManagerClient();
 
  private:
-  static constexpr auto kBusName = "org.freedesktop.NetworkManager";
-  static constexpr auto kObjectPath = "/org/freedesktop";
-
-  sdbus::IConnection& connection_;
-  sdbus::ObjectPath object_path_;
+  static constexpr auto INTERFACE_NAME = "org.freedesktop.NetworkManager";
+  static constexpr auto OBJECT_PATH = "/org/freedesktop";
 
   void onInterfacesAdded(
       const sdbus::ObjectPath& objectPath,

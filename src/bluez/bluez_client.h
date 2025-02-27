@@ -40,11 +40,9 @@ class BluezClient final
   static constexpr auto INTROSPECTABLE_INTERFACE_NAME =
       "org.freedesktop.DBus.Introspectable";
 
-  sdbus::IConnection& connection_;
-
-  std::mutex adapter_mutex_;
+  std::mutex adapters_mutex_;
   std::map<sdbus::ObjectPath, std::unique_ptr<Adapter1>> adapters_;
-  std::mutex device_mutex_;
+  std::mutex devices_mutex_;
   std::map<sdbus::ObjectPath, std::unique_ptr<Device1>> devices_;
 
   std::mutex gatt_characteristics_mutex_;

@@ -26,35 +26,33 @@ class Login1Session final
                 const sdbus::ObjectPath& objectPath)
       : ProxyInterfaces{connection,
                         sdbus::ServiceName("org.freedesktop.login1"),
-                        objectPath},
-        connection_(connection),
-        object_path_(objectPath) {
+                        objectPath} {
     registerProxy();
-    const auto properties = GetAll("org.freedesktop.login1.Session");
-    Login1Session::onPropertiesChanged(
-        sdbus::InterfaceName("org.freedesktop.login1.Session"), properties, {});
+    {
+      const auto props = this->GetAllAsync(
+          Session_proxy::INTERFACE_NAME,
+          [&](std::optional<sdbus::Error> error,
+              std::map<sdbus::PropertyName, sdbus::Variant> values) {
+            if (!error)
+              onPropertiesChanged(
+                  sdbus::InterfaceName(Session_proxy::INTERFACE_NAME), values,
+                  {});
+            else
+              spdlog::error("login1.Session: {} - {}", error->getName(),
+                            error->getMessage());
+          });
+    }
   }
 
   virtual ~Login1Session() { unregisterProxy(); }
 
  private:
-  sdbus::IConnection& connection_;
-  sdbus::ObjectPath object_path_;
-
   void onPropertiesChanged(
       const sdbus::InterfaceName& interfaceName,
       const std::map<sdbus::PropertyName, sdbus::Variant>& changedProperties,
       const std::vector<sdbus::PropertyName>& invalidatedProperties) override {
-    std::stringstream ss;
-    ss << std::endl;
-    ss << "[" << interfaceName << "] Login1Session Properties changed"
-       << std::endl;
-    Utils::append_properties(changedProperties, ss);
-    for (const auto& name : invalidatedProperties) {
-      ss << "[" << interfaceName << "] Invalidated property: " << name
-         << std::endl;
-    }
-    spdlog::info("{}", ss.str());
+    Utils::print_changed_properties(interfaceName, changedProperties,
+                                    invalidatedProperties);
   }
 
   void onPauseDevice(const uint32_t& major,

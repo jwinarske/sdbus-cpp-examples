@@ -25,38 +25,25 @@ class UDisks2Filesystem final
  public:
   UDisks2Filesystem(sdbus::IConnection& connection,
                     const sdbus::ObjectPath& objectPath)
-      : ProxyInterfaces{connection, sdbus::ServiceName(kBusName), objectPath},
-        connection_(connection),
-        object_path_(objectPath) {
+      : ProxyInterfaces{connection, sdbus::ServiceName(INTERFACE_NAME),
+                        objectPath} {
     registerProxy();
-    const auto properties = this->GetAll("org.freedesktop.UDisks2.Filesystem");
+    const auto properties = this->GetAll(Filesystem_proxy::INTERFACE_NAME);
     UDisks2Filesystem::onPropertiesChanged(
-        sdbus::InterfaceName("org.freedesktop.UDisks2.Filesystem"), properties,
-        {});
+        sdbus::InterfaceName(Filesystem_proxy::INTERFACE_NAME), properties, {});
   }
 
   virtual ~UDisks2Filesystem() { unregisterProxy(); }
 
  private:
-  static constexpr char kBusName[] = "org.freedesktop.UDisks2";
-
-  sdbus::IConnection& connection_;
-  sdbus::ObjectPath object_path_;
+  static constexpr auto INTERFACE_NAME = "org.freedesktop.UDisks2";
 
   void onPropertiesChanged(
       const sdbus::InterfaceName& interfaceName,
       const std::map<sdbus::PropertyName, sdbus::Variant>& changedProperties,
       const std::vector<sdbus::PropertyName>& invalidatedProperties) override {
-    std::stringstream ss;
-    ss << std::endl;
-    ss << "[" << interfaceName << "] UDisks2Filesystem Properties changed"
-       << std::endl;
-    Utils::append_properties(changedProperties, ss);
-    for (const auto& name : invalidatedProperties) {
-      ss << "[" << interfaceName << "] Invalidated property: " << name
-         << std::endl;
-    }
-    spdlog::info("{}", ss.str());
+    Utils::print_changed_properties(interfaceName, changedProperties,
+                                    invalidatedProperties);
   }
 };
 

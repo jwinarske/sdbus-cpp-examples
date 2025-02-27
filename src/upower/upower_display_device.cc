@@ -20,8 +20,7 @@ UPowerDisplayDevice::UPowerDisplayDevice(sdbus::IConnection& connection,
                                          const sdbus::ObjectPath& objectPath)
     : ProxyInterfaces(connection,
                       sdbus::ServiceName("org.freedesktop.UPower"),
-                      objectPath),
-      connection_(connection) {
+                      objectPath) {
   registerProxy();
   const auto properties = this->GetAll("org.freedesktop.UPower.Device");
   UPowerDisplayDevice::onPropertiesChanged(

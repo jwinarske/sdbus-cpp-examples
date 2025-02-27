@@ -40,15 +40,8 @@ class Adapter1 final
       const sdbus::InterfaceName& interfaceName,
       const std::map<sdbus::PropertyName, sdbus::Variant>& changedProperties,
       const std::vector<sdbus::PropertyName>& invalidatedProperties) override {
-    std::stringstream ss;
-    ss << std::endl;
-    ss << "[" << object_path_ << "] Properties changed" << std::endl;
-    Utils::append_properties(changedProperties, ss);
-    for (const auto& name : invalidatedProperties) {
-      ss << "[" << object_path_ << "] Invalidated property: " << name
-         << std::endl;
-    }
-    spdlog::info("{}", ss.str());
+    Utils::print_changed_properties(interfaceName, changedProperties,
+                                    invalidatedProperties);
   }
 };
 

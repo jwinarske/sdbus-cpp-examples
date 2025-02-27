@@ -29,9 +29,19 @@ class Login1User final
                         objectPath},
         object_path_(objectPath) {
     registerProxy();
-    const auto properties = this->GetAll("org.freedesktop.login1.User");
-    Login1User::onPropertiesChanged(
-        sdbus::InterfaceName("org.freedesktop.login1.User"), properties, {});
+    {
+      const auto props = this->GetAllAsync(
+          User_proxy::INTERFACE_NAME,
+          [&](std::optional<sdbus::Error> error,
+              std::map<sdbus::PropertyName, sdbus::Variant> values) {
+            if (!error)
+              onPropertiesChanged(
+                  sdbus::InterfaceName(User_proxy::INTERFACE_NAME), values, {});
+            else
+              spdlog::error("login1.User: {} - {}", error->getName(),
+                            error->getMessage());
+          });
+    }
   }
 
   virtual ~Login1User() { unregisterProxy(); }
@@ -43,16 +53,8 @@ class Login1User final
       const sdbus::InterfaceName& interfaceName,
       const std::map<sdbus::PropertyName, sdbus::Variant>& changedProperties,
       const std::vector<sdbus::PropertyName>& invalidatedProperties) override {
-    std::stringstream ss;
-    ss << std::endl;
-    ss << "[" << interfaceName << "] Login1User Properties changed"
-       << std::endl;
-    Utils::append_properties(changedProperties, ss);
-    for (const auto& name : invalidatedProperties) {
-      ss << "[" << interfaceName << "] Invalidated property: " << name
-         << std::endl;
-    }
-    spdlog::info("{}", ss.str());
+    Utils::print_changed_properties(interfaceName, changedProperties,
+                                    invalidatedProperties);
   }
 };
 

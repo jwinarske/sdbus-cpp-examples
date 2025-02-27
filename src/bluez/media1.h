@@ -28,9 +28,17 @@ class Media1 final : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,
       : ProxyInterfaces{connection, destination, objectPath},
         object_path_(objectPath) {
     registerProxy();
-    const auto props = this->GetAll(Media1_proxy::INTERFACE_NAME);
-    onPropertiesChanged(sdbus::InterfaceName(Media1_proxy::INTERFACE_NAME),
-                        props, {});
+    const auto props = this->GetAllAsync(
+        Media1_proxy::INTERFACE_NAME,
+        [&](std::optional<sdbus::Error> error,
+            std::map<sdbus::PropertyName, sdbus::Variant> values) {
+          if (!error)
+            onPropertiesChanged(
+                sdbus::InterfaceName(Media1_proxy::INTERFACE_NAME), values, {});
+          else
+            spdlog::error("Media1: {} - {}", error->getName(),
+                          error->getMessage());
+        });
   }
 
   virtual ~Media1() { unregisterProxy(); }

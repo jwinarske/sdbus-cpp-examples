@@ -26,35 +26,32 @@ class Login1Seat final
              const sdbus::ObjectPath& objectPath)
       : ProxyInterfaces{connection,
                         sdbus::ServiceName("org.freedesktop.login1"),
-                        objectPath},
-        connection_(connection),
-        object_path_(objectPath) {
+                        objectPath} {
     registerProxy();
-    const auto properties = this->GetAll("org.freedesktop.login1.Seat");
-    Login1Seat::onPropertiesChanged(
-        sdbus::InterfaceName("org.freedesktop.login1.Seat"), properties, {});
+    {
+      const auto props = this->GetAllAsync(
+          Seat_proxy::INTERFACE_NAME,
+          [&](std::optional<sdbus::Error> error,
+              std::map<sdbus::PropertyName, sdbus::Variant> values) {
+            if (!error)
+              onPropertiesChanged(
+                  sdbus::InterfaceName(Seat_proxy::INTERFACE_NAME), values, {});
+            else
+              spdlog::error("login1.Seat: {} - {}", error->getName(),
+                            error->getMessage());
+          });
+    }
   }
 
   virtual ~Login1Seat() { unregisterProxy(); }
 
  private:
-  sdbus::IConnection& connection_;
-  sdbus::ObjectPath object_path_;
-
   void onPropertiesChanged(
       const sdbus::InterfaceName& interfaceName,
       const std::map<sdbus::PropertyName, sdbus::Variant>& changedProperties,
       const std::vector<sdbus::PropertyName>& invalidatedProperties) override {
-    std::stringstream ss;
-    ss << std::endl;
-    ss << "[" << interfaceName << "] Login1Seat Properties changed"
-       << std::endl;
-    Utils::append_properties(changedProperties, ss);
-    for (const auto& name : invalidatedProperties) {
-      ss << "[" << interfaceName << "] Invalidated property: " << name
-         << std::endl;
-    }
-    spdlog::info("{}", ss.str());
+    Utils::print_changed_properties(interfaceName, changedProperties,
+                                    invalidatedProperties);
   }
 };
 

@@ -29,11 +29,21 @@ class LEAdvertisingManager1 final
       : ProxyInterfaces{connection, destination, objectPath},
         object_path_(objectPath) {
     registerProxy();
-    const auto props =
-        this->GetAll(LEAdvertisingManager1_proxy::INTERFACE_NAME);
-    onPropertiesChanged(
-        sdbus::InterfaceName(LEAdvertisingManager1_proxy::INTERFACE_NAME),
-        props, {});
+    {
+      const auto props = this->GetAllAsync(
+          LEAdvertisingManager1_proxy::INTERFACE_NAME,
+          [&](std::optional<sdbus::Error> error,
+              std::map<sdbus::PropertyName, sdbus::Variant> values) {
+            if (!error)
+              onPropertiesChanged(
+                  sdbus::InterfaceName(
+                      LEAdvertisingManager1_proxy::INTERFACE_NAME),
+                  values, {});
+            else
+              spdlog::error("LEAdvertisingManager1: {} - {}", error->getName(),
+                            error->getMessage());
+          });
+    }
   }
 
   virtual ~LEAdvertisingManager1() { unregisterProxy(); }

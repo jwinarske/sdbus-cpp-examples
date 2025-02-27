@@ -29,9 +29,6 @@ class Resolve1Manager final
   virtual ~Resolve1Manager();
 
  private:
-  sdbus::IConnection& connection_;
-  sdbus::ObjectPath object_path_;
-
   void onPropertiesChanged(
       const sdbus::InterfaceName& interfaceName,
       const std::map<sdbus::PropertyName, sdbus::Variant>& changedProperties,

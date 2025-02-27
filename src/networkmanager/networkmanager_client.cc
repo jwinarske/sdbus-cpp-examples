@@ -17,10 +17,8 @@
 #include "../utils.h"
 
 NetworkManagerClient::NetworkManagerClient(sdbus::IConnection& connection)
-    : ProxyInterfaces{connection, sdbus::ServiceName(kBusName),
-                      sdbus::ObjectPath(kObjectPath)},
-      connection_(connection),
-      object_path_(sdbus::ObjectPath(kObjectPath)) {
+    : ProxyInterfaces{connection, sdbus::ServiceName(INTERFACE_NAME),
+                      sdbus::ObjectPath(OBJECT_PATH)} {
   registerProxy();
   for (const auto& [object, interfacesAndProperties] : GetManagedObjects()) {
     onInterfacesAdded(object, interfacesAndProperties);

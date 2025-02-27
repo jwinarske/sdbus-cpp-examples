@@ -30,10 +30,9 @@ class Login1ManagerClient final
   virtual ~Login1ManagerClient();
 
  private:
-  static constexpr auto kBusName = "org.freedesktop.login1";
-  static constexpr auto kObjectPath = "/org/freedesktop/login1";
+  static constexpr auto INTERFACE_NAME = "org.freedesktop.login1";
+  static constexpr auto OBJECT_PATH = "/org/freedesktop/login1";
 
-  sdbus::IConnection& connection_;
   sdbus::ObjectPath object_path_;
 
   std::map<sdbus::ObjectPath, std::unique_ptr<Login1Seat>> seats_;

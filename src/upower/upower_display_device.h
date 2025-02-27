@@ -27,8 +27,6 @@ class UPowerDisplayDevice final
   virtual ~UPowerDisplayDevice();
 
  private:
-  sdbus::IConnection& connection_;
-
   void onPropertiesChanged(
       const sdbus::InterfaceName& interfaceName,
       const std::map<sdbus::PropertyName, sdbus::Variant>& changedProperties,

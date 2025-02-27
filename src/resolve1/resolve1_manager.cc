@@ -18,9 +18,7 @@
 
 Resolve1Manager::Resolve1Manager(sdbus::IConnection& connection)
     : ProxyInterfaces{connection, sdbus::ServiceName(kServiceName),
-                      sdbus::ObjectPath(kInterfaceName)},
-      connection_(connection),
-      object_path_(sdbus::ObjectPath(kInterfaceName)) {
+                      sdbus::ObjectPath(kInterfaceName)} {
   registerProxy();
   const auto properties = this->GetAll("org.freedesktop.resolve1.Manager");
   Resolve1Manager::onPropertiesChanged(

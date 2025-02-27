@@ -34,11 +34,8 @@ class UDisks2Manager final
   virtual ~UDisks2Manager();
 
  private:
-  static constexpr auto kBusName = "org.freedesktop.UDisks2";
-  static constexpr auto kObjectPath = "/org/freedesktop/UDisks2";
-
-  sdbus::IConnection& connection_;
-  sdbus::ObjectPath object_path_;
+  static constexpr auto INTERFACE_NAME = "org.freedesktop.UDisks2";
+  static constexpr auto OBJECT_PATH = "/org/freedesktop/UDisks2";
 
   std::unique_ptr<UDisks2ManagerNvme> manager_nvme_;
 
