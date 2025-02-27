@@ -22,14 +22,30 @@ class GattDescriptor1 final
  public:
   GattDescriptor1(sdbus::IConnection& connection,
                   const sdbus::ServiceName(&destination),
-                  const sdbus::ObjectPath(&objectPath))
-      : ProxyInterfaces{connection, destination, objectPath},
-        object_path_(objectPath) {}
+                  const sdbus::ObjectPath(&objectPath),
+                  const std::map<sdbus::MemberName, sdbus::Variant>& properties)
+      : ProxyInterfaces{connection, destination, objectPath} {
+    if (const auto key = sdbus::MemberName("Characteristic");
+        properties.contains(key)) {
+      characteristic_ = properties.at(key).get<sdbus::ObjectPath>();
+    }
+    if (const auto key = sdbus::MemberName("UUID"); properties.contains(key)) {
+      uuid_ = properties.at(key).get<std::string>();
+    }
+    if (const auto key = sdbus::MemberName("Value"); properties.contains(key)) {
+      value_ = properties.at(key).get<std::vector<std::uint8_t>>();
+    }
+    if (properties.size() > 3) {
+      assert(false);
+    }
+  }
 
   ~GattDescriptor1() = default;
 
  private:
-  sdbus::ObjectPath object_path_;
+  sdbus::ObjectPath characteristic_;
+  std::string uuid_;
+  std::vector<std::uint8_t> value_;
 };
 
 #endif  // SRC_BLUEZ_GATT_DESCRIPTOR1_H

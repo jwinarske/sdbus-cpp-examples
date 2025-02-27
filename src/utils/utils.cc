@@ -17,6 +17,7 @@
 void Utils::append_property(const sdbus::Variant& value,
                             std::stringstream& ss) {
   const std::string type = value.peekValueType();
+  ss << "[" << type << "] ";
   auto it = type_map_.find(type);
   if (it != type_map_.end()) {
     it->second(value, ss);

@@ -23,40 +23,48 @@ class LEAdvertisingManager1 final
     : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,
                                     org::bluez::LEAdvertisingManager1_proxy> {
  public:
-  LEAdvertisingManager1(sdbus::IConnection& connection,
-                        const sdbus::ServiceName(&destination),
-                        const sdbus::ObjectPath(&objectPath))
-      : ProxyInterfaces{connection, destination, objectPath},
-        object_path_(objectPath) {
+  LEAdvertisingManager1(
+      sdbus::IConnection& connection,
+      const sdbus::ServiceName(&destination),
+      const sdbus::ObjectPath(&objectPath),
+      const std::map<sdbus::MemberName, sdbus::Variant>& properties)
+      : ProxyInterfaces{connection, destination, objectPath} {
     registerProxy();
-    {
-      const auto props = this->GetAllAsync(
-          LEAdvertisingManager1_proxy::INTERFACE_NAME,
-          [&](std::optional<sdbus::Error> error,
-              std::map<sdbus::PropertyName, sdbus::Variant> values) {
-            if (!error)
-              onPropertiesChanged(
-                  sdbus::InterfaceName(
-                      LEAdvertisingManager1_proxy::INTERFACE_NAME),
-                  values, {});
-            else
-              spdlog::error("LEAdvertisingManager1: {} - {}", error->getName(),
-                            error->getMessage());
-          });
-    }
+    onPropertiesChanged(
+        sdbus::InterfaceName(LEAdvertisingManager1_proxy::INTERFACE_NAME),
+        properties, {});
   }
 
   virtual ~LEAdvertisingManager1() { unregisterProxy(); }
 
  private:
-  sdbus::ObjectPath object_path_;
+  std::uint8_t active_instances_{};
+  std::vector<std::string> supported_includes_;
+  std::uint8_t supported_instances_{};
+  std::vector<std::string> supported_secondary_channels_;
 
   void onPropertiesChanged(
       const sdbus::InterfaceName& interfaceName,
       const std::map<sdbus::PropertyName, sdbus::Variant>& changedProperties,
       const std::vector<sdbus::PropertyName>& invalidatedProperties) override {
-    Utils::print_changed_properties(interfaceName, changedProperties,
-                                    invalidatedProperties);
+    if (const auto key = sdbus::MemberName("ActiveInstances");
+        changedProperties.contains(key)) {
+      active_instances_ = changedProperties.at(key).get<std::uint8_t>();
+    }
+    if (const auto key = sdbus::MemberName("SupportedIncludes");
+        changedProperties.contains(key)) {
+      supported_includes_ =
+          changedProperties.at(key).get<std::vector<std::string>>();
+    }
+    if (const auto key = sdbus::MemberName("SupportedInstances");
+        changedProperties.contains(key)) {
+      supported_instances_ = changedProperties.at(key).get<std::uint8_t>();
+    }
+    if (const auto key = sdbus::MemberName("SupportedSecondaryChannels");
+        changedProperties.contains(key)) {
+      supported_secondary_channels_ =
+          changedProperties.at(key).get<std::vector<std::string>>();
+    }
   }
 };
 

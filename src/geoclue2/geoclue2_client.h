@@ -26,12 +26,11 @@ class GeoClue2Client final
  public:
   explicit GeoClue2Client(sdbus::IConnection& connection,
                           const sdbus::ObjectPath& objectPath)
-      : ProxyInterfaces{connection, sdbus::ServiceName(kBusName), objectPath},
-        connection_(connection),
-        object_path_(objectPath) {
+      : ProxyInterfaces{connection, sdbus::ServiceName(INTERFACE_NAME),
+                        objectPath} {
     registerProxy();
     const auto properties = this->GetAll("org.freedesktop.GeoClue2.Client");
-    GeoClue2Client::onPropertiesChanged(sdbus::InterfaceName(kBusName),
+    GeoClue2Client::onPropertiesChanged(sdbus::InterfaceName(INTERFACE_NAME),
                                         properties, {});
   }
 
@@ -40,10 +39,7 @@ class GeoClue2Client final
   [[nodiscard]] auto getLocation() const { return location_; }
 
  private:
-  static constexpr auto kBusName = "org.freedesktop.GeoClue2";
-
-  sdbus::IConnection& connection_;
-  sdbus::ObjectPath object_path_;
+  static constexpr auto INTERFACE_NAME = "org.freedesktop.GeoClue2";
 
   std::shared_ptr<GeoClue2Location> location_;
 
@@ -66,7 +62,8 @@ class GeoClue2Client final
   void onLocationUpdated(const sdbus::ObjectPath& old,
                          const sdbus::ObjectPath& new_) override {
     spdlog::info("GeoClue2Client onLocationUpdated: {}, {}", old, new_);
-    location_ = std::make_unique<GeoClue2Location>(connection_, new_);
+    location_ =
+        std::make_unique<GeoClue2Location>(getProxy().getConnection(), new_);
   }
 };
 

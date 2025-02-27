@@ -25,23 +25,87 @@ class Adapter1 final
  public:
   Adapter1(sdbus::IConnection& connection,
            const sdbus::ServiceName(&destination),
-           const sdbus::ObjectPath(&objectPath))
-      : ProxyInterfaces{connection, destination, objectPath},
-        object_path_(objectPath) {
+           const sdbus::ObjectPath(&objectPath),
+           const std::map<sdbus::PropertyName, sdbus::Variant>& properties)
+      : ProxyInterfaces{connection, destination, objectPath} {
     registerProxy();
+    onPropertiesChanged(sdbus::InterfaceName(Adapter1_proxy::INTERFACE_NAME),
+                        properties, {});
   }
 
   virtual ~Adapter1() { unregisterProxy(); }
 
  private:
-  sdbus::ObjectPath object_path_;
+  std::string address_;
+  std::string address_type_;
+  std::string alias_;
+  std::uint32_t class_;
+  bool discoverable_{};
+  std::uint32_t discoverable_timeout_;
+  bool discovering_{};
+  std::string modalias_;
+  std::string name_;
+  bool pairable_{};
+  std::uint32_t pairable_timeout_;
+  bool powered_{};
+  std::vector<std::string> uuids_;
 
   void onPropertiesChanged(
       const sdbus::InterfaceName& interfaceName,
       const std::map<sdbus::PropertyName, sdbus::Variant>& changedProperties,
       const std::vector<sdbus::PropertyName>& invalidatedProperties) override {
-    Utils::print_changed_properties(interfaceName, changedProperties,
-                                    invalidatedProperties);
+    if (const auto key = sdbus::MemberName("Address");
+        changedProperties.contains(key)) {
+      address_ = changedProperties.at(key).get<std::string>();
+    }
+    if (const auto key = sdbus::MemberName("AddressType");
+        changedProperties.contains(key)) {
+      address_type_ = changedProperties.at(key).get<std::string>();
+    }
+    if (const auto key = sdbus::MemberName("Alias");
+        changedProperties.contains(key)) {
+      alias_ = changedProperties.at(key).get<std::string>();
+    }
+    if (const auto key = sdbus::MemberName("Class");
+        changedProperties.contains(key)) {
+      class_ = changedProperties.at(key).get<std::uint32_t>();
+    }
+    if (const auto key = sdbus::MemberName("Discoverable");
+        changedProperties.contains(key)) {
+      discoverable_ = changedProperties.at(key).get<bool>();
+    }
+    if (const auto key = sdbus::MemberName("DiscoverableTimeout");
+        changedProperties.contains(key)) {
+      discoverable_timeout_ = changedProperties.at(key).get<std::uint32_t>();
+    }
+    if (const auto key = sdbus::MemberName("Discovering");
+        changedProperties.contains(key)) {
+      discovering_ = changedProperties.at(key).get<bool>();
+    }
+    if (const auto key = sdbus::MemberName("Modalias");
+        changedProperties.contains(key)) {
+      modalias_ = changedProperties.at(key).get<std::string>();
+    }
+    if (const auto key = sdbus::MemberName("Name");
+        changedProperties.contains(key)) {
+      name_ = changedProperties.at(key).get<std::string>();
+    }
+    if (const auto key = sdbus::MemberName("Pairable");
+        changedProperties.contains(key)) {
+      pairable_ = changedProperties.at(key).get<bool>();
+    }
+    if (const auto key = sdbus::MemberName("PairableTimeout");
+        changedProperties.contains(key)) {
+      pairable_timeout_ = changedProperties.at(key).get<std::uint32_t>();
+    }
+    if (const auto key = sdbus::MemberName("Powered");
+        changedProperties.contains(key)) {
+      powered_ = changedProperties.at(key).get<bool>();
+    }
+    if (const auto key = sdbus::MemberName("UUIDs");
+        changedProperties.contains(key)) {
+      uuids_ = changedProperties.at(key).get<std::vector<std::string>>();
+    }
   }
 };
 

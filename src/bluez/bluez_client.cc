@@ -16,6 +16,7 @@
 
 #include "battery_provider_manager1.h"
 #include "gatt_manager1.h"
+#include "gatt_service1.h"
 #include "le_advertising_manager1.h"
 #include "media1.h"
 #include "network_server1.h"
@@ -60,7 +61,7 @@ void BluezClient::onInterfacesAdded(
       if (!adapters_.contains(objectPath)) {
         auto adapter1 = std::make_unique<Adapter1>(
             getProxy().getConnection(), sdbus::ServiceName(INTERFACE_NAME),
-            objectPath);
+            objectPath, properties);
         adapter1->Alias("bluez_ble_client");
         if (!adapter1->Discovering()) {
           adapter1->StartDiscovery();
@@ -76,34 +77,32 @@ void BluezClient::onInterfacesAdded(
       if (!devices_.contains(objectPath)) {
         auto device = std::make_unique<Device1>(
             getProxy().getConnection(), sdbus::ServiceName(INTERFACE_NAME),
-            objectPath);
+            objectPath, properties);
         devices_[objectPath] = std::move(device);
-      }
-    } else if (interface ==
-               org::bluez::GattCharacteristic1_proxy::INTERFACE_NAME) {
-      std::scoped_lock lock(gatt_characteristics_mutex_);
-      if (!gatt_characteristics_.contains(objectPath)) {
-        auto device = std::make_unique<GattCharacteristic1>(
-            getProxy().getConnection(), sdbus::ServiceName(INTERFACE_NAME),
-            objectPath);
-        gatt_characteristics_[objectPath] = std::move(device);
-      }
-    } else if (interface == org::bluez::GattDescriptor1_proxy::INTERFACE_NAME) {
-      std::scoped_lock lock(gatt_descriptors_stics_mutex_);
-      if (!gatt_descriptors_.contains(objectPath)) {
-        auto device = std::make_unique<GattDescriptor1>(
-            getProxy().getConnection(), sdbus::ServiceName(INTERFACE_NAME),
-            objectPath);
-        gatt_descriptors_[objectPath] = std::move(device);
       }
     } else if (interface == org::bluez::GattService1_proxy::INTERFACE_NAME) {
       std::scoped_lock lock(gatt_services_mutex_);
       if (!gatt_services_.contains(objectPath)) {
         auto device = std::make_unique<GattService1>(
             getProxy().getConnection(), sdbus::ServiceName(INTERFACE_NAME),
-            objectPath);
+            objectPath, properties);
         gatt_services_[objectPath] = std::move(device);
       }
+    } else if (interface ==
+               org::bluez::GattCharacteristic1_proxy::INTERFACE_NAME) {
+      std::scoped_lock lock(gatt_services_mutex_);
+      auto key = sdbus::MemberName("Service");
+      auto object_path = properties.at(key).get<sdbus::ObjectPath>();
+      gatt_characteristics_[objectPath] = std::make_unique<GattCharacteristic1>(
+          getProxy().getConnection(), sdbus::ServiceName(INTERFACE_NAME),
+          objectPath, properties);
+    } else if (interface == org::bluez::GattDescriptor1_proxy::INTERFACE_NAME) {
+      std::scoped_lock lock(gatt_services_mutex_);
+      auto key = sdbus::MemberName("Characteristic");
+      auto object_path = properties.at(key).get<sdbus::ObjectPath>();
+      gatt_descriptors_[objectPath] = std::make_unique<GattDescriptor1>(
+          getProxy().getConnection(), sdbus::ServiceName(INTERFACE_NAME),
+          objectPath, properties);
     } else if (interface ==
                org::bluez::BatteryProviderManager1_proxy::INTERFACE_NAME) {
       battery_provider_manager1_ = std::make_unique<BatteryProviderManager1>(
@@ -125,7 +124,7 @@ void BluezClient::onInterfacesAdded(
                org::bluez::LEAdvertisingManager1_proxy::INTERFACE_NAME) {
       le_advertising_manager1_ = std::make_unique<LEAdvertisingManager1>(
           getProxy().getConnection(), sdbus::ServiceName(INTERFACE_NAME),
-          objectPath);
+          objectPath, properties);
     } else if (interface == org::bluez::Media1_proxy::INTERFACE_NAME) {
       media1_ = std::make_unique<Media1>(getProxy().getConnection(),
                                          sdbus::ServiceName(INTERFACE_NAME),
@@ -159,23 +158,6 @@ void BluezClient::onInterfacesRemoved(
         if (devices_.contains(objectPath)) {
           devices_[objectPath].reset();
           devices_.erase(objectPath);
-        }
-      }
-    } else if (interface ==
-               org::bluez::GattCharacteristic1_proxy::INTERFACE_NAME) {
-      std::scoped_lock lock(gatt_characteristics_mutex_);
-      if (!gatt_characteristics_.contains(objectPath)) {
-        if (gatt_characteristics_.contains(objectPath)) {
-          gatt_characteristics_[objectPath].reset();
-          gatt_characteristics_.erase(objectPath);
-        }
-      }
-    } else if (interface == org::bluez::GattDescriptor1_proxy::INTERFACE_NAME) {
-      std::scoped_lock lock(gatt_descriptors_stics_mutex_);
-      if (!gatt_descriptors_.contains(objectPath)) {
-        if (gatt_descriptors_.contains(objectPath)) {
-          gatt_descriptors_[objectPath].reset();
-          gatt_descriptors_.erase(objectPath);
         }
       }
     } else if (interface == org::bluez::GattService1_proxy::INTERFACE_NAME) {

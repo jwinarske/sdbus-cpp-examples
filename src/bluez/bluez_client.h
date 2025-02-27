@@ -45,15 +45,13 @@ class BluezClient final
   std::map<sdbus::ObjectPath, std::unique_ptr<Adapter1>> adapters_;
   std::mutex devices_mutex_;
   std::map<sdbus::ObjectPath, std::unique_ptr<Device1>> devices_;
-
-  std::mutex gatt_characteristics_mutex_;
-  std::map<sdbus::ObjectPath, std::unique_ptr<GattCharacteristic1>>
-      gatt_characteristics_;
-  std::mutex gatt_descriptors_stics_mutex_;
-  std::map<sdbus::ObjectPath, std::unique_ptr<GattDescriptor1>>
-      gatt_descriptors_;
   std::mutex gatt_services_mutex_;
   std::map<sdbus::ObjectPath, std::unique_ptr<GattService1>> gatt_services_;
+  std::map<sdbus::ObjectPath, std::unique_ptr<GattDescriptor1>>
+      gatt_descriptors_;
+  std::map<sdbus::ObjectPath, std::unique_ptr<GattCharacteristic1>>
+      gatt_characteristics_;
+
   std::mutex battery1_mutex_;
   std::map<sdbus::ObjectPath, std::unique_ptr<Battery1>> battery1_;
 

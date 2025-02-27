@@ -25,9 +25,7 @@ class GeoClue2Location final : public sdbus::ProxyInterfaces<
  public:
   explicit GeoClue2Location(sdbus::IConnection& connection,
                             const sdbus::ObjectPath& objectPath)
-      : ProxyInterfaces{connection, sdbus::ServiceName(kBusName), objectPath},
-        connection_(connection),
-        object_path_(objectPath) {
+      : ProxyInterfaces{connection, sdbus::ServiceName(kBusName), objectPath} {
     registerProxy();
     const auto properties = this->GetAll("org.freedesktop.GeoClue2.Location");
     GeoClue2Location::onPropertiesChanged(sdbus::InterfaceName(kBusName),
@@ -38,9 +36,6 @@ class GeoClue2Location final : public sdbus::ProxyInterfaces<
 
  private:
   static constexpr auto kBusName = "org.freedesktop.GeoClue2";
-
-  sdbus::IConnection& connection_;
-  sdbus::ObjectPath object_path_;
 
   void onPropertiesChanged(
       const sdbus::InterfaceName& interfaceName,
