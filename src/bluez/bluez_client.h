@@ -18,7 +18,10 @@
 #include "adapter1.h"
 #include "battery_provider_manager1.h"
 #include "device1.h"
+#include "gatt_characteristic1.h"
+#include "gatt_descriptor1.h"
 #include "gatt_manager1.h"
+#include "gatt_service1.h"
 #include "le_advertising_manager1.h"
 #include "media1.h"
 #include "network_server1.h"
@@ -31,14 +34,27 @@ class BluezClient final
   virtual ~BluezClient();
 
  private:
-  static constexpr char INTERFACE_NAME[] = "org.bluez";
+  static constexpr auto INTERFACE_NAME = "org.bluez";
+  static constexpr auto PROPERTIES_INTERFACE_NAME =
+      "org.freedesktop.DBus.Properties";
+  static constexpr auto INTROSPECTABLE_INTERFACE_NAME =
+      "org.freedesktop.DBus.Introspectable";
+
   sdbus::IConnection& connection_;
 
+  std::mutex adapter_mutex_;
   std::map<sdbus::ObjectPath, std::unique_ptr<Adapter1>> adapters_;
+  std::mutex device_mutex_;
   std::map<sdbus::ObjectPath, std::unique_ptr<Device1>> devices_;
 
-  std::mutex adapter_mutex_;
-  std::mutex device_mutex_;
+  std::mutex gatt_characteristics_mutex_;
+  std::map<sdbus::ObjectPath, std::unique_ptr<GattCharacteristic1>>
+      gatt_characteristics_;
+  std::mutex gatt_descriptors_stics_mutex_;
+  std::map<sdbus::ObjectPath, std::unique_ptr<GattDescriptor1>>
+      gatt_descriptors_;
+  std::mutex gatt_services_mutex_;
+  std::map<sdbus::ObjectPath, std::unique_ptr<GattService1>> gatt_services_;
 
   std::unique_ptr<BatteryProviderManager1> battery_provider_manager1_;
   std::unique_ptr<GattManager1> gatt_manager1_;

@@ -3,17 +3,21 @@
 PROXY=src/proxy
 XML2CPP=$(find -iname sdbus-c++-xml2cpp)
 
-mkdir -p ${PROXY}/org/bluez/{Adapter1,AgentManager,BatteryProviderManager1,Device1,GattManager1,LEAdvertisingManager1,Media1,NetworkServer1,Profile1} |true
+mkdir -p ${PROXY}/org/bluez/{Adapter1,AgentManager,BatteryProviderManager1,Device1,GattManager1,GattService1,GattCharacteristic1,GattDescriptor1,LEAdvertisingManager1,Media1,NetworkServer1,Profile1} |true
 
 ${XML2CPP} --verbose --proxy=${PROXY}/org/bluez/Adapter1/adapter1_proxy.h interfaces/org/bluez/Adapter1/Adapter1.xml
 ${XML2CPP} --verbose --proxy=${PROXY}/org/bluez/AgentManager/agent_manager1_proxy.h interfaces/org/bluez/AgentManager1/AgentManager1.xml
 ${XML2CPP} --verbose --proxy=${PROXY}/org/bluez/BatteryProviderManager1/battery_provider_manager1_proxy.h interfaces/org/bluez/BatteryProviderManager1/BatteryProviderManager1.xml
 ${XML2CPP} --verbose --proxy=${PROXY}/org/bluez/Device1/device1_proxy.h interfaces/org/bluez/Device1/Device1.xml
-${XML2CPP} --verbose --proxy=${PROXY}/org/bluez/GattManager1/gatt_manager1_proxy.h interfaces/org/bluez/GattManager1/GattManager1.xml
 ${XML2CPP} --verbose --proxy=${PROXY}/org/bluez/LEAdvertisingManager1/le_advertising_manager1_proxy.h interfaces/org/bluez/LEAdvertisingManager1/LEAdvertisingManager1.xml
 ${XML2CPP} --verbose --proxy=${PROXY}/org/bluez/Media1/media1_proxy.h interfaces/org/bluez/Media1/Media1.xml
 ${XML2CPP} --verbose --proxy=${PROXY}/org/bluez/NetworkServer1/network_server1_proxy.h interfaces/org/bluez/NetworkServer1/NetworkServer1.xml
 ${XML2CPP} --verbose --proxy=${PROXY}/org/bluez/Profile1/profile1_proxy.h interfaces/org/bluez/Profile1/Profile1.xml
+
+${XML2CPP} --verbose --proxy=${PROXY}/org/bluez/GattManager1/gatt_manager1_proxy.h interfaces/org/bluez/GattManager1/GattManager1.xml
+${XML2CPP} --verbose --proxy=${PROXY}/org/bluez/GattService1/gatt_service1_proxy.h interfaces/org/bluez/GattService1/GattService1.xml
+${XML2CPP} --verbose --proxy=${PROXY}/org/bluez/GattCharacteristic1/gatt_characteristic1_proxy.h interfaces/org/bluez/GattCharacteristic1/GattCharacteristic1.xml
+${XML2CPP} --verbose --proxy=${PROXY}/org/bluez/GattDescriptor1/gatt_descriptor1_proxy.h interfaces/org/bluez/GattDescriptor1/GattDescriptor1.xml
 
 mkdir -p ${PROXY}/org/freedesktop/UPower/DisplayDevice |true
 

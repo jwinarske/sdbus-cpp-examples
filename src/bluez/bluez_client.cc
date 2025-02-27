@@ -32,6 +32,11 @@ BluezClient::BluezClient(sdbus::IConnection& connection)
 }
 
 BluezClient::~BluezClient() {
+  for (const auto& [_, adapter] : adapters_) {
+    if (adapter) {
+      adapter->StopDiscovery();
+    }
+  }
   unregisterProxy();
 }
 
@@ -43,8 +48,14 @@ void BluezClient::onInterfacesAdded(
   std::stringstream ss;
   ss << std::endl;
   for (const auto& [interface, properties] : interfacesAndProperties) {
+    if (interface == PROPERTIES_INTERFACE_NAME ||
+        interface == INTROSPECTABLE_INTERFACE_NAME) {
+      continue;
+    }
     ss << "[" << objectPath << "] Add - " << interface << std::endl;
-    Utils::append_properties(properties, ss);
+    if (!properties.empty()) {
+      Utils::append_properties(properties, ss);
+    }
     if (interface == org::bluez::Adapter1_proxy::INTERFACE_NAME) {
       std::scoped_lock lock(adapter_mutex_);
       if (!adapters_.contains(objectPath)) {
@@ -66,6 +77,28 @@ void BluezClient::onInterfacesAdded(
         auto device = std::make_unique<Device1>(
             connection_, sdbus::ServiceName(INTERFACE_NAME), objectPath);
         devices_[objectPath] = std::move(device);
+      }
+    } else if (interface ==
+               org::bluez::GattCharacteristic1_proxy::INTERFACE_NAME) {
+      std::scoped_lock lock(gatt_characteristics_mutex_);
+      if (!gatt_characteristics_.contains(objectPath)) {
+        auto device = std::make_unique<GattCharacteristic1>(
+            connection_, sdbus::ServiceName(INTERFACE_NAME), objectPath);
+        gatt_characteristics_[objectPath] = std::move(device);
+      }
+    } else if (interface == org::bluez::GattDescriptor1_proxy::INTERFACE_NAME) {
+      std::scoped_lock lock(gatt_descriptors_stics_mutex_);
+      if (!gatt_descriptors_.contains(objectPath)) {
+        auto device = std::make_unique<GattDescriptor1>(
+            connection_, sdbus::ServiceName(INTERFACE_NAME), objectPath);
+        gatt_descriptors_[objectPath] = std::move(device);
+      }
+    } else if (interface == org::bluez::GattService1_proxy::INTERFACE_NAME) {
+      std::scoped_lock lock(gatt_services_mutex_);
+      if (!gatt_services_.contains(objectPath)) {
+        auto device = std::make_unique<GattService1>(
+            connection_, sdbus::ServiceName(INTERFACE_NAME), objectPath);
+        gatt_services_[objectPath] = std::move(device);
       }
     } else if (interface ==
                org::bluez::BatteryProviderManager1_proxy::INTERFACE_NAME) {

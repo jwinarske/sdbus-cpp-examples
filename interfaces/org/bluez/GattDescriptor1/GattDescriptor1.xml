@@ -1,0 +1,13 @@
+<node>
+    <interface name="org.bluez.GattDescriptor1">
+        <method name="ReadValue"><arg name="options" type="a{sv}" direction="in"/>\n<arg name="value" type="ay"
+                                                                                         direction="out"/>\n
+        </method>
+        <method name="WriteValue"><arg name="value" type="ay" direction="in"/>\n<arg name="options" type="a{sv}"
+                                                                                     direction="in"/>\n
+        </method>
+        <property name="UUID" type="s" access="read"></property>
+        <property name="Characteristic" type="o" access="read"></property>
+        <property name="Value" type="ay" access="read"></property>
+    </interface>
+</node>
