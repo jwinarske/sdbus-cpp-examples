@@ -49,9 +49,6 @@ class GattCharacteristic1 final
     if (const auto key = sdbus::MemberName("Value"); properties.contains(key)) {
       value_ = properties.at(key).get<std::vector<std::uint8_t>>();
     }
-    if (properties.size() > 8) {
-      assert(false);
-    }
   }
 
   [[nodiscard]] bool isNotifyFlagSet() const {

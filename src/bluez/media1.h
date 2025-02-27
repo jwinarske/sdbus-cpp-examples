@@ -17,8 +17,6 @@
 
 #include "../proxy/org/bluez/Media1/media1_proxy.h"
 
-#include "../utils/utils.h"
-
 class Media1 final : public sdbus::ProxyInterfaces<org::bluez::Media1_proxy> {
  public:
   Media1(sdbus::IConnection& connection,

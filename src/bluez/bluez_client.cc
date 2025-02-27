@@ -32,11 +32,6 @@ BluezClient::BluezClient(sdbus::IConnection& connection)
 }
 
 BluezClient::~BluezClient() {
-  for (const auto& [_, adapter] : adapters_) {
-    if (adapter) {
-      adapter->StopDiscovery();
-    }
-  }
   unregisterProxy();
 }
 
@@ -62,14 +57,6 @@ void BluezClient::onInterfacesAdded(
         auto adapter1 = std::make_unique<Adapter1>(
             getProxy().getConnection(), sdbus::ServiceName(INTERFACE_NAME),
             objectPath, properties);
-        adapter1->Alias("bluez_ble_client");
-        if (!adapter1->Discovering()) {
-          adapter1->StartDiscovery();
-        }
-        for (auto filters = adapter1->GetDiscoveryFilters();
-             const auto& filter : filters) {
-          spdlog::info("Discovery Filter: {}", filter);
-        }
         adapters_[objectPath] = std::move(adapter1);
       }
     } else if (interface == org::bluez::Device1_proxy::INTERFACE_NAME) {

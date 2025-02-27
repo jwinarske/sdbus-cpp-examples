@@ -81,6 +81,10 @@ class Adapter1 final
     if (const auto key = sdbus::MemberName("Discovering");
         changedProperties.contains(key)) {
       discovering_ = changedProperties.at(key).get<bool>();
+
+      if (!discovering_) {
+        this->StartDiscovery();
+      }
     }
     if (const auto key = sdbus::MemberName("Modalias");
         changedProperties.contains(key)) {
