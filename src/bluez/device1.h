@@ -92,6 +92,11 @@ class Device1 final : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,
       service_data_ = changedProperties.at(key)
                           .get<std::map<std::string, sdbus::Variant>>();
     }
+    if (const auto key = sdbus::MemberName("RSSI");
+        changedProperties.contains(key)) {
+      rssi_ = changedProperties.at(key).get<std::int16_t>();
+      spdlog::debug("RSSI: {}", rssi_);
+    }
     if (const auto key = sdbus::MemberName("ServicesResolved");
         changedProperties.contains(key)) {
       services_resolved_ = changedProperties.at(key).get<bool>();
