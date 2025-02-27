@@ -19,40 +19,14 @@
 
 #include "../utils/utils.h"
 
-class Media1 final : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,
-                                                   org::bluez::Media1_proxy> {
+class Media1 final : public sdbus::ProxyInterfaces<org::bluez::Media1_proxy> {
  public:
   Media1(sdbus::IConnection& connection,
          const sdbus::ServiceName(&destination),
          const sdbus::ObjectPath(&objectPath))
-      : ProxyInterfaces{connection, destination, objectPath},
-        object_path_(objectPath) {
-    registerProxy();
-    const auto props = this->GetAllAsync(
-        Media1_proxy::INTERFACE_NAME,
-        [&](std::optional<sdbus::Error> error,
-            std::map<sdbus::PropertyName, sdbus::Variant> values) {
-          if (!error)
-            onPropertiesChanged(
-                sdbus::InterfaceName(Media1_proxy::INTERFACE_NAME), values, {});
-          else
-            spdlog::error("Media1: {} - {}", error->getName(),
-                          error->getMessage());
-        });
-  }
+      : ProxyInterfaces{connection, destination, objectPath} {}
 
-  virtual ~Media1() { unregisterProxy(); }
-
- private:
-  sdbus::ObjectPath object_path_;
-
-  void onPropertiesChanged(
-      const sdbus::InterfaceName& interfaceName,
-      const std::map<sdbus::PropertyName, sdbus::Variant>& changedProperties,
-      const std::vector<sdbus::PropertyName>& invalidatedProperties) override {
-    Utils::print_changed_properties(interfaceName, changedProperties,
-                                    invalidatedProperties);
-  }
+  ~Media1() = default;
 };
 
 #endif  // SRC_BLUEZ_MEDIA1_H

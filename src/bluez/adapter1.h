@@ -39,14 +39,14 @@ class Adapter1 final
   std::string address_;
   std::string address_type_;
   std::string alias_;
-  std::uint32_t class_;
+  std::uint32_t class_{};
   bool discoverable_{};
-  std::uint32_t discoverable_timeout_;
+  std::uint32_t discoverable_timeout_{};
   bool discovering_{};
   std::string modalias_;
   std::string name_;
   bool pairable_{};
-  std::uint32_t pairable_timeout_;
+  std::uint32_t pairable_timeout_{};
   bool powered_{};
   std::vector<std::string> uuids_;
 
