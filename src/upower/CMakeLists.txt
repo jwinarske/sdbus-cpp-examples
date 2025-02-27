@@ -6,6 +6,7 @@ add_executable(upower_client
 )
 target_link_libraries(upower_client
         PUBLIC
+        utils
         sdbus-c++
         spdlog::spdlog
 )

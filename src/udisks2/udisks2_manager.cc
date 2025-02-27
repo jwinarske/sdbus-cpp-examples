@@ -14,7 +14,7 @@
 
 #include "udisks2_manager.h"
 
-#include "../utils.h"
+#include "../utils/utils.h"
 #include "udisks2_manager_nvme.h"
 
 UDisks2Manager::UDisks2Manager(sdbus::IConnection& connection)

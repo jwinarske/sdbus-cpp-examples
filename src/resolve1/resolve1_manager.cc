@@ -14,7 +14,7 @@
 
 #include "resolve1_manager.h"
 
-#include "../utils.h"
+#include "../utils/utils.h"
 
 Resolve1Manager::Resolve1Manager(sdbus::IConnection& connection)
     : ProxyInterfaces{connection, sdbus::ServiceName(kServiceName),

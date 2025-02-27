@@ -16,7 +16,7 @@
 #define SRC_UDISK2_UDISK2_DRIVE_H
 
 #include "../proxy/org/freedesktop/UDisks2/Drive/drive_proxy.h"
-#include "../utils.h"
+#include "../utils/utils.h"
 
 class UDisks2Drive final
     : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,

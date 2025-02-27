@@ -6,6 +6,7 @@ add_executable(timedate1_client
 )
 target_link_libraries(timedate1_client
         PUBLIC
+        utils
         sdbus-c++
         spdlog::spdlog
 )

@@ -15,7 +15,7 @@
 #include "packagekit_client.h"
 #include "packagekit_transaction.h"
 
-#include "../utils.h"
+#include "../utils/utils.h"
 
 int main() {
   const auto connection = sdbus::createSystemBusConnection();

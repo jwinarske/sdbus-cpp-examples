@@ -6,6 +6,7 @@ add_executable(networkmanager_client
 )
 target_link_libraries(networkmanager_client
         PUBLIC
+        utils
         sdbus-c++
         spdlog::spdlog
 )

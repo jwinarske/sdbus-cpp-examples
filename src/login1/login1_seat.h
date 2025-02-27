@@ -16,7 +16,7 @@
 #define SRC_LOGIN1_LOGIN1_SEAT_H
 
 #include "../proxy/org/freedesktop/login1/Seat/seat_proxy.h"
-#include "../utils.h"
+#include "../utils/utils.h"
 
 class Login1Seat final
     : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,

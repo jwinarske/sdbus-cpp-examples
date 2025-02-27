@@ -17,8 +17,6 @@
 
 #include "../proxy/org/bluez/GattCharacteristic1/gatt_characteristic1_proxy.h"
 
-#include "../utils.h"
-
 class GattCharacteristic1 final
     : public sdbus::ProxyInterfaces<org::bluez::GattCharacteristic1_proxy> {
  public:

@@ -14,7 +14,7 @@
 
 #include "geoclue2_manager.h"
 
-#include "../utils.h"
+#include "../utils/utils.h"
 
 GeoClue2Manager::GeoClue2Manager(sdbus::IConnection& connection)
     : ProxyInterfaces{connection, sdbus::ServiceName(kBusName),

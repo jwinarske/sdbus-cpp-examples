@@ -18,7 +18,7 @@
 #include "../proxy/org/freedesktop/GeoClue2/Client/client_proxy.h"
 #include "geoclue2_location.h"
 
-#include "../utils.h"
+#include "../utils/utils.h"
 
 class GeoClue2Client final
     : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,

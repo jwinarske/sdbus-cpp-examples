@@ -14,7 +14,7 @@
 
 #include "avahi_server.h"
 
-#include "../utils.h"
+#include "../utils/utils.h"
 
 int main() {
   const auto connection = sdbus::createSystemBusConnection();

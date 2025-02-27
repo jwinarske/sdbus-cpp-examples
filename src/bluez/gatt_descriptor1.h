@@ -17,8 +17,6 @@
 
 #include "../proxy/org/bluez/GattDescriptor1/gatt_descriptor1_proxy.h"
 
-#include "../utils.h"
-
 class GattDescriptor1 final
     : public sdbus::ProxyInterfaces<org::bluez::GattDescriptor1_proxy> {
  public:

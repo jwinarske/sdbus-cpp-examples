@@ -17,8 +17,6 @@
 
 #include "../proxy/org/bluez/GattService1/gatt_service1_proxy.h"
 
-#include "../utils.h"
-
 class GattService1 final
     : public sdbus::ProxyInterfaces<org::bluez::GattService1_proxy> {
  public:

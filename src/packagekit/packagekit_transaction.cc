@@ -1,7 +1,7 @@
 
 #include "packagekit_transaction.h"
 
-#include "../utils.h"
+#include "../utils/utils.h"
 
 PackageKitTransaction::PackageKitTransaction(
     sdbus::IConnection& connection,

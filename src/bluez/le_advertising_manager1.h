@@ -17,7 +17,7 @@
 
 #include "../proxy/org/bluez/LEAdvertisingManager1/le_advertising_manager1_proxy.h"
 
-#include "../utils.h"
+#include "../utils/utils.h"
 
 class LEAdvertisingManager1 final
     : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,

@@ -16,7 +16,7 @@
 #define SRC_UDISK2_UDISK2_NVME_NAMESPACE_H
 
 #include "../proxy/org/freedesktop/UDisks2/NVMe/Namespace/namespace_proxy.h"
-#include "../utils.h"
+#include "../utils/utils.h"
 
 class UDisks2NvmeNamespace final
     : public sdbus::ProxyInterfaces<

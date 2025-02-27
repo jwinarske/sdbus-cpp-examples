@@ -17,7 +17,7 @@
 
 #include "../proxy/org/bluez/Device1/device1_proxy.h"
 
-#include "../utils.h"
+#include "../utils/utils.h"
 
 class Device1 final : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,
                                                     org::bluez::Device1_proxy> {

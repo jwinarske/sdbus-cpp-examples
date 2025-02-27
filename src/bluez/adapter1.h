@@ -17,7 +17,7 @@
 
 #include "../proxy/org/bluez/Adapter1/adapter1_proxy.h"
 
-#include "../utils.h"
+#include "../utils/utils.h"
 
 class Adapter1 final
     : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,

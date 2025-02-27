@@ -2,10 +2,10 @@
 add_executable(avahi_server_client
         main.cc
         avahi_server.h
-        avahi_server2.h
 )
 target_link_libraries(avahi_server_client
         PUBLIC
+        utils
         sdbus-c++
         spdlog::spdlog
 )

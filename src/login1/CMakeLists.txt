@@ -6,6 +6,7 @@ add_executable(login1_manager_client
 )
 target_link_libraries(login1_manager_client
         PUBLIC
+        utils
         sdbus-c++
         spdlog::spdlog
 )

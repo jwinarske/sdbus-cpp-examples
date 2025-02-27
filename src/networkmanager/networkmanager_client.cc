@@ -14,7 +14,7 @@
 
 #include "networkmanager_client.h"
 
-#include "../utils.h"
+#include "../utils/utils.h"
 
 NetworkManagerClient::NetworkManagerClient(sdbus::IConnection& connection)
     : ProxyInterfaces{connection, sdbus::ServiceName(INTERFACE_NAME),

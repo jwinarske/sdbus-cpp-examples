@@ -14,7 +14,7 @@
 
 #include "upower_display_device.h"
 
-#include "../utils.h"
+#include "../utils/utils.h"
 
 UPowerDisplayDevice::UPowerDisplayDevice(sdbus::IConnection& connection,
                                          const sdbus::ObjectPath& objectPath)

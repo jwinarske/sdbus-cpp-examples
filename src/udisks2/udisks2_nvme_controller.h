@@ -16,7 +16,7 @@
 #define SRC_UDISK2_UDISK2_NVME_CONTROLLER_H
 
 #include "../proxy/org/freedesktop/UDisks2/NVMe/controller_proxy.h"
-#include "../utils.h"
+#include "../utils/utils.h"
 
 class UDisks2NvmeController final
     : public sdbus::ProxyInterfaces<

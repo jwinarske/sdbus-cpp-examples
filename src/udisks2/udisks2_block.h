@@ -16,7 +16,7 @@
 #define SRC_UDISK2_UDISK2_BLOCK_H
 
 #include "../proxy/org/freedesktop/UDisks2/Block/block_proxy.h"
-#include "../utils.h"
+#include "../utils/utils.h"
 
 class UDisks2Block final
     : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,

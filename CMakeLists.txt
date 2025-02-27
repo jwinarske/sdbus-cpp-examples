@@ -60,4 +60,6 @@ add_subdirectory(src/timedate1)
 add_subdirectory(src/udisks2)
 add_subdirectory(src/upower)
 
+add_subdirectory(src/utils)
+
 add_subdirectory(third_party)

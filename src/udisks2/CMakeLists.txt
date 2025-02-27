@@ -6,6 +6,7 @@ add_executable(udisks2_client
 )
 target_link_libraries(udisks2_client
         PUBLIC
+        utils
         sdbus-c++
         spdlog::spdlog
 )

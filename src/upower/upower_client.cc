@@ -16,7 +16,7 @@
 
 #include "upower_display_device.h"
 
-#include "../utils.h"
+#include "../utils/utils.h"
 
 void UPowerClient::onDeviceAdded(const sdbus::ObjectPath& device) {
   spdlog::info("onDeviceAdded: {}", device);

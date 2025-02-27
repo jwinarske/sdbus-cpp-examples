@@ -8,6 +8,7 @@ add_executable(packagekit_client
 )
 target_link_libraries(packagekit_client
         PUBLIC
+        utils
         sdbus-c++
         spdlog::spdlog
 )

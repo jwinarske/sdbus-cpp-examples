@@ -6,6 +6,7 @@ add_executable(resolve1_client
 )
 target_link_libraries(resolve1_client
         PUBLIC
+        utils
         sdbus-c++
         spdlog::spdlog
 )

@@ -14,7 +14,7 @@
 
 #include "timedate1_client.h"
 
-#include "../utils.h"
+#include "../utils/utils.h"
 
 Timedate1Client::Timedate1Client(sdbus::IConnection& connection)
     : ProxyInterfaces{connection, sdbus::ServiceName(INTERFACE_NAME),

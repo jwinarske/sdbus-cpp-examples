@@ -6,6 +6,7 @@ add_executable(hostname1_client
 )
 target_link_libraries(hostname1_client
         PUBLIC
+        utils
         sdbus-c++
         spdlog::spdlog
 )

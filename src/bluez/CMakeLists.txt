@@ -6,6 +6,7 @@ add_executable(bluez_client
 )
 target_link_libraries(bluez_client
         PUBLIC
+        utils
         sdbus-c++
         spdlog::spdlog
 )

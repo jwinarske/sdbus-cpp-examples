@@ -16,7 +16,7 @@
 
 #include <sys/socket.h>
 
-#include "../utils.h"
+#include "../utils/utils.h"
 
 Login1ManagerClient::Login1ManagerClient(sdbus::IConnection& connection)
     : ProxyInterfaces{connection, sdbus::ServiceName(INTERFACE_NAME),

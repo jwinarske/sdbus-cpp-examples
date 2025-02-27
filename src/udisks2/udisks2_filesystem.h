@@ -16,7 +16,7 @@
 #define SRC_UDISK2_UDISK2_FILESYSTEM_H
 
 #include "../proxy/org/freedesktop/UDisks2/Filesystem/filesystem_proxy.h"
-#include "../utils.h"
+#include "../utils/utils.h"
 
 class UDisks2Filesystem final
     : public sdbus::ProxyInterfaces<
