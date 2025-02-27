@@ -16,6 +16,7 @@
 #define SRC_BLUEZ_BLUEZ_CLIENT_H
 
 #include "adapter1.h"
+#include "battery1.h"
 #include "battery_provider_manager1.h"
 #include "device1.h"
 #include "gatt_characteristic1.h"
@@ -53,6 +54,8 @@ class BluezClient final
       gatt_descriptors_;
   std::mutex gatt_services_mutex_;
   std::map<sdbus::ObjectPath, std::unique_ptr<GattService1>> gatt_services_;
+  std::mutex battery1_mutex_;
+  std::map<sdbus::ObjectPath, std::unique_ptr<Battery1>> battery1_;
 
   std::unique_ptr<BatteryProviderManager1> battery_provider_manager1_;
   std::unique_ptr<GattManager1> gatt_manager1_;

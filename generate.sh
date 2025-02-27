@@ -3,11 +3,12 @@
 PROXY=src/proxy
 XML2CPP=$(find -iname sdbus-c++-xml2cpp)
 
-mkdir -p ${PROXY}/org/bluez/{Adapter1,AgentManager,BatteryProviderManager1,Device1,GattManager1,GattService1,GattCharacteristic1,GattDescriptor1,LEAdvertisingManager1,Media1,NetworkServer1,Profile1} |true
+mkdir -p ${PROXY}/org/bluez/{Adapter1,AgentManager,BatteryProviderManager1,Battery1,Device1,GattManager1,GattService1,GattCharacteristic1,GattDescriptor1,LEAdvertisingManager1,Media1,NetworkServer1,Profile1} |true
 
 ${XML2CPP} --verbose --proxy=${PROXY}/org/bluez/Adapter1/adapter1_proxy.h interfaces/org/bluez/Adapter1/Adapter1.xml
 ${XML2CPP} --verbose --proxy=${PROXY}/org/bluez/AgentManager/agent_manager1_proxy.h interfaces/org/bluez/AgentManager1/AgentManager1.xml
 ${XML2CPP} --verbose --proxy=${PROXY}/org/bluez/BatteryProviderManager1/battery_provider_manager1_proxy.h interfaces/org/bluez/BatteryProviderManager1/BatteryProviderManager1.xml
+${XML2CPP} --verbose --proxy=${PROXY}/org/bluez/Battery1/battery1_proxy.h interfaces/org/bluez/Battery1/Battery1.xml
 ${XML2CPP} --verbose --proxy=${PROXY}/org/bluez/Device1/device1_proxy.h interfaces/org/bluez/Device1/Device1.xml
 ${XML2CPP} --verbose --proxy=${PROXY}/org/bluez/LEAdvertisingManager1/le_advertising_manager1_proxy.h interfaces/org/bluez/LEAdvertisingManager1/LEAdvertisingManager1.xml
 ${XML2CPP} --verbose --proxy=${PROXY}/org/bluez/Media1/media1_proxy.h interfaces/org/bluez/Media1/Media1.xml
