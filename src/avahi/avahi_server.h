@@ -15,21 +15,32 @@
 #ifndef SRC_AVAHI_AVAHI_SERVER_CLIENT_H
 #define SRC_AVAHI_AVAHI_SERVER_CLIENT_H
 
+#include "../proxy/org/freedesktop/Avahi/Server/server_proxy.h"
 #include "../proxy/org/freedesktop/Avahi/Server2/server2_proxy.h"
 
-class AvahiServer2 final
-    : public sdbus::ProxyInterfaces<org::freedesktop::Avahi::Server2_proxy> {
- public:
-  explicit AvahiServer2(sdbus::IConnection& connection);
+#include "../utils.h"
 
-  virtual ~AvahiServer2();
+class AvahiServer final
+    : public sdbus::ProxyInterfaces<org::freedesktop::Avahi::Server_proxy> {
+ public:
+  explicit AvahiServer(sdbus::IConnection& connection)
+      : ProxyInterfaces{connection, sdbus::ServiceName(kServiceName),
+                        sdbus::ObjectPath(kObjectPath)} {
+    registerProxy();
+    onStateChanged(GetState(), {});
+  }
+
+  virtual ~AvahiServer() { unregisterProxy(); }
 
  private:
   static constexpr auto kServiceName = "org.freedesktop.Avahi";
   static constexpr auto kObjectPath = "/";
   std::int32_t state_{};
 
-  void onStateChanged(const int32_t& state, const std::string& error) override;
+  void onStateChanged(const int32_t& state, const std::string& error) override {
+    spdlog::info("onStateChanged: state={}, error={}", state, error);
+    state_ = state;
+  }
 };
 
 #endif  // SRC_AVAHI_AVAHI_SERVER_CLIENT_H

@@ -351,6 +351,25 @@ struct Utils {
     }
     spdlog::info("{}", ss.str());
   }
+
+  static std::vector<std::string> ListNames(sdbus::IConnection& connection) {
+    const auto proxy = sdbus::createProxy(
+        connection, sdbus::ServiceName("org.freedesktop.DBus"),
+        sdbus::ObjectPath("/org/freedesktop/DBus"));
+
+    std::vector<std::string> dbus_interfaces;
+    proxy->callMethod("ListNames")
+        .onInterface("org.freedesktop.DBus")
+        .storeResultsTo(dbus_interfaces);
+
+    return std::move(dbus_interfaces);
+  }
+
+  static bool isServicePresent(const std::vector<std::string>& dbus_interfaces,
+                               const std::string_view& service) {
+    return std::find(dbus_interfaces.begin(), dbus_interfaces.end(), service) !=
+           dbus_interfaces.end();
+  }
 };
 
 #endif  // SRC_UTILS_H

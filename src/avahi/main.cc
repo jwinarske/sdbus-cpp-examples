@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "avahi_server2.h"
+#include "avahi_server.h"
 
 #include "../utils.h"
 
@@ -20,21 +20,20 @@ int main() {
   const auto connection = sdbus::createSystemBusConnection();
   connection->enterEventLoopAsync();
 
-  AvahiServer2 server(*connection);
+  if (const auto names = Utils::ListNames(*connection);
+      Utils::isServicePresent(names, "org.freedesktop.Avahi")) {
+    AvahiServer server(*connection);
+    spdlog::info("API Version: {}", server.GetAPIVersion());
+    spdlog::info("Domain Name: {}", server.GetDomainName());
+    spdlog::info("Host Name: {}", server.GetHostName());
+    spdlog::info("FQDN: {}", server.GetHostNameFqdn());
+    spdlog::info("Local Service Cookie: {}", server.GetLocalServiceCookie());
+    spdlog::info("State: {}", server.GetState());
+    spdlog::info("Version: {}", server.GetVersionString());
+    spdlog::info("NSSS upport available: {}",
+                 server.IsNSSSupportAvailable() ? "Yes" : "No");
+  }
 
-  spdlog::info("API Version: {}", server.GetAPIVersion());
-  spdlog::info("Domain Name: {}", server.GetDomainName());
-  spdlog::info("Host Name: {}", server.GetHostName());
-  spdlog::info("FQDN: {}", server.GetHostNameFqdn());
-  spdlog::info("Local Service Cookie: {}", server.GetLocalServiceCookie());
-  spdlog::info("State: {}", server.GetState());
-  spdlog::info("Version: {}", server.GetVersionString());
-  spdlog::info("NSSS upport available: {}",
-               server.IsNSSSupportAvailable() ? "Yes" : "No");
-
-  using namespace std::chrono_literals;
-  std::this_thread::sleep_for(120000ms);
   connection->leaveEventLoop();
-
   return 0;
 }
