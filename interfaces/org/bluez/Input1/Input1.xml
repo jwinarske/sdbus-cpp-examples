@@ -1,0 +1,5 @@
+<node>
+    <interface name="org.bluez.Input1">
+        <property name="ReconnectMode" type="s" access="read"></property>
+    </interface>
+</node>
