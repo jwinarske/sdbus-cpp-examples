@@ -44,11 +44,11 @@ class UPowerClient final
   }
 
   virtual ~UPowerClient() {
-    unregisterProxy();
-    for (const auto devices = EnumerateDevices();
-         const auto& device : devices) {
-      UPowerClient::onDeviceRemoved(device);
+    std::lock_guard lock(devices_mutex_);
+    for (auto& [_, display_device] : devices_) {
+      display_device.reset();
     }
+    unregisterProxy();
   }
 
  private:

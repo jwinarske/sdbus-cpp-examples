@@ -21,10 +21,11 @@
 
 #include <hidapi/hidapi.h>
 
+#include "../../upower/upower_client.h"
 #include "../../utils/utils.h"
 
-class Device1 : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,
-                                              org::bluez::Device1_proxy> {
+class Device1 final : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,
+                                                    org::bluez::Device1_proxy> {
  public:
   Device1(sdbus::IConnection& connection,
           const sdbus::ServiceName(&destination),
@@ -60,6 +61,8 @@ class Device1 : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,
   bool trusted_{};
   std::vector<std::string> uuids_;
 
+  std::unique_ptr<UPowerClient> upower_client_;
+
   hid_device* handle_{};
 
   static int IntializeHid() {
@@ -70,7 +73,7 @@ class Device1 : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,
     return 0;
   }
 
-  const char* hid_bus_name(hid_bus_type bus_type) {
+  static const char* hid_bus_name(hid_bus_type bus_type) {
     static const char* const HidBusTypeName[] = {
         "Unknown", "USB", "Bluetooth", "I2C", "SPI",
     };
@@ -186,6 +189,15 @@ class Device1 : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,
     }
   }
 
+  static std::string convert_mac_to_path(const std::string& mac_address) {
+    std::string result =
+        "/org/freedesktop/UPower/devices/battery_ps_controller_battery_";
+    std::string converted_mac = mac_address;
+    std::ranges::replace(converted_mac, ':', 'o');
+    result += converted_mac;
+    return result;
+  }
+
   void onPropertiesChanged(
       const sdbus::InterfaceName& interfaceName,
       const std::map<sdbus::PropertyName, sdbus::Variant>& changedProperties,
@@ -256,15 +268,22 @@ class Device1 : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,
     if (bonded_ && connected_ && paired_ && !modalias_.empty() &&
         modalias_ == "usb:v054Cp0CE6d0100") {
       spdlog::info("Connected: {}", address_);
+
       IntializeHid();
+
       if (OpenFirstDualSenseController()) {
         return;
       }
 
+      std::string upower_path = convert_mac_to_path(address_);
+      spdlog::info("UPower path: {}", upower_path);
+      upower_client_ = std::make_unique<UPowerClient>(
+          getProxy().getConnection(), upower_path);
+
       // Set up the command buffer.
       int res;
       unsigned char buf[256]{};
-#define MAX_STR 255
+      static constexpr size_t MAX_STR = 255;
       wchar_t wstr[MAX_STR]{};
 
       buf[0] = 0x01;
@@ -305,6 +324,21 @@ class Device1 : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,
       // Try to read from the device. There shoud be no
       // data here, but execution should not block.
       res = hid_read(handle_, buf, 17);
+
+      memset(buf, 0, sizeof(buf));
+
+      // Read a Feature Report from the device
+      buf[0] = 0x2;
+      res = hid_get_feature_report(handle_, buf, sizeof(buf));
+      if (res < 0) {
+        printf("Unable to get a feature report: %ls\n", hid_error(handle_));
+      } else {
+        // Print out the returned buffer.
+        printf("Feature Report\n   ");
+        for (int i = 0; i < res; i++)
+          printf("%02x ", static_cast<unsigned int>(buf[i]));
+        printf("\n");
+      }
     }
   }
 };
