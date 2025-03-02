@@ -107,6 +107,14 @@ void BluezClient::onInterfacesAdded(
       gatt_manager1_ = std::make_unique<GattManager1>(
           getProxy().getConnection(), sdbus::ServiceName(INTERFACE_NAME),
           objectPath);
+    } else if (interface == org::bluez::Input1_proxy::INTERFACE_NAME) {
+      std::lock_guard lock(input1_mutex_);
+      if (!input1_.contains(objectPath)) {
+        input1_[objectPath] = std::make_unique<Input1>(
+            getProxy().getConnection(),
+            sdbus::ServiceName(org::bluez::Input1_proxy::INTERFACE_NAME),
+            objectPath);
+      }
     } else if (interface ==
                org::bluez::LEAdvertisingManager1_proxy::INTERFACE_NAME) {
       le_advertising_manager1_ = std::make_unique<LEAdvertisingManager1>(
@@ -162,6 +170,12 @@ void BluezClient::onInterfacesRemoved(
           battery1_[objectPath].reset();
           battery1_.erase(objectPath);
         }
+      }
+    } else if (interface == org::bluez::Input1_proxy::INTERFACE_NAME) {
+      std::lock_guard lock(input1_mutex_);
+      if (!input1_.contains(objectPath)) {
+        input1_[objectPath].reset();
+        input1_.erase(objectPath);
       }
     } else if (interface ==
                org::bluez::BatteryProviderManager1_proxy::INTERFACE_NAME) {

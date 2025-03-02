@@ -15,7 +15,10 @@
 #ifndef SRC_UPOWER_UPOWER_CLIENT_H
 #define SRC_UPOWER_UPOWER_CLIENT_H
 
+#include <utility>
+
 #include "../proxy/org/freedesktop/UPower/upower_proxy.h"
+#include "../utils/utils.h"
 #include "upower_display_device.h"
 
 class UPowerDisplayDevice;
@@ -24,44 +27,69 @@ class UPowerClient final
     : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,
                                     org::freedesktop::UPower_proxy> {
  public:
-  explicit UPowerClient(sdbus::IConnection& connection)
+  explicit UPowerClient(sdbus::IConnection& connection,
+                        std::string device_filter = {})
       : ProxyInterfaces{connection,
                         sdbus::ServiceName("org.freedesktop.UPower"),
-                        sdbus::ObjectPath("/org/freedesktop/UPower")} {
+                        sdbus::ObjectPath("/org/freedesktop/UPower")},
+        device_filter_(std::move(device_filter)) {
     registerProxy();
     const auto properties = this->GetAll("org.freedesktop.UPower");
     UPowerClient::onPropertiesChanged(
         sdbus::InterfaceName("org.freedesktop.UPower"), properties, {});
-    for (auto devices = EnumerateDevices(); const auto& device : devices) {
+    for (const auto devices = EnumerateDevices();
+         const auto& device : devices) {
       UPowerClient::onDeviceAdded(device);
-    }
-    if (auto display_device = GetDisplayDevice(); !display_device.empty()) {
-      display_device_ = std::make_unique<UPowerDisplayDevice>(
-          getProxy().getConnection(), display_device);
     }
   }
 
   virtual ~UPowerClient() {
     unregisterProxy();
-    for (auto devices = EnumerateDevices(); const auto& device : devices) {
+    for (const auto devices = EnumerateDevices();
+         const auto& device : devices) {
       UPowerClient::onDeviceRemoved(device);
     }
   }
 
  private:
   std::unique_ptr<UPowerDisplayDevice> display_device_;
+  std::string device_filter_;
 
   std::mutex devices_mutex_;
   std::map<sdbus::ObjectPath, std::shared_ptr<UPowerDisplayDevice>> devices_;
 
-  void onDeviceAdded(const sdbus::ObjectPath& device) override;
+  void onDeviceAdded(const sdbus::ObjectPath& device) override {
+    if (device_filter_.empty() ||
+        !device_filter_.empty() && device_filter_ == device) {
+      spdlog::info("onDeviceAdded: {}", device);
+      std::lock_guard lock(devices_mutex_);
+      if (!devices_.contains(device)) {
+        devices_[device] = std::make_shared<UPowerDisplayDevice>(
+            getProxy().getConnection(), device);
+      }
+    }
+  }
 
-  void onDeviceRemoved(const sdbus::ObjectPath& device) override;
+  void onDeviceRemoved(const sdbus::ObjectPath& device) override {
+    if (device_filter_.empty() ||
+        !device_filter_.empty() && device_filter_ == device) {
+      spdlog::info("onDeviceRemoved: {}", device);
+      std::lock_guard lock(devices_mutex_);
+      if (devices_.contains(device)) {
+        devices_[device].reset();
+        devices_.erase(device);
+      }
+    }
+  }
 
   void onPropertiesChanged(
       const sdbus::InterfaceName& interfaceName,
       const std::map<sdbus::PropertyName, sdbus::Variant>& changedProperties,
-      const std::vector<sdbus::PropertyName>& invalidatedProperties) override;
+      const std::vector<sdbus::PropertyName>& invalidatedProperties) override {
+    spdlog::info("onPropertiesChanged: {}", interfaceName);
+    Utils::print_changed_properties(interfaceName, changedProperties,
+                                    invalidatedProperties);
+  }
 };
 
 #endif  // SRC_UPOWER_UPOWER_CLIENT_H

@@ -46,6 +46,7 @@ class Device1 final : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,
   std::map<std::uint16_t, sdbus::Variant> manufacturer_data_;
   std::map<std::string, sdbus::Variant> service_data_;
   bool paired_{};
+  std::string modalias_;
   std::int16_t rssi_{};
   bool services_resolved_{};
   bool trusted_{};
@@ -82,6 +83,10 @@ class Device1 final : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,
     if (const auto key = sdbus::MemberName("Paired");
         changedProperties.contains(key)) {
       paired_ = changedProperties.at(key).get<bool>();
+    }
+    if (const auto key = sdbus::MemberName("Modalias");
+        changedProperties.contains(key)) {
+      modalias_ = changedProperties.at(key).get<std::string>();
     }
     if (const auto key = sdbus::MemberName("Name");
         changedProperties.contains(key)) {

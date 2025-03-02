@@ -12,15 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "upower_client.h"
+#include "dual_sense.h"
 
 int main() {
   const auto connection = sdbus::createSystemBusConnection();
   connection->enterEventLoopAsync();
 
-  // UPowerClient client(*connection,
-  // "/org/freedesktop/UPower/devices/battery_ps_controller_battery_88o03o4co82o6bo29");
-  UPowerClient client(*connection);
+  DualSense client(*connection);
 
   using namespace std::chrono_literals;
   std::this_thread::sleep_for(120000ms);

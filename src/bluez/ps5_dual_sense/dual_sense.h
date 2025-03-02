@@ -12,28 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SRC_BLUEZ_BLUEZ_CLIENT_H
-#define SRC_BLUEZ_BLUEZ_CLIENT_H
+#ifndef SRC_DUAL_SENSE_H
+#define SRC_DUAL_SENSE_H
 
-#include "adapter1.h"
-#include "battery1.h"
-#include "battery_provider_manager1.h"
+#include <hidapi.h>
+#include <iostream>
+#include <string>
+#include <vector>
+
+#include "../adapter1.h"
+#include "../input1.h"
 #include "device1.h"
-#include "gatt_characteristic1.h"
-#include "gatt_descriptor1.h"
-#include "gatt_manager1.h"
-#include "gatt_service1.h"
-#include "input1.h"
-#include "le_advertising_manager1.h"
-#include "media1.h"
-#include "network_server1.h"
 
-class BluezClient final
+class DualSense final
     : public sdbus::ProxyInterfaces<sdbus::ObjectManager_proxy> {
  public:
-  explicit BluezClient(sdbus::IConnection& connection);
+  explicit DualSense(sdbus::IConnection& connection);
 
-  virtual ~BluezClient();
+  virtual ~DualSense();
 
  private:
   static constexpr auto INTERFACE_NAME = "org.bluez";
@@ -42,28 +38,20 @@ class BluezClient final
   static constexpr auto INTROSPECTABLE_INTERFACE_NAME =
       "org.freedesktop.DBus.Introspectable";
 
+  const std::vector<std::string> UUIDs = {
+      "0000110a-0000-1000-8000-00805f9b34fb"
+      "0000110b-0000-1000-8000-00805f9b34fb"};
+
+  // Modalias: [s] "usb:v054Cp0CE6d0100"
+
   std::mutex adapters_mutex_;
   std::map<sdbus::ObjectPath, std::unique_ptr<Adapter1>> adapters_;
+
   std::mutex devices_mutex_;
   std::map<sdbus::ObjectPath, std::unique_ptr<Device1>> devices_;
-  std::mutex gatt_services_mutex_;
-  std::map<sdbus::ObjectPath, std::unique_ptr<GattService1>> gatt_services_;
-  std::map<sdbus::ObjectPath, std::unique_ptr<GattDescriptor1>>
-      gatt_descriptors_;
-  std::map<sdbus::ObjectPath, std::unique_ptr<GattCharacteristic1>>
-      gatt_characteristics_;
-
-  std::mutex battery1_mutex_;
-  std::map<sdbus::ObjectPath, std::unique_ptr<Battery1>> battery1_;
 
   std::mutex input1_mutex_;
   std::map<sdbus::ObjectPath, std::unique_ptr<Input1>> input1_;
-
-  std::unique_ptr<BatteryProviderManager1> battery_provider_manager1_;
-  std::unique_ptr<GattManager1> gatt_manager1_;
-  std::unique_ptr<LEAdvertisingManager1> le_advertising_manager1_;
-  std::unique_ptr<Media1> media1_;
-  std::unique_ptr<NetworkServer1> network_server1_;
 
   void onInterfacesAdded(
       const sdbus::ObjectPath& objectPath,
@@ -76,4 +64,4 @@ class BluezClient final
       const std::vector<sdbus::InterfaceName>& interfaces) override;
 };
 
-#endif  // SRC_BLUEZ_BLUEZ_CLIENT_H
+#endif  // SRC_DUAL_SENSE_H

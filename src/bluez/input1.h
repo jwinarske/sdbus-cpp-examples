@@ -12,19 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "upower_client.h"
+#ifndef SRC_BLUEZ_INPUT1_H
+#define SRC_BLUEZ_INPUT1_H
 
-int main() {
-  const auto connection = sdbus::createSystemBusConnection();
-  connection->enterEventLoopAsync();
+#include "../proxy/org/bluez/Input1/input_proxy.h"
 
-  // UPowerClient client(*connection,
-  // "/org/freedesktop/UPower/devices/battery_ps_controller_battery_88o03o4co82o6bo29");
-  UPowerClient client(*connection);
+#include "../utils/utils.h"
 
-  using namespace std::chrono_literals;
-  std::this_thread::sleep_for(120000ms);
-  connection->leaveEventLoop();
+class Input1 final : public sdbus::ProxyInterfaces<org::bluez::Input1_proxy> {
+ public:
+  Input1(sdbus::IConnection& connection,
+         const sdbus::ServiceName(&destination),
+         const sdbus::ObjectPath(&objectPath))
+      : ProxyInterfaces{connection, destination, objectPath} {}
 
-  return 0;
-}
+  virtual ~Input1() {}
+};
+
+#endif  // SRC_BLUEZ_INPUT1_H

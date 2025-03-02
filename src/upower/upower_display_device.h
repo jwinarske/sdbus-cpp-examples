@@ -27,6 +27,42 @@ class UPowerDisplayDevice final
   virtual ~UPowerDisplayDevice();
 
  private:
+  sdbus::ObjectPath object_path_;
+  std::uint32_t battery_level_{};
+  double capacity_{};
+  std::int32_t charge_cycles_{};
+  std::uint32_t charge_end_threshold_{};
+  std::uint32_t charge_start_threshold_{};
+  bool charge_threshold_enabled_{};
+  bool charge_threshold_supported_{};
+  double energy_{};
+  double energy_empty_{};
+  double energy_full_{};
+  double energy_full_design_{};
+  double energy_rate_{};
+  bool has_history_{};
+  bool has_statistics_{};
+  std::string icon_name_;
+  bool is_present_{};
+  bool is_rechargeable_{};
+  double luminosity_{};
+  std::string model_;
+  std::string native_path_;
+  bool online_{};
+  double percentage_{};
+  bool power_supply_{};
+  std::string serial_;
+  std::uint32_t state_{};
+  std::uint32_t technology_{};
+  double temperature_{};
+  std::int64_t time_to_empty_{};
+  std::int64_t time_to_full_{};
+  std::uint32_t type_{};
+  std::uint64_t update_time_{};
+  std::string vendor_;
+  double voltage_{};
+  std::uint32_t warning_level_{};
+
   void onPropertiesChanged(
       const sdbus::InterfaceName& interfaceName,
       const std::map<sdbus::PropertyName, sdbus::Variant>& changedProperties,

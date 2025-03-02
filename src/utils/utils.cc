@@ -14,6 +14,8 @@
 
 #include "utils.h"
 
+#include <iomanip>
+
 void Utils::append_property(const sdbus::Variant& value,
                             std::stringstream& ss) {
   const std::string type = value.peekValueType();

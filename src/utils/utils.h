@@ -15,11 +15,11 @@
 #ifndef SRC_UTILS_UTILS_H
 #define SRC_UTILS_UTILS_H
 
-#include <iomanip>
 #include <sstream>
 #include <unordered_map>
 
 #include <sdbus-c++/sdbus-c++.h>
+
 #include <spdlog/spdlog.h>
 
 class Utils {
