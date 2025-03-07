@@ -14,10 +14,31 @@
 
 #include "dual_sense.h"
 
+#include "hidraw.hpp"
+
 DualSense::DualSense(sdbus::IConnection& connection)
     : ProxyInterfaces(connection,
                       sdbus::ServiceName(INTERFACE_NAME),
-                      sdbus::ObjectPath("/")) {
+                      sdbus::ObjectPath("/")),
+      UdevMonitor(
+          "hidraw",
+          [&](const char* action,
+              const char* dev_node,
+              const char* sub_system,
+              const char* dev_type) {
+            spdlog::info(
+                "[UdevMonitor] action: {}, dev_node: {}, sub_system: "
+                "{}, dev_type: {}",
+                action, dev_node, sub_system, dev_type ? dev_type : "\"\"");
+            hidraw_devices_ =
+                Hidraw::get_hidraw_devices(BUS_BLUETOOTH, "054C", "0CE6");
+          }) {
+  hidraw_devices_ = Hidraw::get_hidraw_devices(BUS_BLUETOOTH, "054C", "0CE6");
+
+  Hidraw::print_udev_properties("input", {
+                                             {"ID_BUS", "bluetooth"},
+                                         });
+
   registerProxy();
   for (const auto& [object, interfacesAndProperties] : GetManagedObjects()) {
     onInterfacesAdded(object, interfacesAndProperties);

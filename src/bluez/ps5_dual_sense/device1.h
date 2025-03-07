@@ -15,14 +15,13 @@
 #ifndef SRC_BLUEZ_DEVICE1_H
 #define SRC_BLUEZ_DEVICE1_H
 
+#include <optional>
+#include <regex>
+
 #include "../../proxy/org/bluez/Device1/device1_proxy.h"
-
-#include <codecvt>
-
-#include <hidapi/hidapi.h>
+#include "hidraw.hpp"
 
 #include "../../upower/upower_client.h"
-#include "../../utils/utils.h"
 
 class Device1 final : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,
                                                     org::bluez::Device1_proxy> {
@@ -37,12 +36,15 @@ class Device1 final : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,
                         properties, {});
   }
 
-  virtual ~Device1() {
-    unregisterProxy();
-    FinalizeHid();
-  }
+  virtual ~Device1() { unregisterProxy(); }
 
  private:
+  struct Modalias {
+    std::string vid;
+    std::string pid;
+    std::string did;
+  };
+
   sdbus::ObjectPath adapter_;
   std::string address_;
   std::string address_type_;
@@ -51,7 +53,7 @@ class Device1 final : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,
   bool bonded_{};
   bool connected_{};
   bool legacy_pairing_{};
-  std::string modalias_;
+  std::optional<Modalias> modalias_;
   std::string name_;
   bool paired_{};
   std::map<std::uint16_t, sdbus::Variant> manufacturer_data_;
@@ -61,141 +63,27 @@ class Device1 final : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,
   bool trusted_{};
   std::vector<std::string> uuids_;
 
-  std::unique_ptr<UPowerClient> upower_client_;
-
-  hid_device* handle_{};
-
-  static int IntializeHid() {
-    if (const int res = hid_init(); res < 0) {
-      spdlog::error("hid_init failed");
-      return 1;
-    }
-    return 0;
-  }
-
-  static const char* hid_bus_name(hid_bus_type bus_type) {
-    static const char* const HidBusTypeName[] = {
-        "Unknown", "USB", "Bluetooth", "I2C", "SPI",
-    };
-
-    if ((int)bus_type < 0)
-      bus_type = HID_API_BUS_UNKNOWN;
-    if ((int)bus_type >=
-        (int)(sizeof(HidBusTypeName) / sizeof(HidBusTypeName[0])))
-      bus_type = HID_API_BUS_UNKNOWN;
-
-    return HidBusTypeName[bus_type];
-  }
-
-  void print_device(struct hid_device_info* cur_dev) {
-    printf(
-        "Device Found\n  type: %04hx %04hx\n  path: %s\n  serial_number: %ls",
-        cur_dev->vendor_id, cur_dev->product_id, cur_dev->path,
-        cur_dev->serial_number);
-    printf("\n");
-    printf("  Manufacturer: %ls\n", cur_dev->manufacturer_string);
-    printf("  Product:      %ls\n", cur_dev->product_string);
-    printf("  Release:      %hx\n", cur_dev->release_number);
-    printf("  Interface:    %d\n", cur_dev->interface_number);
-    printf("  Usage (page): 0x%hx (0x%hx)\n", cur_dev->usage,
-           cur_dev->usage_page);
-    printf("  Bus type: %u (%s)\n", (unsigned)cur_dev->bus_type,
-           hid_bus_name(cur_dev->bus_type));
-    printf("\n");
-  }
-
-  void print_hid_report_descriptor_from_device(hid_device* device) {
-    unsigned char descriptor[HID_API_MAX_REPORT_DESCRIPTOR_SIZE];
-    int res = 0;
-
-    printf("  Report Descriptor: ");
-#if HID_API_VERSION >= HID_API_MAKE_VERSION(0, 14, 0)
-    res = hid_get_report_descriptor(device, descriptor, sizeof(descriptor));
-#else
-    (void)res;
-#endif
-    if (res < 0) {
-      printf("error getting: %ls", hid_error(device));
-    } else {
-      printf("(%d bytes)", res);
-    }
-    for (int i = 0; i < res; i++) {
-      if (i % 10 == 0) {
-        printf("\n");
-      }
-      printf("0x%02x, ", descriptor[i]);
-    }
-    printf("\n");
-  }
-
-  void print_hid_report_descriptor_from_path(const char* path) {
-    hid_device* device = hid_open_path(path);
-    if (device) {
-      print_hid_report_descriptor_from_device(device);
-      hid_close(device);
-    } else {
-      spdlog::info("  Report Descriptor: Unable to open device by path");
-    }
-  }
-
-  void print_devices(struct hid_device_info* cur_dev) {
-    for (; cur_dev; cur_dev = cur_dev->next) {
-      print_device(cur_dev);
-    }
-  }
-
-  void print_devices_with_descriptor(struct hid_device_info* cur_dev) {
-    for (; cur_dev; cur_dev = cur_dev->next) {
-      print_device(cur_dev);
-      print_hid_report_descriptor_from_path(cur_dev->path);
-    }
-  }
-
-  int OpenFirstDualSenseController() {
-    hid_device_info* devs = hid_enumerate(0x054c, 0x0ce6);
-    print_devices_with_descriptor(devs);
-    hid_free_enumeration(devs);
-
-    // Open the device using the VID, PID, and optionally the Serial number.
-    handle_ = hid_open(0x054c, 0x0ce6, nullptr);
-    if (!handle_) {
-      spdlog::info("unable to open device");
-      return 1;
-    }
-
-    return 0;
-  }
-
-  void FinalizeHid() const {
-    hid_close(handle_);
-    hid_exit();
-  }
-
-  void GetInputReport() const {
-    while (true) {
-      unsigned char buf[64];
-      if (const int res = hid_read(handle_, buf, sizeof(buf)); res < 0) {
-        spdlog::error("hid_read failed");
-        break;
-      }
-
-      std::stringstream ss;
-      ss << "HID Input Report: ";
-      for (int i = 0; i < sizeof(buf); ++i) {
-        ss << std::hex << static_cast<int>(buf[i]) << " ";
-      }
-      ss << std::dec;
-      spdlog::info(ss.str());
-    }
-  }
+  std::unique_ptr<UPowerDisplayDevice> upower_display_device_;
 
   static std::string convert_mac_to_path(const std::string& mac_address) {
     std::string result =
         "/org/freedesktop/UPower/devices/battery_ps_controller_battery_";
     std::string converted_mac = mac_address;
     std::ranges::replace(converted_mac, ':', 'o');
+    std::ranges::transform(converted_mac, converted_mac.begin(), ::tolower);
     result += converted_mac;
     return result;
+  }
+
+  static std::optional<Modalias> parse_modalias(const std::string& modalias) {
+    const std::regex re(
+        R"(usb:v([0-9A-Fa-f]{4})p([0-9A-Fa-f]{4})d([0-9A-Fa-f]{4}))");
+    if (std::smatch match;
+        std::regex_search(modalias, match, re) && match.size() == 4) {
+      return Modalias{match[1].str(), match[2].str(), match[3].str()};
+    }
+    spdlog::error("Failed to parse modalias");
+    return {};
   }
 
   void onPropertiesChanged(
@@ -236,7 +124,12 @@ class Device1 final : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,
     }
     if (const auto key = sdbus::MemberName("Modalias");
         changedProperties.contains(key)) {
-      modalias_ = changedProperties.at(key).get<std::string>();
+      modalias_ = parse_modalias(changedProperties.at(key).get<std::string>());
+      if (modalias_.has_value()) {
+        spdlog::info("VendorID: {}", modalias_.value().vid);
+        spdlog::info("ProductID: {}", modalias_.value().pid);
+        spdlog::info("DeviceID: {}", modalias_.value().did);
+      }
     }
     if (const auto key = sdbus::MemberName("Name");
         changedProperties.contains(key)) {
@@ -265,79 +158,20 @@ class Device1 final : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,
       uuids_ = changedProperties.at(key).get<std::vector<std::string>>();
     }
 
-    if (bonded_ && connected_ && paired_ && !modalias_.empty() &&
-        modalias_ == "usb:v054Cp0CE6d0100") {
+    if (bonded_ && connected_ && paired_ && modalias_.has_value() &&
+        modalias_.value().vid == "054C" && modalias_.value().pid == "0CE6" &&
+        modalias_.value().did == "0100") {
       spdlog::info("Connected: {}", address_);
 
-      IntializeHid();
-
-      if (OpenFirstDualSenseController()) {
-        return;
-      }
-
       std::string upower_path = convert_mac_to_path(address_);
-      spdlog::info("UPower path: {}", upower_path);
-      upower_client_ = std::make_unique<UPowerClient>(
-          getProxy().getConnection(), upower_path);
+      spdlog::info("UPower Display Device: {}", upower_path);
+      upower_display_device_ = std::make_unique<UPowerDisplayDevice>(
+          getProxy().getConnection(), sdbus::ObjectPath(upower_path));
 
-      // Set up the command buffer.
-      int res;
-      unsigned char buf[256]{};
-      static constexpr size_t MAX_STR = 255;
-      wchar_t wstr[MAX_STR]{};
-
-      buf[0] = 0x01;
-      buf[1] = 0x81;
-
-      // Read the Manufacturer String
-      wstr[0] = 0x0000;
-      res = hid_get_manufacturer_string(handle_, wstr, MAX_STR);
-      if (res < 0)
-        printf("Unable to read manufacturer string\n");
-      printf("Manufacturer String: %ls\n", wstr);
-
-      // Read the Product String
-      wstr[0] = 0x0000;
-      res = hid_get_product_string(handle_, wstr, MAX_STR);
-      if (res < 0)
-        printf("Unable to read product string\n");
-      printf("Product String: %ls\n", wstr);
-
-      // Read the Serial Number String
-      wstr[0] = 0x0000;
-      res = hid_get_serial_number_string(handle_, wstr, MAX_STR);
-      if (res < 0)
-        printf("Unable to read serial number string\n");
-      printf("Serial Number String: (%d) %ls", wstr[0], wstr);
-      printf("\n");
-
-      // Read Indexed String 1
-      wstr[0] = 0x0000;
-      res = hid_get_indexed_string(handle_, 1, wstr, MAX_STR);
-      if (res < 0)
-        printf("Unable to read indexed string 1\n");
-      printf("Indexed String 1: %ls\n", wstr);
-
-      // Set the hid_read() function to be non-blocking.
-      hid_set_nonblocking(handle_, 1);
-
-      // Try to read from the device. There shoud be no
-      // data here, but execution should not block.
-      res = hid_read(handle_, buf, 17);
-
-      memset(buf, 0, sizeof(buf));
-
-      // Read a Feature Report from the device
-      buf[0] = 0x2;
-      res = hid_get_feature_report(handle_, buf, sizeof(buf));
-      if (res < 0) {
-        printf("Unable to get a feature report: %ls\n", hid_error(handle_));
-      } else {
-        // Print out the returned buffer.
-        printf("Feature Report\n   ");
-        for (int i = 0; i < res; i++)
-          printf("%02x ", static_cast<unsigned int>(buf[i]));
-        printf("\n");
+      for (auto devices =
+               Hidraw::get_hidraw_devices(BUS_BLUETOOTH, "054C", "0CE6");
+           const auto& device : devices) {
+        Hidraw::dump_info(device);
       }
     }
   }

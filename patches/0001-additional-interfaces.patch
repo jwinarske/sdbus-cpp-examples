@@ -1,0 +1,35 @@
+From 2fad4e5dc6f32eb2ee283e1b774ca43d980c841f Mon Sep 17 00:00:00 2001
+From: Joel Winarske <joel.winarske@gmail.com>
+Date: Fri, 7 Mar 2025 12:25:34 -0800
+Subject: [PATCH] additional interfaces
+
+Signed-off-by: Joel Winarske <joel.winarske@gmail.com>
+---
+ include/sdbus-c++/StandardInterfaces.h | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/include/sdbus-c++/StandardInterfaces.h b/include/sdbus-c++/StandardInterfaces.h
+index 4508327..426b8a6 100644
+--- a/include/sdbus-c++/StandardInterfaces.h
++++ b/include/sdbus-c++/StandardInterfaces.h
+@@ -344,6 +344,17 @@ namespace sdbus {
+             return objectsInterfacesAndProperties;
+         }
+ 
++        template <typename _Function>
++        PendingAsyncCall GetManagedObjectsAync(_Function&& callback)
++        {
++          std::map<sdbus::ObjectPath, std::map<sdbus::InterfaceName, std::map<PropertyName, sdbus::Variant>>> objectsInterfacesAndProperties;
++          return m_proxy.callMethodAsync("GetManagedObjects").onInterface(INTERFACE_NAME).uponReplyInvoke(std::forward<_Function>(callback));
++        }
++
++        std::future<std::map<sdbus::ObjectPath, std::map<sdbus::InterfaceName, std::map<PropertyName, sdbus::Variant>>>> GetManagedObjectsAync(with_future_t) const {
++          return m_proxy.callMethodAsync("GetManagedObjects").onInterface(INTERFACE_NAME).getResultAsFuture<std::map<sdbus::ObjectPath, std::map<sdbus::InterfaceName, std::map<PropertyName, sdbus::Variant>>>>();
++        }
++
+     private:
+         sdbus::IProxy& m_proxy;
+     };
+-- 
+2.48.1
+

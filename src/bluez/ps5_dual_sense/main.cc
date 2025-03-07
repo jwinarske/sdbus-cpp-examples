@@ -12,9 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <spdlog/spdlog.h>
 #include "dual_sense.h"
 
 int main() {
+  spdlog::set_level(spdlog::level::debug);
+  spdlog::flush_every(std::chrono::seconds(5));
+
   const auto connection = sdbus::createSystemBusConnection();
   connection->enterEventLoopAsync();
 
