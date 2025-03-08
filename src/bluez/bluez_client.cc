@@ -40,16 +40,16 @@ void BluezClient::onInterfacesAdded(
     const std::map<sdbus::InterfaceName,
                    std::map<sdbus::PropertyName, sdbus::Variant>>&
         interfacesAndProperties) {
-  std::stringstream ss;
-  ss << std::endl;
+  std::ostringstream os;
+  os << std::endl;
   for (const auto& [interface, properties] : interfacesAndProperties) {
     if (interface == PROPERTIES_INTERFACE_NAME ||
         interface == INTROSPECTABLE_INTERFACE_NAME) {
       continue;
     }
-    ss << "[" << objectPath << "] Add - " << interface << std::endl;
+    os << "[" << objectPath << "] Add - " << interface << std::endl;
     if (!properties.empty()) {
-      Utils::append_properties(properties, ss);
+      Utils::append_properties(properties, os);
     }
     if (interface == org::bluez::Adapter1_proxy::INTERFACE_NAME) {
       std::scoped_lock lock(adapters_mutex_);
@@ -130,14 +130,14 @@ void BluezClient::onInterfacesAdded(
           objectPath);
     }
   }
-  spdlog::info("{}", ss.str());
+  spdlog::info(os.str());
 }
 
 void BluezClient::onInterfacesRemoved(
     const sdbus::ObjectPath& objectPath,
     const std::vector<sdbus::InterfaceName>& interfaces) {
-  std::stringstream ss;
-  ss << std::endl;
+  std::ostringstream os;
+  os << std::endl;
   for (const auto& interface : interfaces) {
     if (interface == org::bluez::Adapter1_proxy::INTERFACE_NAME) {
       std::scoped_lock lock(adapters_mutex_);
@@ -192,9 +192,9 @@ void BluezClient::onInterfacesRemoved(
     }
   }
   for (auto it = interfaces.begin(); it != interfaces.end(); ++it) {
-    ss << "[" << objectPath << "] Remove - " << *it;
+    os << "[" << objectPath << "] Remove - " << *it;
     if (std::next(it) != interfaces.end()) {
-      ss << std::endl;
+      os << std::endl;
     }
     std::scoped_lock lock(devices_mutex_);
     if (devices_.contains(objectPath)) {
@@ -202,5 +202,5 @@ void BluezClient::onInterfacesRemoved(
       devices_.erase(objectPath);
     }
   }
-  spdlog::info("{}", ss.str());
+  spdlog::info(os.str());
 }

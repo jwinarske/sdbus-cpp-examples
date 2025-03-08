@@ -21,47 +21,53 @@ class UPowerDisplayDevice final
     : public sdbus::ProxyInterfaces<org::freedesktop::UPower::Device_proxy,
                                     sdbus::Properties_proxy> {
  public:
+  struct Properties {
+    std::uint32_t battery_level;
+    double capacity;
+    std::int32_t charge_cycles;
+    std::uint32_t charge_end_threshold;
+    std::uint32_t charge_start_threshold;
+    bool charge_threshold_enabled;
+    bool charge_threshold_supported;
+    double energy;
+    double energy_empty;
+    double energy_full;
+    double energy_full_design;
+    double energy_rate;
+    bool has_history;
+    bool has_statistics;
+    std::string icon_name;
+    bool is_present;
+    bool is_rechargeable;
+    double luminosity;
+    std::string model;
+    std::string native_path;
+    bool online;
+    double percentage;
+    bool power_supply;
+    std::string serial;
+    std::uint32_t state;
+    std::uint32_t technology;
+    double temperature;
+    std::int64_t time_to_empty;
+    std::int64_t time_to_full;
+    std::uint32_t type;
+    std::uint64_t update_time;
+    std::string vendor;
+    double voltage;
+    std::uint32_t warning_level;
+  };
+
   explicit UPowerDisplayDevice(sdbus::IConnection& connection,
                                const sdbus::ObjectPath& objectPath);
 
   virtual ~UPowerDisplayDevice();
 
+  [[nodiscard]] const Properties& GetProperties() const { return properties_; }
+
  private:
   sdbus::ObjectPath object_path_;
-  std::uint32_t battery_level_{};
-  double capacity_{};
-  std::int32_t charge_cycles_{};
-  std::uint32_t charge_end_threshold_{};
-  std::uint32_t charge_start_threshold_{};
-  bool charge_threshold_enabled_{};
-  bool charge_threshold_supported_{};
-  double energy_{};
-  double energy_empty_{};
-  double energy_full_{};
-  double energy_full_design_{};
-  double energy_rate_{};
-  bool has_history_{};
-  bool has_statistics_{};
-  std::string icon_name_;
-  bool is_present_{};
-  bool is_rechargeable_{};
-  double luminosity_{};
-  std::string model_;
-  std::string native_path_;
-  bool online_{};
-  double percentage_{};
-  bool power_supply_{};
-  std::string serial_;
-  std::uint32_t state_{};
-  std::uint32_t technology_{};
-  double temperature_{};
-  std::int64_t time_to_empty_{};
-  std::int64_t time_to_full_{};
-  std::uint32_t type_{};
-  std::uint64_t update_time_{};
-  std::string vendor_;
-  double voltage_{};
-  std::uint32_t warning_level_{};
+  Properties properties_{};
 
   void onPropertiesChanged(
       const sdbus::InterfaceName& interfaceName,

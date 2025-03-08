@@ -4,6 +4,7 @@
 
 #include <iomanip>
 #include <ostream>
+#include <ranges>
 #include <regex>
 #include <string>
 #include <vector>
@@ -27,28 +28,35 @@ class Hidraw {
   ~Hidraw();
 
   static void print_udev_properties(
+      const std::unordered_map<std::string, std::map<std::string, std::string>>&
+          property_map) {
+    std::ostringstream os;
+    os << "\n";
+    for (const auto& [path, properties] : property_map) {
+      os << "Path: " << path << "\n";
+      os << "Properties:\n";
+      for (const auto& [key, value] : properties) {
+        os << "  " << key << ": " << value << "\n";
+      }
+      os << "\n";
+    }
+    spdlog::info(os.str());
+  }
+
+  static void print_udev_properties(
       const std::string& sub_system,
       const std::vector<std::pair<std::string, std::string>>& match_params =
           {}) {
     std::ostringstream os;
     os << "\n";
-    for (auto paths = get_udev_properties(sub_system);
-         const auto& [path, properties] : paths) {
-      bool match = true;
-      for (const auto& [key, value] : match_params) {
-        if (!properties.contains(key) || properties.at(key) != value) {
-          match = false;
-          break;
-        }
+    for (const auto& [path, properties] :
+         get_udev_properties(sub_system, match_params)) {
+      os << "Path: " << path << "\n";
+      os << "Properties:\n";
+      for (const auto& [key, value] : properties) {
+        os << "  " << key << ": " << value << "\n";
       }
-      if (match) {
-        os << "Path: " << path << "\n";
-        os << "Properties:\n";
-        for (const auto& [key, value] : properties) {
-          os << "  " << key << ": " << value << "\n";
-        }
-        os << "\n";
-      }
+      os << "\n";
     }
     spdlog::info(os.str());
   }
@@ -59,7 +67,9 @@ class Hidraw {
    * \return An unordered map containing the udev framebuffer system attributes.
    */
   static std::unordered_map<std::string, std::map<std::string, std::string>>
-  get_udev_properties(const std::string& sub_system) {
+  get_udev_properties(const std::string& sub_system,
+                      const std::vector<std::pair<std::string, std::string>>&
+                          match_params = {}) {
     std::unordered_map<std::string, std::map<std::string, std::string>> results;
     const auto udev = udev_new();
     if (!udev) {
@@ -91,7 +101,17 @@ class Hidraw {
         }
       }
       udev_device_unref(dev);
-      results[path] = std::move(properties);
+
+      bool match = true;
+      for (const auto& [key, value] : match_params) {
+        if (!properties.contains(key) || properties.at(key) != value) {
+          match = false;
+          break;
+        }
+      }
+      if (match) {
+        results[path] = std::move(properties);
+      }
     }
     udev_unref(udev);
     return results;
@@ -102,8 +122,8 @@ class Hidraw {
                                                      const std::string& pid) {
     std::vector<std::string> devices;
     print_udev_properties("hidraw");
-    for (auto paths = get_udev_properties("hidraw");
-         const auto& [path, properties] : paths) {
+    for (const auto& properties :
+         get_udev_properties("hidraw") | std::views::values) {
       if (properties.contains("DEVNAME") && properties.contains("DEVPATH")) {
         const auto dev_name = properties.at("DEVNAME");
         if (compare_uhid_vid_pid(properties.at("DEVPATH"), bus, vid, pid) ==
@@ -160,34 +180,33 @@ class Hidraw {
     if (res < 0)
       spdlog::error("HIDIOCGRAWNAME");
     else
-      ss << "Raw Name: " << buf << "\n";
+      ss << "HID Name: " << buf << "\n";
 
     // Physical Location
     res = ioctl(fd, HIDIOCGRAWPHYS(sizeof(buf)), buf);
     if (res < 0)
       spdlog::error("HIDIOCGRAWPHYS");
     else
-      ss << "Raw Phys: " << buf << "\n";
+      ss << "HID Physical Location: " << buf << "\n";
 
-    // Raw Info
+    // Info
     hidraw_devinfo dev_info{};
     res = ioctl(fd, HIDIOCGRAWINFO, &dev_info);
     if (res < 0) {
       spdlog::error("HIDIOCGRAWINFO");
     } else {
-      ss << "Raw Info:\n";
-      ss << "\tbustype: " << dev_info.bustype << " ("
-         << bus_str(dev_info.bustype) << "\n";
-      ss << "\tvendor: 0x" << std::hex << std::setw(4) << std::setfill('0')
+      ss << "HID Info:\n";
+      ss << "\tBus: " << bus_str(dev_info.bustype) << "\n";
+      ss << "\tVID: 0x" << std::hex << std::setw(4) << std::setfill('0')
          << dev_info.vendor << "\n";
-      ss << "\tproduct: 0x" << std::hex << std::setw(4) << std::setfill('0')
+      ss << "\tPID: 0x" << std::hex << std::setw(4) << std::setfill('0')
          << dev_info.product << "\n";
     }
     spdlog::info(ss.str());
   }
 
  private:
-  static const char* bus_str(const int bus) {
+  static const char* bus_str(const std::uint32_t bus) {
     switch (bus) {
       case BUS_USB:
         return "USB";

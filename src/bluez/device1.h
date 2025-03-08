@@ -15,42 +15,70 @@
 #ifndef SRC_BLUEZ_DEVICE1_H
 #define SRC_BLUEZ_DEVICE1_H
 
-#include "../proxy/org/bluez/Device1/device1_proxy.h"
+#include <optional>
+#include <regex>
 
-#include "../utils/utils.h"
+#include "../proxy/org/bluez/Device1/device1_proxy.h"
 
 class Device1 final : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,
                                                     org::bluez::Device1_proxy> {
  public:
+  struct Modalias {
+    std::string vid;
+    std::string pid;
+    std::string did;
+  };
+
+  struct Properties {
+    std::string adapter;
+    std::string address;
+    std::string address_type;
+    std::string alias;
+    bool blocked;
+    bool bonded;
+    bool connected;
+    bool legacy_pairing;
+    std::optional<Modalias> modalias;
+    std::string name;
+    bool paired;
+    std::map<std::uint16_t, sdbus::Variant> manufacturer_data;
+    std::map<std::string, sdbus::Variant> service_data;
+    std::int16_t rssi;
+    bool services_resolved;
+    bool trusted;
+    std::vector<std::string> uuids;
+  };
+
   Device1(sdbus::IConnection& connection,
           const sdbus::ServiceName(&destination),
           const sdbus::ObjectPath(&objectPath),
           const std::map<sdbus::PropertyName, sdbus::Variant>& properties)
       : ProxyInterfaces{connection, destination, objectPath} {
     registerProxy();
+    spdlog::debug("Device1: {}", objectPath);
     onPropertiesChanged(sdbus::InterfaceName(Device1_proxy::INTERFACE_NAME),
                         properties, {});
   }
 
   virtual ~Device1() { unregisterProxy(); }
 
+  [[nodiscard]] const Properties& GetProperties() const { return properties_; }
+
+  static std::optional<Modalias> parse_modalias(const std::string& mod_alias) {
+    const std::regex re(
+        R"(usb:v([0-9A-Fa-f]{4})p([0-9A-Fa-f]{4})d([0-9A-Fa-f]{4}))");
+    if (std::smatch match;
+        std::regex_search(mod_alias, match, re) && match.size() == 4) {
+      return Modalias{match[1].str(), match[2].str(), match[3].str()};
+    }
+    spdlog::error("Failed to parse modalias");
+    return {};
+  }
+
  private:
   sdbus::ObjectPath adapter_;
-  std::string address_;
-  std::string address_type_;
-  std::string alias_;
-  bool blocked_{};
-  bool connected_{};
-  bool legacy_pairing_{};
-  std::string name_;
-  std::map<std::uint16_t, sdbus::Variant> manufacturer_data_;
-  std::map<std::string, sdbus::Variant> service_data_;
-  bool paired_{};
-  std::string modalias_;
-  std::int16_t rssi_{};
-  bool services_resolved_{};
-  bool trusted_{};
-  std::vector<std::string> uuids_;
+
+  Properties properties_{};
 
   void onPropertiesChanged(
       const sdbus::InterfaceName& interfaceName,
@@ -58,62 +86,73 @@ class Device1 final : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,
       const std::vector<sdbus::PropertyName>& invalidatedProperties) override {
     if (const auto key = sdbus::MemberName("Adapter");
         changedProperties.contains(key)) {
-      adapter_ = changedProperties.at(key).get<sdbus::ObjectPath>();
+      properties_.adapter = changedProperties.at(key).get<sdbus::ObjectPath>();
     }
     if (const auto key = sdbus::MemberName("Address");
         changedProperties.contains(key)) {
-      address_ = changedProperties.at(key).get<std::string>();
+      properties_.address = changedProperties.at(key).get<std::string>();
     }
     if (const auto key = sdbus::MemberName("AddressType");
         changedProperties.contains(key)) {
-      address_type_ = changedProperties.at(key).get<std::string>();
+      properties_.address_type = changedProperties.at(key).get<std::string>();
+    }
+    if (const auto key = sdbus::MemberName("Bonded");
+        changedProperties.contains(key)) {
+      properties_.bonded = changedProperties.at(key).get<bool>();
     }
     if (const auto key = sdbus::MemberName("Blocked");
         changedProperties.contains(key)) {
-      blocked_ = changedProperties.at(key).get<bool>();
+      properties_.blocked = changedProperties.at(key).get<bool>();
     }
     if (const auto key = sdbus::MemberName("Connected");
         changedProperties.contains(key)) {
-      connected_ = changedProperties.at(key).get<bool>();
+      properties_.connected = changedProperties.at(key).get<bool>();
     }
     if (const auto key = sdbus::MemberName("LegacyPairing");
         changedProperties.contains(key)) {
-      legacy_pairing_ = changedProperties.at(key).get<bool>();
+      properties_.legacy_pairing = changedProperties.at(key).get<bool>();
     }
     if (const auto key = sdbus::MemberName("Paired");
         changedProperties.contains(key)) {
-      paired_ = changedProperties.at(key).get<bool>();
+      properties_.paired = changedProperties.at(key).get<bool>();
     }
     if (const auto key = sdbus::MemberName("Modalias");
         changedProperties.contains(key)) {
-      modalias_ = changedProperties.at(key).get<std::string>();
+      properties_.modalias =
+          parse_modalias(changedProperties.at(key).get<std::string>());
     }
     if (const auto key = sdbus::MemberName("Name");
         changedProperties.contains(key)) {
-      name_ = changedProperties.at(key).get<std::string>();
+      properties_.name = changedProperties.at(key).get<std::string>();
     }
     if (const auto key = sdbus::MemberName("ServiceData");
         changedProperties.contains(key)) {
-      service_data_ = changedProperties.at(key)
-                          .get<std::map<std::string, sdbus::Variant>>();
+      properties_.service_data =
+          changedProperties.at(key)
+              .get<std::map<std::string, sdbus::Variant>>();
     }
     if (const auto key = sdbus::MemberName("RSSI");
         changedProperties.contains(key)) {
-      rssi_ = changedProperties.at(key).get<std::int16_t>();
-      spdlog::debug("RSSI: {}", rssi_);
+      properties_.rssi = changedProperties.at(key).get<std::int16_t>();
+      spdlog::debug("RSSI: {}", properties_.rssi);
     }
     if (const auto key = sdbus::MemberName("ServicesResolved");
         changedProperties.contains(key)) {
-      services_resolved_ = changedProperties.at(key).get<bool>();
+      properties_.services_resolved = changedProperties.at(key).get<bool>();
     }
     if (const auto key = sdbus::MemberName("Trusted");
         changedProperties.contains(key)) {
-      trusted_ = changedProperties.at(key).get<bool>();
+      properties_.trusted = changedProperties.at(key).get<bool>();
     }
     if (const auto key = sdbus::MemberName("UUIDs");
         changedProperties.contains(key)) {
-      uuids_ = changedProperties.at(key).get<std::vector<std::string>>();
+      properties_.uuids =
+          changedProperties.at(key).get<std::vector<std::string>>();
     }
+#if 0
+    Utils::print_changed_properties(interfaceName, changedProperties,
+                                    invalidatedProperties);
+#endif
   }
 };
 

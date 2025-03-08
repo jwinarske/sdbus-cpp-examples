@@ -43,10 +43,10 @@ void UDisks2Manager::onInterfacesAdded(
                    std::map<sdbus::PropertyName, sdbus::Variant>>&
         interfacesAndProperties) {
   for (const auto& [interface, properties] : interfacesAndProperties) {
-    std::stringstream ss;
-    ss << std::endl;
-    Utils::append_properties(properties, ss);
-    spdlog::info("[{}] Add - {}\n{}", objectPath, interface, ss.str());
+    std::ostringstream os;
+    os << std::endl;
+    Utils::append_properties(properties, os);
+    spdlog::info("[{}] Add - {}\n{}", objectPath, interface, os.str());
     if ("org.freedesktop.UDisks2.Manager" == interface) {
       continue;
     }

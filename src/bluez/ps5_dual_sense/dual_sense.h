@@ -15,21 +15,27 @@
 #ifndef SRC_DUAL_SENSE_H
 #define SRC_DUAL_SENSE_H
 
-#include <iostream>
 #include <vector>
 
+#if 0
 #include "hid/page/button.hpp"
 #include "hid/page/consumer.hpp"
 #include "hid/page/generic_desktop.hpp"
 #include "hid/rdf/descriptor.hpp"
+#endif
 
+#include "../../upower/upower_display_device.h"
 #include "../adapter1.h"
+#include "../device1.h"
 #include "../input1.h"
-#include "device1.h"
 #include "udev_monitor.hpp"
+
+#if 0
 #include "vendor.hpp"
 #include "vendor1.hpp"
+#endif
 
+class UPowerDisplayDevice;
 class DualSense final
     : public sdbus::ProxyInterfaces<sdbus::ObjectManager_proxy>,
       public UdevMonitor {
@@ -223,6 +229,7 @@ class DualSense final
               report_count(7),
               feature::absolute_variable()
 ));
+    //clang-format on
 }
 #endif
 
@@ -242,8 +249,11 @@ class DualSense final
   std::mutex input1_mutex_;
   std::map<sdbus::ObjectPath, std::unique_ptr<Input1>> input1_;
 
-  std::vector<std::string> hidraw_devices_;
+  std::mutex hidraw_devices_mutex_;
+  std::map<std::string, std::string> hidraw_devices_;
 
+  std::mutex upower_display_devices_mutex_;
+  std::map<std::string, std::unique_ptr<UPowerDisplayDevice>> upower_display_devices_;
 
   void onInterfacesAdded(
     const sdbus::ObjectPath& objectPath,
@@ -255,7 +265,14 @@ class DualSense final
     const sdbus::ObjectPath& objectPath,
     const std::vector<sdbus::InterfaceName>& interfaces) override;
 
-  // clang-format on
+  void get_hidraw_devices();
+
+  static std::string convert_mac_to_path(const std::string& mac_address);
+
+  static bool compare_subsystem_device_paths(const std::string& input_path,
+                          const std::string& hidraw_path);
+
+  static std::string create_device_key_from_serial_number(const std::string& serial_number);
 };
 
 #endif  // SRC_DUAL_SENSE_H

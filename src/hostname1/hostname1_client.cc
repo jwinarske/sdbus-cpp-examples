@@ -89,88 +89,88 @@ void Hostname1Client::updateHostname1(
 }
 
 void Hostname1Client::printHostname1() const {
-  std::stringstream ss;
+  std::ostringstream os;
   if (!hostname1_.Hostname.empty()) {
-    ss << "\tHostname: " << hostname1_.Hostname << std::endl;
+    os << "\tHostname: " << hostname1_.Hostname << std::endl;
   }
   if (!hostname1_.StaticHostname.empty()) {
-    ss << "\tStaticHostname: " << hostname1_.StaticHostname << std::endl;
+    os << "\tStaticHostname: " << hostname1_.StaticHostname << std::endl;
   }
   if (!hostname1_.PrettyHostname.empty()) {
-    ss << "\tPrettyHostname: " << hostname1_.PrettyHostname << std::endl;
+    os << "\tPrettyHostname: " << hostname1_.PrettyHostname << std::endl;
   }
   if (!hostname1_.DefaultHostname.empty()) {
-    ss << "\tDefaultHostname: " << hostname1_.DefaultHostname << std::endl;
+    os << "\tDefaultHostname: " << hostname1_.DefaultHostname << std::endl;
   }
   if (!hostname1_.HostnameSource.empty()) {
-    ss << "\tHostnameSource: " << hostname1_.HostnameSource << std::endl;
+    os << "\tHostnameSource: " << hostname1_.HostnameSource << std::endl;
   }
   if (!hostname1_.IconName.empty()) {
-    ss << "\tIconName: " << hostname1_.IconName << std::endl;
+    os << "\tIconName: " << hostname1_.IconName << std::endl;
   }
   if (!hostname1_.Chassis.empty()) {
-    ss << "\tChassis: " << hostname1_.Chassis << std::endl;
+    os << "\tChassis: " << hostname1_.Chassis << std::endl;
   }
   if (!hostname1_.Deployment.empty()) {
-    ss << "\tDeployment: " << hostname1_.Deployment << std::endl;
+    os << "\tDeployment: " << hostname1_.Deployment << std::endl;
   }
   if (!hostname1_.Location.empty()) {
-    ss << "\tLocation: " << hostname1_.Location << std::endl;
+    os << "\tLocation: " << hostname1_.Location << std::endl;
   }
   if (!hostname1_.KernelName.empty()) {
-    ss << "\tKernelName: " << hostname1_.KernelName << std::endl;
+    os << "\tKernelName: " << hostname1_.KernelName << std::endl;
   }
   if (!hostname1_.KernelRelease.empty()) {
-    ss << "\tKernelRelease: " << hostname1_.KernelRelease << std::endl;
+    os << "\tKernelRelease: " << hostname1_.KernelRelease << std::endl;
   }
   if (!hostname1_.KernelVersion.empty()) {
-    ss << "\tKernelVersion: " << hostname1_.KernelVersion << std::endl;
+    os << "\tKernelVersion: " << hostname1_.KernelVersion << std::endl;
   }
   if (!hostname1_.OperatingSystemPrettyName.empty()) {
-    ss << "\tOperatingSystemPrettyName: "
+    os << "\tOperatingSystemPrettyName: "
        << hostname1_.OperatingSystemPrettyName << std::endl;
   }
   if (!hostname1_.OperatingSystemCPEName.empty()) {
-    ss << "\tOperatingSystemCPEName: " << hostname1_.OperatingSystemCPEName
+    os << "\tOperatingSystemCPEName: " << hostname1_.OperatingSystemCPEName
        << std::endl;
   }
   if (hostname1_.OperatingSystemSupportEnd.has_value()) {
-    ss << "\tOperatingSystemSupportEnd: "
+    os << "\tOperatingSystemSupportEnd: "
        << hostname1_.OperatingSystemSupportEnd.value() << std::endl;
   }
   if (!hostname1_.HomeURL.empty()) {
-    ss << "\tHomeURL: " << hostname1_.HomeURL << std::endl;
+    os << "\tHomeURL: " << hostname1_.HomeURL << std::endl;
   }
   if (!hostname1_.HardwareVendor.empty()) {
-    ss << "\tHardwareVendor: " << hostname1_.HardwareVendor << std::endl;
+    os << "\tHardwareVendor: " << hostname1_.HardwareVendor << std::endl;
   }
   if (!hostname1_.HardwareModel.empty()) {
-    ss << "\tHardwareModel: " << hostname1_.HardwareModel << std::endl;
+    os << "\tHardwareModel: " << hostname1_.HardwareModel << std::endl;
   }
   if (!hostname1_.FirmwareVersion.empty()) {
-    ss << "\tFirmwareVersion: " << hostname1_.FirmwareVersion << std::endl;
+    os << "\tFirmwareVersion: " << hostname1_.FirmwareVersion << std::endl;
   }
   if (!hostname1_.FirmwareVendor.empty()) {
-    ss << "\tFirmwareVendor: " << hostname1_.FirmwareVendor << std::endl;
+    os << "\tFirmwareVendor: " << hostname1_.FirmwareVendor << std::endl;
   }
   if (hostname1_.FirmwareDate.has_value()) {
-    ss << "\tFirmwareDate: " << hostname1_.FirmwareDate.value() << std::endl;
+    os << "\tFirmwareDate: " << hostname1_.FirmwareDate.value() << std::endl;
   }
   if (hostname1_.MachineID.has_value()) {
-    ss << "\tMachineID: ";
+    os << "\tMachineID: ";
     for (const auto& b : hostname1_.MachineID.value()) {
-      ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(b)
+      os << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(b)
          << " ";
     }
-    ss << std::endl;
+    os << std::endl;
   }
   if (hostname1_.BootID.has_value()) {
-    ss << "\tBootID: ";
+    os << "\tBootID: ";
     for (const auto& b : hostname1_.BootID.value()) {
-      ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(b)
+      os << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(b)
          << " ";
     }
-    ss << std::endl;
+    os << std::endl;
   }
-  spdlog::info("\n{}", ss.str());
+  spdlog::info("\n{}", os.str());
 }

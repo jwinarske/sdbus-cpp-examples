@@ -25,15 +25,15 @@
 class Utils {
  public:
   static void append_property(const sdbus::Variant& value,
-                              std::stringstream& string_stream);
+                              std::ostringstream& os);
 
   static void append_properties(
       const std::map<sdbus::MemberName, sdbus::Variant>& props,
-      std::stringstream& ss);
+      std::ostringstream& os);
 
   static void append_properties(
       const std::map<std::string, sdbus::Variant>& props,
-      std::stringstream& ss);
+      std::ostringstream& os);
 
   static void print_changed_properties(
       const sdbus::InterfaceName& interfaceName,
@@ -47,8 +47,8 @@ class Utils {
 
  private:
   static const std::unordered_map<
-      std::string,
-      std::function<void(const sdbus::Variant&, std::stringstream&)>>
+      std::string_view,
+      std::function<void(const sdbus::Variant&, std::ostringstream&)>>
       type_map_;
 };
 

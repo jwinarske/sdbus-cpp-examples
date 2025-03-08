@@ -41,16 +41,16 @@ class GeoClue2Location final : public sdbus::ProxyInterfaces<
       const sdbus::InterfaceName& interfaceName,
       const std::map<sdbus::PropertyName, sdbus::Variant>& changedProperties,
       const std::vector<sdbus::PropertyName>& invalidatedProperties) override {
-    std::stringstream ss;
-    ss << std::endl;
-    ss << "[" << interfaceName << "] GeoClue2Location Properties changed"
+    std::ostringstream os;
+    os << std::endl;
+    os << "[" << interfaceName << "] GeoClue2Location Properties changed"
        << std::endl;
-    Utils::append_properties(changedProperties, ss);
+    Utils::append_properties(changedProperties, os);
     for (const auto& name : invalidatedProperties) {
-      ss << "[" << interfaceName << "] Invalidated property: " << name
+      os << "[" << interfaceName << "] Invalidated property: " << name
          << std::endl;
     }
-    spdlog::info("{}", ss.str());
+    spdlog::info(os.str());
   }
 };
 

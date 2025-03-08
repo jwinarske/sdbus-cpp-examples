@@ -151,10 +151,10 @@ void Login1ManagerClient::onPrepareForShutdownWithMetadata(
     const bool& start,
     const std::map<std::string, sdbus::Variant>& metadata) {
   spdlog::info("onPrepareForShutdownWithMetadata: {}", start);
-  std::stringstream ss;
-  ss << std::endl;
-  Utils::append_properties(metadata, ss);
-  spdlog::info("{}", ss.str());
+  std::ostringstream os;
+  os << std::endl;
+  Utils::append_properties(metadata, os);
+  spdlog::info(os.str());
 }
 
 void Login1ManagerClient::onPrepareForSleep(const bool& start) {

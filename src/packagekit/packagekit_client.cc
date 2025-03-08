@@ -16,14 +16,14 @@ PackageKitClient::~PackageKitClient() {
 
 void PackageKitClient::onTransactionListChanged(
     const std::vector<std::string>& transactions) {
-  std::stringstream ss;
-  ss << std::endl;
-  ss << "[PackageKitClient] onTransactionListChanged (" << transactions.size()
+  std::ostringstream os;
+  os << std::endl;
+  os << "[PackageKitClient] onTransactionListChanged (" << transactions.size()
      << ")" << std::endl;
   for (const auto& transaction : transactions) {
-    ss << transaction << std::endl;
+    os << transaction << std::endl;
   }
-  spdlog::info("{}", ss.str());
+  spdlog::info(os.str());
 }
 
 void PackageKitClient::onRestartSchedule() {

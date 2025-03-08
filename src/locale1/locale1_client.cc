@@ -55,34 +55,34 @@ void Locale1Client::updateLocale1(
 }
 
 void Locale1Client::printLocale1() const {
-  std::stringstream ss;
+  std::ostringstream os;
 
   if (!locale1_.Locale.empty()) {
-    ss << "Locale:" << std::endl;
+    os << "Locale:" << std::endl;
     for (const auto& s : locale1_.Locale) {
-      ss << "\t" << s << " ";
+      os << "\t" << s << " ";
     }
-    ss << std::endl;
+    os << std::endl;
   }
   if (!locale1_.X11Layout.empty()) {
-    ss << "\tX11Layout: " << locale1_.X11Layout << std::endl;
+    os << "\tX11Layout: " << locale1_.X11Layout << std::endl;
   }
   if (!locale1_.X11Model.empty()) {
-    ss << "\tX11Model: " << locale1_.X11Model << std::endl;
+    os << "\tX11Model: " << locale1_.X11Model << std::endl;
   }
   if (!locale1_.X11Variant.empty()) {
-    ss << "\tX11Variant: " << locale1_.X11Variant << std::endl;
+    os << "\tX11Variant: " << locale1_.X11Variant << std::endl;
   }
   if (!locale1_.X11Options.empty()) {
-    ss << "\tX11Options: " << locale1_.X11Options << std::endl;
+    os << "\tX11Options: " << locale1_.X11Options << std::endl;
   }
   if (!locale1_.VConsoleKeymap.empty()) {
-    ss << "\tVConsoleKeymap: " << locale1_.VConsoleKeymap << std::endl;
+    os << "\tVConsoleKeymap: " << locale1_.VConsoleKeymap << std::endl;
   }
   if (!locale1_.VConsoleKeymapToggle.empty()) {
-    ss << "\tVConsoleKeymapToggle: " << locale1_.VConsoleKeymapToggle
+    os << "\tVConsoleKeymapToggle: " << locale1_.VConsoleKeymapToggle
        << std::endl;
   }
 
-  spdlog::info("\n{}", ss.str());
+  spdlog::info("\n{}", os.str());
 }

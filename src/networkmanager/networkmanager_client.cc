@@ -34,36 +34,36 @@ void NetworkManagerClient::onInterfacesAdded(
     const std::map<sdbus::InterfaceName,
                    std::map<sdbus::PropertyName, sdbus::Variant>>&
         interfacesAndProperties) {
-  std::stringstream ss;
-  ss << std::endl;
+  std::ostringstream os;
+  os << std::endl;
   for (const auto& [interface, properties] : interfacesAndProperties) {
-    ss << "[" << objectPath << "] Add - " << interface << std::endl;
-    Utils::append_properties(properties, ss);
+    os << "[" << objectPath << "] Add - " << interface << std::endl;
+    Utils::append_properties(properties, os);
   }
-  spdlog::info("{}", ss.str());
+  spdlog::info(os.str());
 }
 
 void NetworkManagerClient::onInterfacesRemoved(
     const sdbus::ObjectPath& objectPath,
     const std::vector<sdbus::InterfaceName>& interfaces) {
-  std::stringstream ss;
-  ss << std::endl;
+  std::ostringstream os;
+  os << std::endl;
   for (auto it = interfaces.begin(); it != interfaces.end(); ++it) {
-    ss << "[" << objectPath << "] Remove - " << *it;
+    os << "[" << objectPath << "] Remove - " << *it;
     if (std::next(it) != interfaces.end()) {
-      ss << std::endl;
+      os << std::endl;
     }
   }
-  spdlog::info("{}", ss.str());
+  spdlog::info(os.str());
 }
 
 void NetworkManagerClient::onPropertiesChanged(
     const std::map<std::string, sdbus::Variant>& properties) {
-  std::stringstream ss;
-  ss << std::endl;
-  ss << "NetworkManagerClient Properties changed" << std::endl;
-  Utils::append_properties(properties, ss);
-  spdlog::info("{}", ss.str());
+  std::ostringstream os;
+  os << std::endl;
+  os << "NetworkManagerClient Properties changed" << std::endl;
+  Utils::append_properties(properties, os);
+  spdlog::info(os.str());
 }
 
 void NetworkManagerClient::onCheckPermissions() {

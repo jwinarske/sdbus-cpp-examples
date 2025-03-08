@@ -57,7 +57,7 @@ void Timedate1Client::updateTimedate1(
   }
 }
 
-void appendTimeUSecAsDate(const uint64_t timeUSec, std::stringstream& ss) {
+void appendTimeUSecAsDate(const uint64_t timeUSec, std::ostringstream& ss) {
   const auto timePoint = std::chrono::system_clock::time_point(
       std::chrono::microseconds(timeUSec));
   const std::time_t timeT = std::chrono::system_clock::to_time_t(timePoint);
@@ -66,21 +66,21 @@ void appendTimeUSecAsDate(const uint64_t timeUSec, std::stringstream& ss) {
 }
 
 void Timedate1Client::printTimedate1() const {
-  std::stringstream ss;
+  std::ostringstream os;
 
   if (!timedate1_.Timezone.empty()) {
-    ss << "Timezone:" << timedate1_.Timezone << std::endl;
+    os << "Timezone:" << timedate1_.Timezone << std::endl;
   }
-  ss << "\tLocalRTC: " << (timedate1_.LocalRTC ? "True" : "False") << std::endl;
-  ss << "\tCanNTP: " << (timedate1_.CanNTP ? "True" : "False") << std::endl;
-  ss << "\tNTP: " << (timedate1_.NTP ? "True" : "False") << std::endl;
-  ss << "\tNTPSynchronized: " << (timedate1_.NTPSynchronized ? "True" : "False")
+  os << "\tLocalRTC: " << (timedate1_.LocalRTC ? "True" : "False") << std::endl;
+  os << "\tCanNTP: " << (timedate1_.CanNTP ? "True" : "False") << std::endl;
+  os << "\tNTP: " << (timedate1_.NTP ? "True" : "False") << std::endl;
+  os << "\tNTPSynchronized: " << (timedate1_.NTPSynchronized ? "True" : "False")
      << std::endl;
-  ss << "\tNTP: " << (timedate1_.NTP ? "True" : "False") << std::endl;
-  ss << "\tTimeUSec: " << timedate1_.TimeUSec << std::endl;
-  appendTimeUSecAsDate(timedate1_.TimeUSec, ss);
-  ss << "\tRTCTimeUSec: " << timedate1_.RTCTimeUSec << std::endl;
-  appendTimeUSecAsDate(timedate1_.RTCTimeUSec, ss);
+  os << "\tNTP: " << (timedate1_.NTP ? "True" : "False") << std::endl;
+  os << "\tTimeUSec: " << timedate1_.TimeUSec << std::endl;
+  appendTimeUSecAsDate(timedate1_.TimeUSec, os);
+  os << "\tRTCTimeUSec: " << timedate1_.RTCTimeUSec << std::endl;
+  appendTimeUSecAsDate(timedate1_.RTCTimeUSec, os);
 
-  spdlog::info("\n{}", ss.str());
+  spdlog::info("\n{}", os.str());
 }
