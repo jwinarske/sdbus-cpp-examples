@@ -125,10 +125,9 @@ class Hidraw {
     print_udev_properties("hidraw");
     for (const auto& properties :
          get_udev_properties("hidraw") | std::views::values) {
-      if (properties.contains("DEVNAME") && properties.contains("DEVPATH")) {
-        const auto dev_name = properties.at("DEVNAME");
-        if (compare_uhid_vid_pid(properties.at("DEVPATH"), bus, vid, pid) ==
-            0) {
+      if (properties.contains(DEVNAME) && properties.contains(DEVPATH)) {
+        const auto dev_name = properties.at(DEVNAME);
+        if (compare_uhid_vid_pid(properties.at(DEVPATH), bus, vid, pid) == 0) {
           devices.push_back(dev_name);
         }
       }
@@ -207,6 +206,9 @@ class Hidraw {
   }
 
  private:
+  static constexpr std::string DEVNAME = "DEVNAME";
+  static constexpr std::string DEVPATH = "DEVPATH";
+
   static const char* bus_str(const std::uint32_t bus) {
     switch (bus) {
       case BUS_USB:
