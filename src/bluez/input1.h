@@ -26,7 +26,7 @@ class Input1 final : public sdbus::ProxyInterfaces<org::bluez::Input1_proxy> {
          const sdbus::ObjectPath(&objectPath))
       : ProxyInterfaces{connection, destination, objectPath} {}
 
-  virtual ~Input1() {}
+  virtual ~Input1() = default;
 };
 
 #endif  // SRC_BLUEZ_INPUT1_H

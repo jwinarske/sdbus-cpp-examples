@@ -20,6 +20,12 @@
 class GattDescriptor1 final
     : public sdbus::ProxyInterfaces<org::bluez::GattDescriptor1_proxy> {
  public:
+  struct Properties {
+    sdbus::ObjectPath characteristic;
+    std::string uuid;
+    std::vector<std::uint8_t> value;
+  };
+
   GattDescriptor1(sdbus::IConnection& connection,
                   const sdbus::ServiceName(&destination),
                   const sdbus::ObjectPath(&objectPath),
@@ -27,22 +33,22 @@ class GattDescriptor1 final
       : ProxyInterfaces{connection, destination, objectPath} {
     if (const auto key = sdbus::MemberName("Characteristic");
         properties.contains(key)) {
-      characteristic_ = properties.at(key).get<sdbus::ObjectPath>();
+      properties_.characteristic = properties.at(key).get<sdbus::ObjectPath>();
     }
     if (const auto key = sdbus::MemberName("UUID"); properties.contains(key)) {
-      uuid_ = properties.at(key).get<std::string>();
+      properties_.uuid = properties.at(key).get<std::string>();
     }
     if (const auto key = sdbus::MemberName("Value"); properties.contains(key)) {
-      value_ = properties.at(key).get<std::vector<std::uint8_t>>();
+      properties_.value = properties.at(key).get<std::vector<std::uint8_t>>();
     }
   }
 
   ~GattDescriptor1() = default;
 
+  [[nodiscard]] const Properties& GetProperties() const { return properties_; }
+
  private:
-  sdbus::ObjectPath characteristic_;
-  std::string uuid_;
-  std::vector<std::uint8_t> value_;
+  Properties properties_;
 };
 
 #endif  // SRC_BLUEZ_GATT_DESCRIPTOR1_H

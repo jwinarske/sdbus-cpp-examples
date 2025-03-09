@@ -14,6 +14,14 @@ struct info<vendor> {
 };
 
 enum class vendor : std::uint16_t {
+  USB_1 = 0x20,
+  USB_2 = 0x21,
+  USB_3 = 0x22,
+  USB_4 = 0x23,
+  USB_5 = 0x24,
+  USB_6 = 0x25,
+  USB_7 = 0x26,
+  USB_8 = 0x27,
 
   UNKNOWN_1 = 0x31,
   UNKNOWN_2 = 0x3B,
@@ -25,6 +33,8 @@ enum class vendor : std::uint16_t {
   UNKNOWN_8 = 0x37,
   UNKnOWN_9 = 0x38,
   UNKNOWN_10 = 0x39,
+
+  UNKNOWN_11 = 0x40,
 };
 }  // namespace hid::page
 

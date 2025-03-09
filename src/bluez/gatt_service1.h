@@ -20,6 +20,13 @@
 class GattService1
     : public sdbus::ProxyInterfaces<org::bluez::GattService1_proxy> {
  public:
+  struct Properties {
+    sdbus::ObjectPath device;
+    std::vector<sdbus::ObjectPath> includes;
+    bool primary{};
+    std::string uuid;
+  };
+
   GattService1(sdbus::IConnection& connection,
                const sdbus::ServiceName(&destination),
                const sdbus::ObjectPath(&objectPath),
@@ -27,18 +34,19 @@ class GattService1
       : ProxyInterfaces{connection, destination, objectPath} {
     if (const auto key = sdbus::MemberName("Device");
         properties.contains(key)) {
-      device_ = properties.at(key).get<sdbus::ObjectPath>();
+      properties_.device = properties.at(key).get<sdbus::ObjectPath>();
     }
     if (const auto key = sdbus::MemberName("Includes");
         properties.contains(key)) {
-      includes_ = properties.at(key).get<std::vector<sdbus::ObjectPath>>();
+      properties_.includes =
+          properties.at(key).get<std::vector<sdbus::ObjectPath>>();
     }
     if (const auto key = sdbus::MemberName("Primary");
         properties.contains(key)) {
-      primary_ = properties.at(key).get<bool>();
+      properties_.primary = properties.at(key).get<bool>();
     }
     if (const auto key = sdbus::MemberName("UUID"); properties.contains(key)) {
-      uuid_ = properties.at(key).get<std::string>();
+      properties_.uuid = properties.at(key).get<std::string>();
     }
   }
 
@@ -61,11 +69,10 @@ class GattService1
     return gatt_characteristics_[objectPath];
   }
 
+  [[nodiscard]] const Properties& GetProperties() const { return properties_; }
+
  private:
-  sdbus::ObjectPath device_;
-  std::vector<sdbus::ObjectPath> includes_;
-  bool primary_;
-  std::string uuid_;
+  Properties properties_;
 
   std::map<sdbus::ObjectPath, std::unique_ptr<GattCharacteristic1>>
       gatt_characteristics_;

@@ -21,6 +21,13 @@ class LEAdvertisingManager1 final
     : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,
                                     org::bluez::LEAdvertisingManager1_proxy> {
  public:
+  struct Properties {
+    std::uint8_t active_instances{};
+    std::vector<std::string> supported_includes;
+    std::uint8_t supported_instances{};
+    std::vector<std::string> supported_secondary_channels;
+  };
+
   LEAdvertisingManager1(
       sdbus::IConnection& connection,
       const sdbus::ServiceName(&destination),
@@ -36,10 +43,7 @@ class LEAdvertisingManager1 final
   virtual ~LEAdvertisingManager1() { unregisterProxy(); }
 
  private:
-  std::uint8_t active_instances_{};
-  std::vector<std::string> supported_includes_;
-  std::uint8_t supported_instances_{};
-  std::vector<std::string> supported_secondary_channels_;
+  Properties properties_{};
 
   void onPropertiesChanged(
       const sdbus::InterfaceName& interfaceName,
@@ -47,20 +51,22 @@ class LEAdvertisingManager1 final
       const std::vector<sdbus::PropertyName>& invalidatedProperties) override {
     if (const auto key = sdbus::MemberName("ActiveInstances");
         changedProperties.contains(key)) {
-      active_instances_ = changedProperties.at(key).get<std::uint8_t>();
+      properties_.active_instances =
+          changedProperties.at(key).get<std::uint8_t>();
     }
     if (const auto key = sdbus::MemberName("SupportedIncludes");
         changedProperties.contains(key)) {
-      supported_includes_ =
+      properties_.supported_includes =
           changedProperties.at(key).get<std::vector<std::string>>();
     }
     if (const auto key = sdbus::MemberName("SupportedInstances");
         changedProperties.contains(key)) {
-      supported_instances_ = changedProperties.at(key).get<std::uint8_t>();
+      properties_.supported_instances =
+          changedProperties.at(key).get<std::uint8_t>();
     }
     if (const auto key = sdbus::MemberName("SupportedSecondaryChannels");
         changedProperties.contains(key)) {
-      supported_secondary_channels_ =
+      properties_.supported_secondary_channels =
           changedProperties.at(key).get<std::vector<std::string>>();
     }
   }

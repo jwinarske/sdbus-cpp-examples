@@ -20,6 +20,15 @@
 class GattCharacteristic1 final
     : public sdbus::ProxyInterfaces<org::bluez::GattCharacteristic1_proxy> {
  public:
+  struct Properties {
+    std::vector<std::string> flags;
+    bool notify_acquired{};
+    bool notifying{};
+    sdbus::ObjectPath service;
+    std::string uuid;
+    std::vector<std::uint8_t> value;
+  };
+
   GattCharacteristic1(
       sdbus::IConnection& connection,
       const sdbus::ServiceName(&destination),
@@ -27,32 +36,33 @@ class GattCharacteristic1 final
       const std::map<sdbus::MemberName, sdbus::Variant>& properties)
       : ProxyInterfaces{connection, destination, objectPath} {
     if (const auto key = sdbus::MemberName("Flags"); properties.contains(key)) {
-      flags_ = properties.at(key).get<std::vector<std::string>>();
+      properties_.flags = properties.at(key).get<std::vector<std::string>>();
     }
     if (isNotifyFlagSet()) {
       if (const auto key = sdbus::MemberName("NotifyAcquired");
           properties.contains(key)) {
-        notify_acquired_ = properties.at(key).get<bool>();
+        properties_.notify_acquired = properties.at(key).get<bool>();
       }
       if (const auto key = sdbus::MemberName("Notifying");
           properties.contains(key)) {
-        notifying_ = properties.at(key).get<bool>();
+        properties_.notifying = properties.at(key).get<bool>();
       }
     }
     if (const auto key = sdbus::MemberName("Service");
         properties.contains(key)) {
-      service_ = properties.at(key).get<sdbus::ObjectPath>();
+      properties_.service = properties.at(key).get<sdbus::ObjectPath>();
     }
     if (const auto key = sdbus::MemberName("UUID"); properties.contains(key)) {
-      uuid_ = properties.at(key).get<std::string>();
+      properties_.uuid = properties.at(key).get<std::string>();
     }
     if (const auto key = sdbus::MemberName("Value"); properties.contains(key)) {
-      value_ = properties.at(key).get<std::vector<std::uint8_t>>();
+      properties_.value = properties.at(key).get<std::vector<std::uint8_t>>();
     }
   }
 
   [[nodiscard]] bool isNotifyFlagSet() const {
-    if (std::find(flags_.begin(), flags_.end(), "notify") != flags_.end()) {
+    if (std::ranges::find(properties_.flags, "notify") !=
+        properties_.flags.end()) {
       return true;
     }
     return false;
@@ -60,13 +70,10 @@ class GattCharacteristic1 final
 
   ~GattCharacteristic1() = default;
 
+  [[nodiscard]] const Properties& GetProperties() const { return properties_; }
+
  private:
-  std::vector<std::string> flags_;
-  bool notify_acquired_{};
-  bool notifying_{};
-  sdbus::ObjectPath service_;
-  std::string uuid_;
-  std::vector<std::uint8_t> value_;
+  Properties properties_;
 };
 
 #endif  // SRC_BLUEZ_GATT_CHARACTERISTIC1_H

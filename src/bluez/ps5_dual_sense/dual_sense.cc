@@ -16,6 +16,7 @@
 
 #include "hidraw.hpp"
 
+
 DualSense::DualSense(sdbus::IConnection& connection)
     : ProxyInterfaces(connection,
                       sdbus::ServiceName(INTERFACE_NAME),
@@ -23,8 +24,17 @@ DualSense::DualSense(sdbus::IConnection& connection)
       UdevMonitor({"hidraw"},
                   [&](const char* /* action */,
                       const char* /* dev_node */,
-                      const char* sub_system) { get_hidraw_devices(); }) {
-  get_hidraw_devices();
+                      const char* sub_system) {
+                    if (!get_bt_hidraw_devices()) {
+                      if (!get_usb_hidraw_devices()) {
+                        spdlog::warn("Dual Sense not present.");
+                      }
+                    }
+                  }) {
+  if (!get_bt_hidraw_devices()) {
+    get_usb_hidraw_devices();
+  }
+
   registerProxy();
   for (const auto& [object, interfacesAndProperties] : GetManagedObjects()) {
     onInterfacesAdded(object, interfacesAndProperties);
@@ -186,9 +196,9 @@ std::string DualSense::convert_mac_to_path(const std::string& mac_address) {
 
 bool DualSense::compare_subsystem_device_paths(const std::string& input_path,
                                                const std::string& hidraw_path) {
-  const std::string prefix = "/sys/devices/virtual/misc/uhid/";
+  const std::string prefix = "/sys/devices/";
 
-  // Check if both paths start with their respective prefixes
+  // Check if both paths start with the prefix
   if (input_path.compare(0, prefix.size(), prefix) != 0 ||
       hidraw_path.compare(0, prefix.size(), prefix) != 0) {
     return false;
@@ -226,26 +236,28 @@ std::string DualSense::create_device_key_from_serial_number(
   return key;
 }
 
-void DualSense::get_hidraw_devices() {
+bool DualSense::get_usb_hidraw_devices() {
   // Clear all contents of hidraw_devices_
   std::scoped_lock lock(hidraw_devices_mutex_);
   hidraw_devices_.clear();
 
   // Get input devices matching the specified properties
-  const auto input_devices = Hidraw::get_udev_properties(
-      "input", {{"ID_BUS", "bluetooth"},
-                {"NAME", "\"DualSense Wireless Controller\""},
-                {"PRODUCT", "5/54c/ce6/8100"}});
+  const auto usb_input_devices =
+      Hidraw::get_udev_properties("input", {{"ID_BUS", "usb"},
+                                            {"ID_USB_VENDOR_ID", "054c"},
+                                            {"ID_USB_MODEL_ID", "0ce6"},
+                                            {"ID_USB_REVISION", "0100"},
+                                            {"TAGS", ":seat:"}});
 
-  if (input_devices.empty()) {
-    SPDLOG_DEBUG("No matching input devices found.");
-    return;
+  if (usb_input_devices.empty()) {
+    spdlog::warn("No matching USB input devices found.");
+    return false;
   }
 
   // Get all hidraw devices
   const auto hidraw_devices = Hidraw::get_udev_properties("hidraw");
 
-  for (const auto& [input_path, input_properties] : input_devices) {
+  for (const auto& [input_path, input_properties] : usb_input_devices) {
     for (const auto& [hidraw_path, hidraw_properties] : hidraw_devices) {
       if (compare_subsystem_device_paths(input_path, hidraw_path)) {
         if (hidraw_properties.contains("DEVNAME")) {
@@ -265,4 +277,47 @@ void DualSense::get_hidraw_devices() {
     spdlog::debug("hidraw device: {} = {}", key, value);
     Hidraw::dump_info(value);
   }
+  return true;
+}
+
+bool DualSense::get_bt_hidraw_devices() {
+  // Clear all contents of hidraw_devices_
+  std::scoped_lock lock(hidraw_devices_mutex_);
+  hidraw_devices_.clear();
+
+  // Get input devices matching the specified properties
+  const auto bt_input_devices = Hidraw::get_udev_properties(
+      "input", {{"ID_BUS", "bluetooth"},
+                {"NAME", "\"DualSense Wireless Controller\""},
+                {"PRODUCT", "5/54c/ce6/8100"}});
+
+  if (bt_input_devices.empty()) {
+    spdlog::warn("No matching BT input devices found.");
+    return false;
+  }
+
+  // Get all hidraw devices
+  const auto hidraw_devices = Hidraw::get_udev_properties("hidraw");
+
+  for (const auto& [input_path, input_properties] : bt_input_devices) {
+    for (const auto& [hidraw_path, hidraw_properties] : hidraw_devices) {
+      if (compare_subsystem_device_paths(input_path, hidraw_path)) {
+        if (hidraw_properties.contains("DEVNAME")) {
+          const auto& hidraw_dev_name = hidraw_properties.at("DEVNAME");
+          auto serial_number = input_properties.at("UNIQ");
+          const auto dev_key =
+              create_device_key_from_serial_number(serial_number);
+          spdlog::info(
+              "Associated input device path: {} with hidraw device: {}",
+              input_path, hidraw_dev_name);
+          hidraw_devices_[dev_key] = hidraw_dev_name;
+        }
+      }
+    }
+  }
+  for (const auto& [key, value] : hidraw_devices_) {
+    spdlog::debug("hidraw device: {} = {}", key, value);
+    Hidraw::dump_info(value);
+  }
+  return !hidraw_devices_.empty();
 }
