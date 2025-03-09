@@ -104,7 +104,8 @@ class Hidraw {
 
       bool match = true;
       for (const auto& [key, value] : match_params) {
-        if (!properties.contains(key) || properties.at(key) != value) {
+        if (auto it = properties.find(key);
+            it == properties.end() || it->second != value) {
           match = false;
           break;
         }

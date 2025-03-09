@@ -30,13 +30,13 @@ class UPowerClient final
   explicit UPowerClient(sdbus::IConnection& connection,
                         std::string device_filter = {})
       : ProxyInterfaces{connection,
-                        sdbus::ServiceName("org.freedesktop.UPower"),
+                        sdbus::ServiceName(UPower_proxy::INTERFACE_NAME),
                         sdbus::ObjectPath("/org/freedesktop/UPower")},
         device_filter_(std::move(device_filter)) {
     registerProxy();
-    const auto properties = this->GetAll("org.freedesktop.UPower");
+    const auto properties = this->GetAll(UPower_proxy::INTERFACE_NAME);
     UPowerClient::onPropertiesChanged(
-        sdbus::InterfaceName("org.freedesktop.UPower"), properties, {});
+        sdbus::InterfaceName(UPower_proxy::INTERFACE_NAME), properties, {});
     for (const auto devices = EnumerateDevices();
          const auto& device : devices) {
       UPowerClient::onDeviceAdded(device);
@@ -52,9 +52,7 @@ class UPowerClient final
   }
 
  private:
-  std::unique_ptr<UPowerDisplayDevice> display_device_;
   std::string device_filter_;
-
   std::mutex devices_mutex_;
   std::map<sdbus::ObjectPath, std::shared_ptr<UPowerDisplayDevice>> devices_;
 

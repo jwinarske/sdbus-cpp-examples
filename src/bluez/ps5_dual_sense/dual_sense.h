@@ -24,7 +24,7 @@
 #include "hid/rdf/descriptor.hpp"
 #endif
 
-#include "../../upower/upower_display_device.h"
+#include "../../upower/upower_client.h"
 #include "../adapter1.h"
 #include "../device1.h"
 #include "../input1.h"
@@ -70,11 +70,11 @@ class DualSense final
               usage(generic_desktop::HAT_SWITCH),
               logical_limits<1,1>(0, 7),
               physical_limits<1,2>(0,315),
-              unit::degree(),
+              unit::degree(), // requires two bytes, not four - upstream change
               report_size(4),
               report_count(1),
               input::absolute_variable(main::field_flags::NULL_STATE),
-              unit::none(),
+              unit::none(), // requires two bytes, not four - upstream change
 
               usage_page<button>(),
               usage_limits(button(1), button(14)),
@@ -234,6 +234,10 @@ class DualSense final
 #endif
 
  private:
+  const std::string kVendorId = "054C";
+  const std::string kProductId = "0CE6";
+  const std::string kDeviceId = "0100";
+
   static constexpr auto INTERFACE_NAME = "org.bluez";
   static constexpr auto PROPERTIES_INTERFACE_NAME =
       "org.freedesktop.DBus.Properties";
@@ -253,7 +257,7 @@ class DualSense final
   std::map<std::string, std::string> hidraw_devices_;
 
   std::mutex upower_display_devices_mutex_;
-  std::map<std::string, std::unique_ptr<UPowerDisplayDevice>> upower_display_devices_;
+  std::map<std::string, std::unique_ptr<UPowerClient>> upower_clients_;
 
   void onInterfacesAdded(
     const sdbus::ObjectPath& objectPath,

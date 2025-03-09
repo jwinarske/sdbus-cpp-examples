@@ -56,16 +56,16 @@ void DualSense::onInterfacesAdded(
       }
     } else if (interface == org::bluez::Device1_proxy::INTERFACE_NAME) {
       auto mod_alias_key = sdbus::MemberName("Modalias");
-      if (!properties.contains(mod_alias_key)) {
+      if (!properties.contains(mod_alias_key))
         continue;
-      }
+
       auto mod_alias = Device1::parse_modalias(
           properties.at(mod_alias_key).get<std::string>());
       if (mod_alias.has_value()) {
         spdlog::debug("VID: {}, PID: {}, DID: {}", mod_alias.value().vid,
                       mod_alias.value().pid, mod_alias.value().did);
         if (auto [vid, pid, did] = mod_alias.value();
-            vid != "054C" || pid != "0CE6" || did != "0100") {
+            vid != kVendorId || pid != kProductId || did != kDeviceId) {
           continue;
         }
       } else {
@@ -82,7 +82,7 @@ void DualSense::onInterfacesAdded(
         if (auto props = device->GetProperties(); props.modalias.has_value()) {
           auto [vid, pid, did] = props.modalias.value();
           spdlog::info("Adding: {}, {}, {}", vid, pid, did);
-          if (vid == "054C" && pid == "0CE6" && did == "0100") {
+          if (vid == kVendorId && pid == kProductId && did == kDeviceId) {
             // if connected, paired, trusted, and bonded a hidraw device should
             // be ready to use
             if (props.bonded && props.connected && props.paired &&
@@ -96,13 +96,11 @@ void DualSense::onInterfacesAdded(
 
             // Add UPower Display Device
             if (std::string power_path = convert_mac_to_path(props.address);
-                !upower_display_devices_.contains(power_path)) {
+                !upower_clients_.contains(power_path)) {
               upower_display_devices_mutex_.lock();
               spdlog::info("[Add] UPower Display Device: {}", power_path);
-              upower_display_devices_[power_path] =
-                  std::make_unique<UPowerDisplayDevice>(
-                      getProxy().getConnection(),
-                      sdbus::ObjectPath(power_path));
+              upower_clients_[power_path] = std::make_unique<UPowerClient>(
+                  getProxy().getConnection(), sdbus::ObjectPath(power_path));
               upower_display_devices_mutex_.unlock();
             }
           }
@@ -158,14 +156,14 @@ void DualSense::onInterfacesRemoved(
       if (auto props = device->GetProperties(); props.modalias.has_value()) {
         auto [vid, pid, did] = props.modalias.value();
         spdlog::info("Removing: {}, {}, {}", vid, pid, did);
-        if (vid == "054C" && pid == "0CE6" && did == "0100") {
+        if (vid == kVendorId && pid == kProductId && did == kDeviceId) {
           if (std::string power_path = convert_mac_to_path(props.address);
-              upower_display_devices_.contains(power_path)) {
+              upower_clients_.contains(power_path)) {
             std::scoped_lock power_lock(upower_display_devices_mutex_);
             spdlog::info("[Remove] UPower Display Device: {}", power_path);
-            auto& power_device = upower_display_devices_[power_path];
+            auto& power_device = upower_clients_[power_path];
             power_device.reset();
-            upower_display_devices_.erase(power_path);
+            upower_clients_.erase(power_path);
           }
         }
       }
