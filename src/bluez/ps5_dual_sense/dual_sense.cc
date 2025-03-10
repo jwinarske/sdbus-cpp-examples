@@ -14,6 +14,8 @@
 
 #include "dual_sense.h"
 
+#include <poll.h>
+
 #include "hidraw.hpp"
 
 DualSense::DualSense(sdbus::IConnection& connection)
@@ -321,111 +323,400 @@ bool DualSense::get_bt_hidraw_devices() {
   return !hidraw_devices_.empty();
 }
 
-void DualSense::print_state_data(USBGetStateData* state_data) {
-  spdlog::info("DPad: {}", static_cast<uint8_t>(state_data->DPad));
-  spdlog::info("ButtonSquare: {}",
-               static_cast<uint8_t>(state_data->ButtonSquare));
-  spdlog::info("ButtonCross: {}",
-               static_cast<uint8_t>(state_data->ButtonCross));
-  spdlog::info("ButtonCircle: {}",
-               static_cast<uint8_t>(state_data->ButtonCircle));
-  spdlog::info("ButtonTriangle: {}",
-               static_cast<uint8_t>(state_data->ButtonTriangle));
-  spdlog::info("ButtonL1: {}", static_cast<uint8_t>(state_data->ButtonL1));
-  spdlog::info("ButtonR1: {}", static_cast<uint8_t>(state_data->ButtonR1));
-  spdlog::info("ButtonL2: {}", static_cast<uint8_t>(state_data->ButtonL2));
-  spdlog::info("ButtonR2: {}", static_cast<uint8_t>(state_data->ButtonR2));
-  spdlog::info("ButtonCreate: {}",
-               static_cast<uint8_t>(state_data->ButtonCreate));
-  spdlog::info("ButtonOptions: {}",
-               static_cast<uint8_t>(state_data->ButtonOptions));
-  spdlog::info("ButtonL3: {}", static_cast<uint8_t>(state_data->ButtonL3));
-  spdlog::info("ButtonR3: {}", static_cast<uint8_t>(state_data->ButtonR3));
-  spdlog::info("ButtonHome: {}", static_cast<uint8_t>(state_data->ButtonHome));
-  spdlog::info("ButtonPad: {}", static_cast<uint8_t>(state_data->ButtonPad));
-  spdlog::info("ButtonMute: {}", static_cast<uint8_t>(state_data->ButtonMute));
-  spdlog::info("ButtonLeftFunction: {}",
-               static_cast<uint8_t>(state_data->ButtonLeftFunction));
-  spdlog::info("ButtonRightFunction: {}",
-               static_cast<uint8_t>(state_data->ButtonRightFunction));
-  spdlog::info("ButtonLeftPaddle: {}",
-               static_cast<uint8_t>(state_data->ButtonLeftPaddle));
-  spdlog::info("ButtonRightPaddle: {}",
-               static_cast<uint8_t>(state_data->ButtonRightPaddle));
-  spdlog::info("TriggerRightStopLocation: {}",
-               static_cast<uint8_t>(state_data->TriggerRightStopLocation));
-  spdlog::info("TriggerRightStatus: {}",
-               static_cast<uint8_t>(state_data->TriggerRightStatus));
-  spdlog::info("TriggerLeftStopLocation: {}",
-               static_cast<uint8_t>(state_data->TriggerLeftStopLocation));
-  spdlog::info("TriggerLeftStatus: {}",
-               static_cast<uint8_t>(state_data->TriggerLeftStatus));
-  spdlog::info("TriggerRightEffect: {}",
-               static_cast<uint8_t>(state_data->TriggerRightEffect));
-  spdlog::info("TriggerLeftEffect: {}",
-               static_cast<uint8_t>(state_data->TriggerLeftEffect));
-  spdlog::info("PowerPercent: {}",
-               static_cast<uint8_t>(state_data->PowerPercent));
-  spdlog::info("PluggedHeadphones: {}",
-               static_cast<uint8_t>(state_data->PluggedHeadphones));
-  spdlog::info("PluggedMic: {}", static_cast<uint8_t>(state_data->PluggedMic));
-  spdlog::info("MicMuted: {}", static_cast<uint8_t>(state_data->MicMuted));
-  spdlog::info("PluggedUsbData: {}",
-               static_cast<uint8_t>(state_data->PluggedUsbData));
-  spdlog::info("PluggedUsbPower: {}",
-               static_cast<uint8_t>(state_data->PluggedUsbPower));
-  spdlog::info("PluggedExternalMic: {}",
-               static_cast<uint8_t>(state_data->PluggedExternalMic));
-  spdlog::info("HapticLowPassFilter: {}",
-               static_cast<uint8_t>(state_data->HapticLowPassFilter));
+#if 0
+int DualSense::GetControllerStateUsb(const int fd, ReportIn01USB& state_data) {
+  state_data.ReportID = 0x01;
+
+  if (const auto result = read(fd, &state_data, sizeof(USBGetStateData));
+      result < 0) {
+    spdlog::error("GetControllerStateUsb failed: {}", strerror(errno));
+    return 1;
+  }
+  if (state_data.ReportID != 0x01) {
+    spdlog::error("GetControllerStateUsb invalid response");
+    return 1;
+  }
+  return 0;
+}
+#endif
+int DualSense::GetControllerStateUsb(const int fd, ReportIn01USB& state_data) {
+  state_data.ReportID = 0x01;
+
+  // Check if data is available using poll
+
+  pollfd pfd{};
+  pfd.fd = fd;
+  pfd.events = POLLIN;
+
+  const int poll_res = poll(&pfd, 1, 0);
+  if (poll_res == -1) {
+    spdlog::error("poll failed: {}", strerror(errno));
+    return 1;
+  }
+
+  // data not available, use epoll to block until data is available
+
+  if (poll_res == 0) {
+    spdlog::info("No data available to read");
+    // Create an epoll instance
+    const int epoll_fd = epoll_create1(0);
+    if (epoll_fd == -1) {
+      spdlog::error("Failed to create epoll instance: {}", strerror(errno));
+      return 1;
+    }
+
+    // Block using epoll to wait for data to be available
+
+    // Add the file descriptor to the epoll instance
+    epoll_event event{};
+    event.events = EPOLLIN;
+    event.data.fd = fd;
+    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &event) == -1) {
+      spdlog::error("Failed to add file descriptor to epoll: {}",
+                    strerror(errno));
+      close(epoll_fd);
+      return 1;
+    }
+
+    // Wait for events
+    epoll_event events[1];
+    if (const int n = epoll_wait(epoll_fd, events, 1, -1); n == -1) {
+      spdlog::error("epoll_wait failed: {}", strerror(errno));
+      close(epoll_fd);
+      return 1;
+    }
+    // Read data if available
+    if (!(events[0].events & EPOLLIN)) {
+      spdlog::error("epoll event EPOLLIN not set");
+    }
+    close(epoll_fd);
+  }
+
+  if (const auto result = read(fd, &state_data, sizeof(USBGetStateData));
+      result < 0) {
+    spdlog::error("GetControllerStateUsb failed: {}", strerror(errno));
+    return 1;
+  }
+
+  if (state_data.ReportID != 0x01) {
+    spdlog::error("GetControllerStateUsb invalid response");
+    return 1;
+  }
+
+  return 0;
 }
 
-int DualSense::GetControllerAndHostMAC(
+int DualSense::GetControllerStateBt(const int fd, ReportIn31& state_data) {
+  // Check if data is available using poll
+
+  pollfd pfd{};
+  pfd.fd = fd;
+  pfd.events = POLLIN;
+
+  const int poll_res = poll(&pfd, 1, 0);
+  if (poll_res == -1) {
+    spdlog::error("poll failed: {}", strerror(errno));
+    return 1;
+  }
+
+  // data not available, use epoll to block until data is available
+
+  if (poll_res == 0) {
+    spdlog::info("No data available to read");
+    // Create an epoll instance
+    const int epoll_fd = epoll_create1(0);
+    if (epoll_fd == -1) {
+      spdlog::error("Failed to create epoll instance: {}", strerror(errno));
+      return 1;
+    }
+
+    // Block using epoll to wait for data to be available
+
+    // Add the file descriptor to the epoll instance
+    epoll_event event{};
+    event.events = EPOLLIN;
+    event.data.fd = fd;
+    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &event) == -1) {
+      spdlog::error("Failed to add file descriptor to epoll: {}",
+                    strerror(errno));
+      close(epoll_fd);
+      return 1;
+    }
+
+    // Wait for events
+    epoll_event events[1];
+    if (const int n = epoll_wait(epoll_fd, events, 1, -1); n == -1) {
+      spdlog::error("epoll_wait failed: {}", strerror(errno));
+      close(epoll_fd);
+      return 1;
+    }
+    // Read data if available
+    if (!(events[0].events & EPOLLIN)) {
+      spdlog::error("epoll event EPOLLIN not set");
+    }
+    close(epoll_fd);
+  }
+
+  if (const auto result = read(fd, &state_data, sizeof(ReportIn31));
+      result < 0) {
+    spdlog::error("GetControllerStateUsb failed: {}", strerror(errno));
+    return 1;
+  }
+
+  if (state_data.Data.ReportID != 0x31) {
+    spdlog::error("GetControllerStateUsb invalid response");
+    return 1;
+  }
+
+  return 0;
+}
+
+int DualSense::GetControllerMacAll(
     const int fd,
     ReportFeatureInMacAll& controller_and_host_mac) {
   controller_and_host_mac.ReportID = 0x09;
-  if (const auto res = ioctl(fd, HIDIOCGFEATURE(20), &controller_and_host_mac);
+  if (const auto res = ioctl(fd, HIDIOCGFEATURE(sizeof(ReportFeatureInMacAll)),
+                             &controller_and_host_mac);
       res < 0) {
-    spdlog::error("GetControllerAndHostMAC failed: {}", strerror(errno));
+    spdlog::error("GetControllerMacAll failed: {}", strerror(errno));
     return 1;
   }
   if (controller_and_host_mac.ReportID != 0x09 ||
       controller_and_host_mac.Hard08 != 0x08 ||
       controller_and_host_mac.Hard25 != 0x25 ||
       controller_and_host_mac.Hard00 != 0x00) {
-    spdlog::error("GetControllerAndHostMAC invalid response");
+    spdlog::error("GetControllerMacAll invalid response");
     return 1;
   }
   return 0;
 }
 
-void DualSense::PrintControllerAndHostMac(
+int DualSense::GetControllerVersion(const int fd,
+                                    ReportFeatureInVersion& version) {
+  version.Data.ReportID = 0x20;
+  if (const auto res =
+          ioctl(fd, HIDIOCGFEATURE(sizeof(ReportFeatureInVersion)), &version);
+      res < 0) {
+    spdlog::error("GetControllerVersion failed: {}", strerror(errno));
+    return 1;
+  }
+  if (version.Data.ReportID != 0x20) {
+    spdlog::error("GetControllerVersion invalid response");
+    return 1;
+  }
+  return 0;
+}
+
+std::string DualSense::DpadToString(const Direction dpad) {
+  switch (dpad) {
+    case Direction::North:
+      return "North";
+    case Direction::NorthEast:
+      return "NorthEast";
+    case Direction::East:
+      return "East";
+    case Direction::SouthEast:
+      return "SouthEast";
+    case Direction::South:
+      return "South";
+    case Direction::SouthWest:
+      return "SouthWest";
+    case Direction::West:
+      return "West";
+    case Direction::NorthWest:
+      return "NorthWest";
+    default:
+      return "None";
+  }
+}
+
+std::string DualSense::PowerStateToString(const PowerState state) {
+  switch (state) {
+    case PowerState::Discharging:
+      return "Discharging";
+    case PowerState::Charging:
+      return "Charging";
+    case PowerState::Complete:
+      return "Complete";
+    case PowerState::AbnormalVoltage:
+      return "AbnormalVoltage";
+    case PowerState::AbnormalTemperature:
+      return "AbnormalTemperature";
+    case PowerState::ChargingError:
+      return "ChargingError";
+    default:
+      return "Unknown";
+  }
+}
+
+std::string DualSense::MuteLightToString(const MuteLight state) {
+  switch (state) {
+    case MuteLight::Off:
+      return "Off";
+    case MuteLight::On:
+      return "On";
+    case MuteLight::Breathing:
+      return "Breathing";
+    case MuteLight::DoNothing:
+      return "DoNothing";
+    case MuteLight::NoAction4:
+      return "NoAction4";
+    case MuteLight::NoAction5:
+      return "NoAction5";
+    case MuteLight::NoAction6:
+      return "NoAction6";
+    case MuteLight::NoAction7:
+      return "NoAction7";
+    default:
+      return "Unknown";
+  }
+}
+
+std::string DualSense::LightBrightnessToString(const LightBrightness state) {
+  switch (state) {
+    case LightBrightness::Bright:
+      return "Bright";
+    case LightBrightness::Mid:
+      return "Mid";
+    case LightBrightness::Dim:
+      return "Dim";
+    case LightBrightness::NoAction3:
+      return "NoAction3";
+    case LightBrightness::NoAction4:
+      return "NoAction4";
+    case LightBrightness::NoAction5:
+      return "NoAction5";
+    case LightBrightness::NoAction6:
+      return "NoAction6";
+    case LightBrightness::NoAction7:
+      return "NoAction7";
+    default:
+      return "Unknown";
+  }
+}
+
+std::string DualSense::LightFadeAnimationToString(
+    const LightFadeAnimation state) {
+  switch (state) {
+    case LightFadeAnimation::Nothing:
+      return "Nothing";
+    case LightFadeAnimation::FadeIn:
+      return "FadeIn";
+    case LightFadeAnimation::FadeOut:
+      return "FadeOut";
+    default:
+      return "Unknown";
+  }
+}
+
+void DualSense::PrintControllerMacAll(
     ReportFeatureInMacAll const& controller_and_host_mac) {
+  spdlog::info("Controller Mac All");
+  spdlog::info("\tReport ID: 0x{:02X}", controller_and_host_mac.ReportID);
+
   std::ostringstream os;
-  os << "ReportID: " << std::hex << std::setw(2) << std::setfill('0')
-     << static_cast<int>(controller_and_host_mac.ReportID) << "\n";
-
-  for (int i = 0; i < 6; i++) {
-    os << "ClientMac[" << i << "]: " << std::hex << std::setw(2)
-       << std::setfill('0')
-       << static_cast<int>(controller_and_host_mac.ClientMac[i]) << "\n";
-  }
-  os << "Hard08: " << std::hex << std::setw(2) << std::setfill('0')
-     << static_cast<int>(controller_and_host_mac.Hard08) << "\n";
-  os << "Hard25: " << std::hex << std::setw(2) << std::setfill('0')
-     << static_cast<int>(controller_and_host_mac.Hard25) << "\n";
-  os << "Hard00: " << std::hex << std::setw(2) << std::setfill('0')
-     << static_cast<int>(controller_and_host_mac.Hard00) << "\n";
-
-  for (int i = 0; i < 6; i++) {
-    os << "HostMac[" << i << "]: " << std::hex << std::setw(2)
-       << std::setfill('0')
-       << static_cast<int>(controller_and_host_mac.HostMac[i]) << "\n";
-  }
-  for (int i = 0; i < 3; i++) {
-    os << "HostMac[" << i << "]: " << std::hex << std::setw(2)
-       << std::setfill('0') << static_cast<int>(controller_and_host_mac.Pad[i])
-       << "\n";
+  os << "\tClient: ";
+  for (int i = 6; i; --i) {
+    os << std::hex << std::setw(2) << std::setfill('0')
+       << static_cast<int>(controller_and_host_mac.ClientMac[i]);
+    if (i != 1) {
+      os << ":";
+    }
   }
   spdlog::info(os.str());
+  os.clear();
+  os.str("");
+  os << "\tHost: ";
+  for (int i = 6; i; --i) {
+    os << std::hex << std::setw(2) << std::setfill('0')
+       << static_cast<int>(controller_and_host_mac.HostMac[i]);
+    if (i != 1) {
+      os << ":";
+    }
+  }
+  spdlog::info(os.str());
+}
+
+void DualSense::PrintControllerVersion(ReportFeatureInVersion const& version) {
+  spdlog::info("Firmware Info");
+  spdlog::info("\tReportID: 0x{:02X}", version.Data.ReportID);
+  spdlog::info("\tBuildDate: {}", std::string_view(version.Data.BuildDate, 11));
+  spdlog::info("\tBuildTime: {}", std::string_view(version.Data.BuildTime, 8));
+  spdlog::info("\tFwType: 0x{:04X}", version.Data.FwType);
+  spdlog::info("\tSwSeries: 0x{:04X}", version.Data.SwSeries);
+  spdlog::info("\tHardwareInfo: 0x{:08X}", version.Data.HardwareInfo);
+  spdlog::info("\tFirmwareVersion: 0x{:08X}", version.Data.FirmwareVersion);
+  spdlog::info("\tDeviceInfo: {}", version.Data.DeviceInfo);
+  spdlog::info("\tUpdateVersion: 0x{:04X}", version.Data.UpdateVersion);
+  spdlog::info("\tUpdateImageInfo: 0x{:02}",
+               static_cast<int>(version.Data.UpdateImageInfo));
+  spdlog::info("\tUpdateUnk: 0x{:02}",
+               static_cast<int>(version.Data.UpdateUnk));
+  spdlog::info("\tSblFwVersion: 0x{:08X}", version.Data.SblFwVersion);
+  spdlog::info("\tVenomFwVersion: 0x{:08X}", version.Data.VenomFwVersion);
+  spdlog::info("\tSpiderDspFwVersion: 0x{:08X}",
+               version.Data.SpiderDspFwVersion);
+}
+
+void DualSense::PrintControllerStateUsb(USBGetStateData const& state) {
+  spdlog::info("LeftStick: {}, {}", state.LeftStickX, state.LeftStickY);
+  spdlog::info("RightStick: {}, {}", state.RightStickX, state.RightStickY);
+  spdlog::info("DPad: {}", DpadToString(state.DPad));
+  spdlog::info("ButtonSquare: {}", state.ButtonSquare);
+  spdlog::info("ButtonCross: {}", state.ButtonCross);
+  spdlog::info("ButtonCircle: {}", state.ButtonCircle);
+  spdlog::info("ButtonTriangle: {}", state.ButtonTriangle);
+  spdlog::info("ButtonL1: {}", state.ButtonL1);
+  spdlog::info("ButtonR1: {}", state.ButtonR1);
+  spdlog::info("ButtonL2: {}", state.ButtonL2);
+  spdlog::info("ButtonR2: {}", state.ButtonR2);
+  spdlog::info("ButtonCreate: {}", state.ButtonCreate);
+  spdlog::info("ButtonOptions: {}", state.ButtonOptions);
+  spdlog::info("ButtonL3: {}", state.ButtonL3);
+  spdlog::info("ButtonR3: {}", state.ButtonR3);
+  spdlog::info("ButtonHome: {}", state.ButtonHome);
+  spdlog::info("ButtonPad: {}", state.ButtonPad);
+  spdlog::info("ButtonMute: {}", state.ButtonMute);
+  spdlog::info("ButtonLeftFunction: {}", state.ButtonLeftFunction);
+  spdlog::info("ButtonRightFunction: {}", state.ButtonRightFunction);
+  spdlog::info("ButtonLeftPaddle: {}", state.ButtonLeftPaddle);
+  spdlog::info("ButtonRightPaddle: {}", state.ButtonRightPaddle);
+  spdlog::info("TriggerRightStopLocation: {}", state.TriggerRightStopLocation);
+  spdlog::info("TriggerRightStatus: {}", state.TriggerRightStatus);
+  spdlog::info("TriggerLeftStopLocation: {}", state.TriggerLeftStopLocation);
+  spdlog::info("TriggerLeftStatus: {}", state.TriggerLeftStatus);
+  spdlog::info("TriggerRightEffect: {}", state.TriggerRightEffect);
+  spdlog::info("TriggerLeftEffect: {}", state.TriggerLeftEffect);
+  spdlog::info("PowerPercent: {}", state.PowerPercent);
+  spdlog::info("PowerState: {}", PowerStateToString(state.powerState));
+  spdlog::info("PluggedHeadphones: {}", state.PluggedHeadphones);
+  spdlog::info("PluggedMic: {}", state.PluggedMic);
+  spdlog::info("MicMuted: {}", state.MicMuted);
+  spdlog::info("PluggedUsbData: {}", state.PluggedUsbData);
+  spdlog::info("PluggedUsbPower: {}", state.PluggedUsbPower);
+  spdlog::info("PluggedExternalMic: {}", state.PluggedExternalMic);
+  spdlog::info("HapticLowPassFilter: {}", state.HapticLowPassFilter);
+}
+
+void DualSense::PrintControllerStateBt(BTSimpleGetStateData const& state) {
+  spdlog::info("LeftStick: {}, {}", state.LeftStickX, state.LeftStickY);
+  spdlog::info("RightStick: {}, {}", state.RightStickX, state.RightStickY);
+  spdlog::info("DPad: {}", DpadToString(state.DPad));
+  spdlog::info("ButtonSquare: {}", state.ButtonSquare);
+  spdlog::info("ButtonCross: {}", state.ButtonCross);
+  spdlog::info("ButtonCircle: {}", state.ButtonCircle);
+  spdlog::info("ButtonTriangle: {}", state.ButtonTriangle);
+  spdlog::info("ButtonL1: {}", state.ButtonL1);
+  spdlog::info("ButtonR1: {}", state.ButtonR1);
+  spdlog::info("ButtonL2: {}", state.ButtonL2);
+  spdlog::info("ButtonR2: {}", state.ButtonR2);
+  spdlog::info("ButtonShare: {}", state.ButtonShare);
+  spdlog::info("ButtonOptions: {}", state.ButtonOptions);
+  spdlog::info("ButtonL3: {}", state.ButtonL3);
+  spdlog::info("ButtonR3: {}", state.ButtonR3);
+  spdlog::info("ButtonHome: {}", state.ButtonHome);
+  spdlog::info("ButtonPad: {}", state.ButtonPad);
+  spdlog::info("Counter: {}", state.Counter);
+  spdlog::info("TriggerLeft: {}", state.TriggerLeft);
+  spdlog::info("TriggerRight: {}", state.TriggerRight);
 }

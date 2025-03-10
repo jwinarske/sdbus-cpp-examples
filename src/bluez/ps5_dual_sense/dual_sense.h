@@ -153,7 +153,7 @@ class DualSense final
     uint8_t ButtonLeftPaddle : 1;
     uint8_t ButtonRightPaddle : 1;
     uint8_t UNK2;
-    uint32_t UNK_COUNTER;
+    uint32_t TimeStamp;
     int16_t AngularVelocityX;
     int16_t AngularVelocityZ;
     int16_t AngularVelocityY;
@@ -172,7 +172,7 @@ class DualSense final
     uint8_t TriggerLeftEffect : 4;
     uint32_t DeviceTimeStamp;
     uint8_t PowerPercent : 4;
-    PowerState powerState : 4;  // Renamed to avoid conflict
+    PowerState powerState : 4;
     uint8_t PluggedHeadphones : 1;
     uint8_t PluggedMic : 1;
     uint8_t MicMuted : 1;
@@ -182,7 +182,8 @@ class DualSense final
     uint8_t PluggedExternalMic : 1;
     uint8_t HapticLowPassFilter : 1;
     uint8_t PluggedUnk3 : 6;
-    uint8_t AesCmac[8];
+    uint8_t AesCmac[5];
+    uint8_t crc[4];  // CRC32 of the entire packet, not just the data section
   };
 
   struct BTGetStateData {
@@ -359,31 +360,36 @@ class DualSense final
         char UpdateImageInfo;
         char UpdateUnk;
         ////
-        uint32_t FwVersion1;  // AKA SblFwVersion
+        uint32_t SblFwVersion;
         // 0xAABBCCCC AA.BB.CCCC
         // Ignored for FwType 0
         // HardwareVersion used for FwType 1
         // Unknown behavior if HardwareVersion < 0.1.38 for FwType 2 & 3
         // If HardwareVersion >= 0.1.38 for FwType 2 & 3
-        uint32_t FwVersion2;  // AKA VenomFwVersion
-        uint32_t FwVersion3;  // AKA SpiderDspFwVersion AKA BettyFwVer
-        // May be Memory Control Unit for Non-Volatile Storage
+        uint32_t VenomFwVersion;
+        uint32_t SpiderDspFwVersion;
       } Data;
     };
 #pragma pack(pop)
   };
 
-  static void print_state_data(USBGetStateData* state_data);
-
   explicit DualSense(sdbus::IConnection& connection);
 
   ~DualSense() override;
 
-  static int GetControllerAndHostMAC(
-      int fd,
-      ReportFeatureInMacAll& controller_and_host_mac);
-  static void PrintControllerAndHostMac(
+  static int GetControllerStateUsb(int fd, ReportIn01USB& state_data);
+  static int GetControllerStateBt(int fd, ReportIn31& state_data);
+
+  static int GetControllerMacAll(int fd, ReportFeatureInMacAll& mac_all);
+
+  static int GetControllerVersion(int fd, ReportFeatureInVersion& version);
+
+  static void PrintControllerMacAll(
       ReportFeatureInMacAll const& controller_and_host_mac);
+  static void PrintControllerVersion(ReportFeatureInVersion const& version);
+
+  static void PrintControllerStateUsb(USBGetStateData const& state);
+  static void PrintControllerStateBt(BTSimpleGetStateData const& state);
 
  private:
   const std::string kVendorId = "054C";
@@ -432,6 +438,12 @@ class DualSense final
 
   static std::string create_device_key_from_serial_number(
       const std::string& serial_number);
+
+  static std::string DpadToString(Direction dpad);
+  static std::string PowerStateToString(PowerState state);
+  static std::string MuteLightToString(MuteLight state);
+  static std::string LightBrightnessToString(LightBrightness state);
+  static std::string LightFadeAnimationToString(LightFadeAnimation state);
 };
 
 #endif  // SRC_DUAL_SENSE_H

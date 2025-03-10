@@ -681,9 +681,24 @@ class Hidraw {
       return;
     }
 
+    // Raw Name
+    std::uint8_t buf[256]{};
+    auto res = ioctl(fd, HIDIOCGRAWNAME(sizeof(buf)), buf);
+    if (res < 0)
+      spdlog::error("HIDIOCGRAWNAME");
+    else
+      ss << "HID Name: " << buf << "\n";
+
+    // Raw Physical Location
+    res = ioctl(fd, HIDIOCGRAWPHYS(sizeof(buf)), buf);
+    if (res < 0)
+      spdlog::error("HIDIOCGRAWPHYS");
+    else
+      ss << "HID Physical Location: " << buf << "\n";
+
     // Raw Info
     hidraw_devinfo dev_info{};
-    auto res = ioctl(fd, HIDIOCGRAWINFO, &dev_info);
+    res = ioctl(fd, HIDIOCGRAWINFO, &dev_info);
     if (res < 0) {
       spdlog::error("HIDIOCGRAWINFO");
     } else {
@@ -701,33 +716,19 @@ class Hidraw {
     if (res < 0) {
       spdlog::error("HIDIOCGRDESCSIZE");
     } else {
-      spdlog::info("Report Descriptor Size: {}", desc_size);
+      ss << "Report Descriptor Size: " << desc_size << "\n";
     }
+    spdlog::info(ss.str());
 
     if (dev_info.bustype == BUS_USB) {
       const hid::report_protocol rp(usb_report_desc);
       print_report_protocol(rp);
       assert(rp.descriptor.size() == desc_size);
     } else if (dev_info.bustype == BUS_BLUETOOTH) {
-      const hid::report_protocol rp(usb_report_desc);
+      const hid::report_protocol rp(bt_report_desc);
       print_report_protocol(rp);
-      assert(rp.descriptor.size() == desc_size);
+      //      assert(rp.descriptor.size() == desc_size);
     }
-
-    // Raw Name
-    std::uint8_t buf[256]{};
-    res = ioctl(fd, HIDIOCGRAWNAME(sizeof(buf)), buf);
-    if (res < 0)
-      spdlog::error("HIDIOCGRAWNAME");
-    else
-      ss << "HID Name: " << buf << "\n";
-
-    // Raw Physical Location
-    res = ioctl(fd, HIDIOCGRAWPHYS(sizeof(buf)), buf);
-    if (res < 0)
-      spdlog::error("HIDIOCGRAWPHYS");
-    else
-      ss << "HID Physical Location: " << buf << "\n";
 
     // Report Descriptor
     hidraw_report_descriptor rpt_desc{};
@@ -743,6 +744,9 @@ class Hidraw {
       spdlog::info("Usage page id: {}", usage_id.page_id());
       spdlog::info("Usage id: {}", usage_id.id());
 
+      ss.clear();
+      ss.str("");
+
       ss << "Raw Report Descriptor:\n";
       for (int i = 0; i < rpt_desc.size; i++)
         ss << "0x" << std::hex << std::setw(2) << std::setfill('0')
@@ -757,89 +761,64 @@ class Hidraw {
     }
     spdlog::debug(ss.str());
 
-    GetFeature(fd, 0x05);  // Get Calibration
-    // GetFeature(fd, 0x08); // Get bluetooth control
+    if (dev_info.bustype == BUS_USB) {
+      GetFeature(fd, 0x05);  // Get Calibration
+      // GetFeature(fd, 0x08); // Get bluetooth control
+      if (DualSense::ReportFeatureInMacAll report_feature_in_mac_all{};
+          DualSense::GetControllerMacAll(fd, report_feature_in_mac_all) == 0) {
+        DualSense::PrintControllerMacAll(report_feature_in_mac_all);
+      }
+      // GetFeature(fd, 0x0A); // Set bluetooth pairing
+      // GetFeature(fd, 0x20); // Get Controller Version/Date
+      // GetFeature(fd, 0x21); // Set audio control
+      // GetFeature(fd, 0x22); // Get Hardware Info
+      // GetFeature(fd, 0x80); // Set test command
+      // GetFeature(fd, 0x81); // Get test result
+      // GetFeature(fd, 0x82); // Set calibration command
+      // GetFeature(fd, 0x83); // Get calibration data
+      // GetFeature(fd, 0x84); // Set individual data
+      //    GetFeature(fd, 0x85);  // Get individual data result
+      // GetFeature(fd, 0xA0); // Set DFU enable
+      // GetFeature(fd, 0xE0); // Get system profile
+      // GetFeature(fd, 0xF0); // Flash command
+      // GetFeature(fd, 0xF1); // Get flash cmd status
+      //    GetFeature(fd, 0xF2);  //
+      // GetFeature(fd, 0xF4); // User update command
+      //    GetFeature(fd, 0xF5);  // User get update status
 
-    DualSense::ReportFeatureInMacAll report_feature_in_mac_all{};
-    DualSense::GetControllerAndHostMAC(fd, report_feature_in_mac_all);
-    DualSense::PrintControllerAndHostMac(report_feature_in_mac_all);
+      if (DualSense::ReportIn01USB report_in_01_usb{};
+          DualSense::GetControllerStateUsb(fd, report_in_01_usb) == 0) {
+        DualSense::PrintControllerStateUsb(report_in_01_usb.State);
+      }
+    } else if (dev_info.bustype == BUS_BLUETOOTH) {
+      GetFeature(fd, 0x05);  // Get Calibration - enables report 0x31
 
-    // GetFeature(fd, 0x0A); // Set bluetooth pairing
-    // GetFeature(fd, 0x20); // Get Controller Version/Date
-    // GetFeature(fd, 0x21); // Set audio control
-    // GetFeature(fd, 0x22); // Get Hardware Info
-    // GetFeature(fd, 0x80); // Set test command
-    // GetFeature(fd, 0x81); // Get test result
-    // GetFeature(fd, 0x82); // Set calibration command
-    // GetFeature(fd, 0x83); // Get calibration data
-    // GetFeature(fd, 0x84); // Set individual data
-    GetFeature(fd, 0x85);  // Get individual data result
-    // GetFeature(fd, 0xA0); // Set DFU enable
-    // GetFeature(fd, 0xE0); // Get system profile
-    // GetFeature(fd, 0xF0); // Flash command
-    // GetFeature(fd, 0xF1); // Get flash cmd status
-    GetFeature(fd, 0xF2);  //
-    // GetFeature(fd, 0xF4); // User update command
-    GetFeature(fd, 0xF5);  // User get update status
-
-    {
-      // Get a report from the device
-
-      if (const auto result = read(fd, buf, 64); result < 0) {
-        perror("read");
-      } else {
-        std::ostringstream os;
-        os << "read() read " << result << " bytes\n";
-        for (int i = 0; i < result; i++)
-          os << "0x" << std::hex << std::setw(2) << std::setfill('0') << buf[i]
-             << ", ";
-        os << "\n";
-        spdlog::debug(os.str());
+      GetFeature(fd, 0x08);  // Get bluetooth control
+      if (DualSense::ReportFeatureInMacAll report_feature_in_mac_all{};
+          DualSense::GetControllerMacAll(fd, report_feature_in_mac_all) == 0) {
+        DualSense::PrintControllerMacAll(report_feature_in_mac_all);
       }
 
-      spdlog::debug("Report ID: 0x{:02x}", buf[0]);
+      DualSense::ReportFeatureInVersion version{};
+      DualSense::GetControllerVersion(fd, version);
+      DualSense::PrintControllerVersion(version);
 
-      if (buf[0] == 0x01) {
-        const auto state_data =
-            reinterpret_cast<DualSense::USBGetStateData*>(&buf[1]);
-        DualSense::print_state_data(state_data);
+      GetFeature(fd, 0x22);  // Get Hardware Info
+      // GetFeature(fd, 0x80); // Set test command
+      // GetFeature(fd, 0x81); // Get test result
+      // GetFeature(fd, 0x82); // Set calibration command
+      GetFeature(fd, 0x83);  // Get calibration data
+      //  GetFeature(fd, 0xF0); // Flash command
+      GetFeature(fd, 0xF1);  // Get flash cmd status
+      GetFeature(fd, 0xF2);  //
+
+      if (DualSense::ReportIn31 report_in_31_bt{};
+          DualSense::GetControllerStateBt(fd, report_in_31_bt) == 0) {
+        DualSense::PrintControllerStateUsb(
+            report_in_31_bt.Data.State.StateData);
       }
     }
 
-#if 0
-    // Set Feature
-    buf[0] = 0x1;  // Report Number
-    buf[1] = 0xff;
-    buf[2] = 0xff;
-    buf[3] = 0xff;
-    res = ioctl(fd, HIDIOCSFEATURE(4), buf);
-    if (res < 0)
-      perror("HIDIOCSFEATURE");
-    else
-      printf("ioctl HIDIOCSFEATURE returned: %d\n", res);
-
-    // Set Feature
-    buf[0] = 0x31;  // Report Number
-    buf[1] = 0xff;
-    buf[2] = 0xff;
-    buf[3] = 0xff;
-    res = ioctl(fd, HIDIOCSFEATURE(4), buf);
-    if (res < 0)
-      perror("HIDIOCSFEATURE");
-    else
-      printf("ioctl HIDIOCSFEATURE returned: %d\n", res);
-
-    // Send a Report to the Device
-    buf[0] = 0x1;  // Report Number
-    buf[1] = 0x77;
-    res = write(fd, buf, 2);
-    if (res < 0) {
-      printf("Error: %d\n", errno);
-      perror("write");
-    } else {
-      printf("write() wrote %d bytes\n", res);
-    }
-#endif
     close(fd);
   }
 
