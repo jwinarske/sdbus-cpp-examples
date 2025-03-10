@@ -295,8 +295,8 @@ class DualSense final
     uint8_t UNKBYTE;  // previous notes suggested this was HLPF, was probably
                       // off by 1
 
-    LightFadeAnimation lightFadeAnimation;  // Renamed to avoid conflict
-    LightBrightness lightBrightness;        // Renamed to avoid conflict
+    LightFadeAnimation lightFadeAnimation;
+    LightBrightness lightBrightness;
 
     // PlayerIndicators
     uint8_t PlayerLight1 : 1;     // x --- -
@@ -326,6 +326,37 @@ class DualSense final
         uint8_t SeqNo : 4;  // increment for every write // we have no proof of
                             // this, need to see some PS5 captures
         SetStateData State;
+      } Data;
+    };
+  };
+
+  struct ReportFeatureCalibrationData {
+    union {
+      BTCRC<41> CRC;
+      struct {
+        uint8_t ReportID;  // 0x05 // does this exist on USB? confirm
+        struct {
+          uint16_t pitch_bias;
+          uint16_t yaw_bias;
+          uint16_t roll_bias;
+          uint16_t pitch_plus;
+          uint16_t pitch_minus;
+          uint16_t yaw_plus;
+          uint16_t yaw_minus;
+          uint16_t roll_plus;
+          uint16_t roll_minus;
+          uint16_t speed_plus;
+          uint16_t speed_minus;
+        } gyro;
+        struct {
+          uint16_t x_plus;
+          uint16_t x_minus;
+          uint16_t y_plus;
+          uint16_t y_minus;
+          uint16_t z_plus;
+          uint16_t z_minus;
+        } acc;
+        int16_t Unknown;
       } Data;
     };
   };
@@ -373,6 +404,18 @@ class DualSense final
 #pragma pack(pop)
   };
 
+  struct CalibrationData {
+    std::int32_t abs_code;
+    std::int16_t bias;
+    std::int32_t sens_numer;
+    std::int32_t sens_denom;
+  };
+
+  struct HardwareCalibrationData {
+    CalibrationData gyro[3];
+    CalibrationData accel[3];
+  };
+
   explicit DualSense(sdbus::IConnection& connection);
 
   ~DualSense() override;
@@ -384,17 +427,23 @@ class DualSense final
 
   static int GetControllerVersion(int fd, ReportFeatureInVersion& version);
 
+  static int GetControllerCalibrationData(int fd,
+                                          HardwareCalibrationData& hw_cal_data);
+
+  static void PrintCalibrationData(HardwareCalibrationData const& hw_cal_data);
   static void PrintControllerMacAll(
       ReportFeatureInMacAll const& controller_and_host_mac);
   static void PrintControllerVersion(ReportFeatureInVersion const& version);
 
-  static void PrintControllerStateUsb(USBGetStateData const& state);
+  static void PrintControllerStateUsb(
+      USBGetStateData const& state,
+      HardwareCalibrationData const& hw_cal_data);
   static void PrintControllerStateBt(BTSimpleGetStateData const& state);
 
  private:
-  const std::string kVendorId = "054C";
-  const std::string kProductId = "0CE6";
-  const std::string kDeviceId = "0100";
+  const std::string VENDOR_ID = "054C";
+  const std::string PRODUCT_ID = "0CE6";
+  const std::string DEVICE_ID = "0100";
 
   static constexpr auto INTERFACE_NAME = "org.bluez";
   static constexpr auto PROPERTIES_INTERFACE_NAME =
@@ -417,6 +466,8 @@ class DualSense final
   std::mutex upower_display_devices_mutex_;
   std::map<std::string, std::unique_ptr<UPowerClient>> upower_clients_;
 
+  HardwareCalibrationData calib_data_{};
+
   void onInterfacesAdded(
       const sdbus::ObjectPath& objectPath,
       const std::map<sdbus::InterfaceName,
@@ -428,7 +479,6 @@ class DualSense final
       const std::vector<sdbus::InterfaceName>& interfaces) override;
 
   bool get_bt_hidraw_devices();
-
   bool get_usb_hidraw_devices();
 
   static std::string convert_mac_to_path(const std::string& mac_address);
@@ -439,11 +489,11 @@ class DualSense final
   static std::string create_device_key_from_serial_number(
       const std::string& serial_number);
 
-  static std::string DpadToString(Direction dpad);
-  static std::string PowerStateToString(PowerState state);
-  static std::string MuteLightToString(MuteLight state);
-  static std::string LightBrightnessToString(LightBrightness state);
-  static std::string LightFadeAnimationToString(LightFadeAnimation state);
+  static std::string dpad_to_string(Direction dpad);
+  static std::string power_state_to_string(PowerState state);
+  static std::string mute_light_to_string(MuteLight state);
+  static std::string light_brightness_to_string(LightBrightness state);
+  static std::string light_fade_animation_to_string(LightFadeAnimation state);
 };
 
 #endif  // SRC_DUAL_SENSE_H

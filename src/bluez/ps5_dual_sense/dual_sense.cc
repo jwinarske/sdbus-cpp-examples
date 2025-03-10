@@ -76,7 +76,7 @@ void DualSense::onInterfacesAdded(
         spdlog::debug("VID: {}, PID: {}, DID: {}", mod_alias.value().vid,
                       mod_alias.value().pid, mod_alias.value().did);
         if (auto [vid, pid, did] = mod_alias.value();
-            vid != kVendorId || pid != kProductId || did != kDeviceId) {
+            vid != VENDOR_ID || pid != PRODUCT_ID || did != DEVICE_ID) {
           continue;
         }
       } else {
@@ -93,7 +93,7 @@ void DualSense::onInterfacesAdded(
         if (auto props = device->GetProperties(); props.modalias.has_value()) {
           auto [vid, pid, did] = props.modalias.value();
           spdlog::info("Adding: {}, {}, {}", vid, pid, did);
-          if (vid == kVendorId && pid == kProductId && did == kDeviceId) {
+          if (vid == VENDOR_ID && pid == PRODUCT_ID && did == DEVICE_ID) {
             // if connected, paired, trusted, and bonded a hidraw device should
             // be ready to use
             if (props.bonded && props.connected && props.paired &&
@@ -167,7 +167,7 @@ void DualSense::onInterfacesRemoved(
       if (auto props = device->GetProperties(); props.modalias.has_value()) {
         auto [vid, pid, did] = props.modalias.value();
         spdlog::info("Removing: {}, {}, {}", vid, pid, did);
-        if (vid == kVendorId && pid == kProductId && did == kDeviceId) {
+        if (vid == VENDOR_ID && pid == PRODUCT_ID && did == DEVICE_ID) {
           if (std::string power_path = convert_mac_to_path(props.address);
               upower_clients_.contains(power_path)) {
             std::scoped_lock power_lock(upower_display_devices_mutex_);
@@ -323,22 +323,6 @@ bool DualSense::get_bt_hidraw_devices() {
   return !hidraw_devices_.empty();
 }
 
-#if 0
-int DualSense::GetControllerStateUsb(const int fd, ReportIn01USB& state_data) {
-  state_data.ReportID = 0x01;
-
-  if (const auto result = read(fd, &state_data, sizeof(USBGetStateData));
-      result < 0) {
-    spdlog::error("GetControllerStateUsb failed: {}", strerror(errno));
-    return 1;
-  }
-  if (state_data.ReportID != 0x01) {
-    spdlog::error("GetControllerStateUsb invalid response");
-    return 1;
-  }
-  return 0;
-}
-#endif
 int DualSense::GetControllerStateUsb(const int fd, ReportIn01USB& state_data) {
   state_data.ReportID = 0x01;
 
@@ -430,8 +414,6 @@ int DualSense::GetControllerStateBt(const int fd, ReportIn31& state_data) {
       return 1;
     }
 
-    // Block using epoll to wait for data to be available
-
     // Add the file descriptor to the epoll instance
     epoll_event event{};
     event.events = EPOLLIN;
@@ -450,7 +432,8 @@ int DualSense::GetControllerStateBt(const int fd, ReportIn31& state_data) {
       close(epoll_fd);
       return 1;
     }
-    // Read data if available
+
+    // event happened
     if (!(events[0].events & EPOLLIN)) {
       spdlog::error("epoll event EPOLLIN not set");
     }
@@ -459,32 +442,29 @@ int DualSense::GetControllerStateBt(const int fd, ReportIn31& state_data) {
 
   if (const auto result = read(fd, &state_data, sizeof(ReportIn31));
       result < 0) {
-    spdlog::error("GetControllerStateUsb failed: {}", strerror(errno));
+    spdlog::error("GetControllerStateBt failed: {}", strerror(errno));
     return 1;
   }
 
   if (state_data.Data.ReportID != 0x31) {
-    spdlog::error("GetControllerStateUsb invalid response");
+    spdlog::error("GetControllerStateBt unexpected response");
     return 1;
   }
 
   return 0;
 }
 
-int DualSense::GetControllerMacAll(
-    const int fd,
-    ReportFeatureInMacAll& controller_and_host_mac) {
-  controller_and_host_mac.ReportID = 0x09;
-  if (const auto res = ioctl(fd, HIDIOCGFEATURE(sizeof(ReportFeatureInMacAll)),
-                             &controller_and_host_mac);
+int DualSense::GetControllerMacAll(const int fd,
+                                   ReportFeatureInMacAll& mac_all) {
+  mac_all.ReportID = 0x09;
+  if (const auto res =
+          ioctl(fd, HIDIOCGFEATURE(sizeof(ReportFeatureInMacAll)), &mac_all);
       res < 0) {
     spdlog::error("GetControllerMacAll failed: {}", strerror(errno));
     return 1;
   }
-  if (controller_and_host_mac.ReportID != 0x09 ||
-      controller_and_host_mac.Hard08 != 0x08 ||
-      controller_and_host_mac.Hard25 != 0x25 ||
-      controller_and_host_mac.Hard00 != 0x00) {
+  if (mac_all.ReportID != 0x09 || mac_all.Hard08 != 0x08 ||
+      mac_all.Hard25 != 0x25 || mac_all.Hard00 != 0x00) {
     spdlog::error("GetControllerMacAll invalid response");
     return 1;
   }
@@ -507,7 +487,108 @@ int DualSense::GetControllerVersion(const int fd,
   return 0;
 }
 
-std::string DualSense::DpadToString(const Direction dpad) {
+int DualSense::GetControllerCalibrationData(
+    const int fd,
+    HardwareCalibrationData& hw_cal_data) {
+  static constexpr auto ACC_RES_PER_G = 8192;
+  static constexpr auto ACC_RANGE = (4 * ACC_RES_PER_G);
+  static constexpr auto GYRO_RES_PER_DEG_S = 1024;
+  static constexpr auto GYRO_RANGE = (2048 * GYRO_RES_PER_DEG_S);
+
+  ReportFeatureCalibrationData cal_data{};
+  cal_data.Data.ReportID = 0x05;
+  if (const auto res = ioctl(
+          fd, HIDIOCGFEATURE(sizeof(ReportFeatureCalibrationData)), &cal_data);
+      res < 0) {
+    spdlog::error("GetControllerCalibrationData failed: {}", strerror(errno));
+    return 1;
+  }
+  if (cal_data.Data.ReportID != 0x05) {
+    spdlog::error("GetControllerCalibrationData invalid response");
+    return 1;
+  }
+
+  // Set gyroscope calibration and normalization parameters.
+  const auto speed_2x =
+      (cal_data.Data.gyro.speed_plus + cal_data.Data.gyro.speed_minus);
+  hw_cal_data.gyro[0].abs_code = ABS_RX;
+  hw_cal_data.gyro[0].bias = 0;
+  hw_cal_data.gyro[0].sens_numer = speed_2x * GYRO_RES_PER_DEG_S;
+  hw_cal_data.gyro[0].sens_denom =
+      abs(cal_data.Data.gyro.pitch_plus - cal_data.Data.gyro.pitch_bias) +
+      abs(cal_data.Data.gyro.pitch_minus - cal_data.Data.gyro.pitch_bias);
+
+  hw_cal_data.gyro[1].abs_code = ABS_RY;
+  hw_cal_data.gyro[1].bias = 0;
+  hw_cal_data.gyro[1].sens_numer = speed_2x * GYRO_RES_PER_DEG_S;
+  hw_cal_data.gyro[1].sens_denom =
+      abs(cal_data.Data.gyro.yaw_plus - cal_data.Data.gyro.yaw_bias) +
+      abs(cal_data.Data.gyro.yaw_minus - cal_data.Data.gyro.yaw_bias);
+
+  hw_cal_data.gyro[2].abs_code = ABS_RZ;
+  hw_cal_data.gyro[2].bias = 0;
+  hw_cal_data.gyro[2].sens_numer = speed_2x * GYRO_RES_PER_DEG_S;
+  hw_cal_data.gyro[2].sens_denom =
+      abs(cal_data.Data.gyro.roll_plus - cal_data.Data.gyro.roll_bias) +
+      abs(cal_data.Data.gyro.roll_minus - cal_data.Data.gyro.roll_bias);
+
+  // Set accelerometer calibration and normalization parameters.
+  auto range_2g = cal_data.Data.acc.x_plus - cal_data.Data.acc.x_minus;
+  hw_cal_data.accel[0].abs_code = ABS_X;
+  hw_cal_data.accel[0].bias =
+      static_cast<std::int16_t>(cal_data.Data.acc.x_plus - range_2g / 2);
+  hw_cal_data.accel[0].sens_numer = 2 * ACC_RES_PER_G;
+  hw_cal_data.accel[0].sens_denom = range_2g;
+
+  range_2g = cal_data.Data.acc.y_plus - cal_data.Data.acc.y_minus;
+  hw_cal_data.accel[1].abs_code = ABS_Y;
+  hw_cal_data.accel[1].bias =
+      static_cast<std::int16_t>(cal_data.Data.acc.y_plus - range_2g / 2);
+  hw_cal_data.accel[1].sens_numer = 2 * ACC_RES_PER_G;
+  hw_cal_data.accel[1].sens_denom = range_2g;
+
+  range_2g = cal_data.Data.acc.z_plus - cal_data.Data.acc.z_minus;
+  hw_cal_data.accel[2].abs_code = ABS_Z;
+  hw_cal_data.accel[2].bias =
+      static_cast<std::int16_t>(cal_data.Data.acc.z_plus - range_2g / 2);
+  hw_cal_data.accel[2].sens_numer = 2 * ACC_RES_PER_G;
+  hw_cal_data.accel[2].sens_denom = range_2g;
+
+  // Sanity check gyro calibration data
+  size_t i = 0;
+  for (auto& [abs_code, bias, sens_numer, sens_denom] : hw_cal_data.gyro) {
+    if (sens_denom == 0) {
+      abs_code = ABS_RX + i;
+      spdlog::warn(
+          "Invalid gyro calibration data for axis ({}), disabling calibration.",
+          abs_code);
+      bias = 0;
+      sens_numer = GYRO_RANGE;
+      sens_denom = INT16_MAX;
+    }
+    i++;
+  }
+
+  // Sanity check accelerometer calibration data
+  i = 0;
+  for (auto& [abs_code, bias, sens_numer, sens_denom] : hw_cal_data.accel) {
+    if (sens_denom == 0) {
+      abs_code = ABS_RX + i;
+      spdlog::warn(
+          "Invalid accelerometer calibration data for axis ({}), disabling "
+          "calibration.",
+          abs_code);
+      bias = 0;
+      sens_numer = ACC_RANGE;
+      sens_denom = INT16_MAX;
+    }
+    i++;
+  }
+
+  return 0;
+}
+
+std::string DualSense::dpad_to_string(const Direction dpad) {
   switch (dpad) {
     case Direction::North:
       return "North";
@@ -530,7 +611,7 @@ std::string DualSense::DpadToString(const Direction dpad) {
   }
 }
 
-std::string DualSense::PowerStateToString(const PowerState state) {
+std::string DualSense::power_state_to_string(const PowerState state) {
   switch (state) {
     case PowerState::Discharging:
       return "Discharging";
@@ -549,7 +630,7 @@ std::string DualSense::PowerStateToString(const PowerState state) {
   }
 }
 
-std::string DualSense::MuteLightToString(const MuteLight state) {
+std::string DualSense::mute_light_to_string(const MuteLight state) {
   switch (state) {
     case MuteLight::Off:
       return "Off";
@@ -572,7 +653,7 @@ std::string DualSense::MuteLightToString(const MuteLight state) {
   }
 }
 
-std::string DualSense::LightBrightnessToString(const LightBrightness state) {
+std::string DualSense::light_brightness_to_string(const LightBrightness state) {
   switch (state) {
     case LightBrightness::Bright:
       return "Bright";
@@ -595,7 +676,7 @@ std::string DualSense::LightBrightnessToString(const LightBrightness state) {
   }
 }
 
-std::string DualSense::LightFadeAnimationToString(
+std::string DualSense::light_fade_animation_to_string(
     const LightFadeAnimation state) {
   switch (state) {
     case LightFadeAnimation::Nothing:
@@ -606,6 +687,21 @@ std::string DualSense::LightFadeAnimationToString(
       return "FadeOut";
     default:
       return "Unknown";
+  }
+}
+
+void DualSense::PrintCalibrationData(
+    HardwareCalibrationData const& hw_cal_data) {
+  spdlog::info("HW Calibration Data");
+  for (auto const& [abs_code, bias, sens_numer, sens_denom] :
+       hw_cal_data.gyro) {
+    spdlog::info("\tGyro {}: bias: {}, sens_numer: {}, sens_denom: {}",
+                 abs_code, bias, sens_numer, sens_denom);
+  }
+  for (auto const& [abs_code, bias, sens_numer, sens_denom] :
+       hw_cal_data.accel) {
+    spdlog::info("\tAccelerometer {}: bias: {}, sens_numer: {}, sens_denom: {}",
+                 abs_code, bias, sens_numer, sens_denom);
   }
 }
 
@@ -642,10 +738,19 @@ void DualSense::PrintControllerVersion(ReportFeatureInVersion const& version) {
   spdlog::info("\tReportID: 0x{:02X}", version.Data.ReportID);
   spdlog::info("\tBuildDate: {}", std::string_view(version.Data.BuildDate, 11));
   spdlog::info("\tBuildTime: {}", std::string_view(version.Data.BuildTime, 8));
-  spdlog::info("\tFwType: 0x{:04X}", version.Data.FwType);
+  spdlog::info("\tFwType: {}", version.Data.FwType);
   spdlog::info("\tSwSeries: 0x{:04X}", version.Data.SwSeries);
   spdlog::info("\tHardwareInfo: 0x{:08X}", version.Data.HardwareInfo);
-  spdlog::info("\tFirmwareVersion: 0x{:08X}", version.Data.FirmwareVersion);
+  const uint32_t firmware_version = version.Data.FirmwareVersion;
+  std::ostringstream firmware_version_str;
+  firmware_version_str << std::hex << std::setw(2) << std::setfill('0')
+                       << ((firmware_version >> 24) & 0xFF) << "."
+                       << std::setw(2) << std::setfill('0')
+                       << ((firmware_version >> 16) & 0xFF) << "."
+                       << std::setw(4) << std::setfill('0')
+                       << (firmware_version & 0xFFFF);
+  spdlog::info("\tFirmwareVersion: {}", firmware_version_str.str());
+  // spdlog::info("\tFirmwareVersion: 0x{:08X}", version.Data.FirmwareVersion);
   spdlog::info("\tDeviceInfo: {}", version.Data.DeviceInfo);
   spdlog::info("\tUpdateVersion: 0x{:04X}", version.Data.UpdateVersion);
   spdlog::info("\tUpdateImageInfo: 0x{:02}",
@@ -658,65 +763,118 @@ void DualSense::PrintControllerVersion(ReportFeatureInVersion const& version) {
                version.Data.SpiderDspFwVersion);
 }
 
-void DualSense::PrintControllerStateUsb(USBGetStateData const& state) {
-  spdlog::info("LeftStick: {}, {}", state.LeftStickX, state.LeftStickY);
-  spdlog::info("RightStick: {}, {}", state.RightStickX, state.RightStickY);
-  spdlog::info("DPad: {}", DpadToString(state.DPad));
-  spdlog::info("ButtonSquare: {}", state.ButtonSquare);
-  spdlog::info("ButtonCross: {}", state.ButtonCross);
-  spdlog::info("ButtonCircle: {}", state.ButtonCircle);
-  spdlog::info("ButtonTriangle: {}", state.ButtonTriangle);
-  spdlog::info("ButtonL1: {}", state.ButtonL1);
-  spdlog::info("ButtonR1: {}", state.ButtonR1);
-  spdlog::info("ButtonL2: {}", state.ButtonL2);
-  spdlog::info("ButtonR2: {}", state.ButtonR2);
-  spdlog::info("ButtonCreate: {}", state.ButtonCreate);
-  spdlog::info("ButtonOptions: {}", state.ButtonOptions);
-  spdlog::info("ButtonL3: {}", state.ButtonL3);
-  spdlog::info("ButtonR3: {}", state.ButtonR3);
-  spdlog::info("ButtonHome: {}", state.ButtonHome);
-  spdlog::info("ButtonPad: {}", state.ButtonPad);
-  spdlog::info("ButtonMute: {}", state.ButtonMute);
-  spdlog::info("ButtonLeftFunction: {}", state.ButtonLeftFunction);
-  spdlog::info("ButtonRightFunction: {}", state.ButtonRightFunction);
-  spdlog::info("ButtonLeftPaddle: {}", state.ButtonLeftPaddle);
-  spdlog::info("ButtonRightPaddle: {}", state.ButtonRightPaddle);
-  spdlog::info("TriggerRightStopLocation: {}", state.TriggerRightStopLocation);
-  spdlog::info("TriggerRightStatus: {}", state.TriggerRightStatus);
-  spdlog::info("TriggerLeftStopLocation: {}", state.TriggerLeftStopLocation);
-  spdlog::info("TriggerLeftStatus: {}", state.TriggerLeftStatus);
-  spdlog::info("TriggerRightEffect: {}", state.TriggerRightEffect);
-  spdlog::info("TriggerLeftEffect: {}", state.TriggerLeftEffect);
-  spdlog::info("PowerPercent: {}", state.PowerPercent);
-  spdlog::info("PowerState: {}", PowerStateToString(state.powerState));
-  spdlog::info("PluggedHeadphones: {}", state.PluggedHeadphones);
-  spdlog::info("PluggedMic: {}", state.PluggedMic);
-  spdlog::info("MicMuted: {}", state.MicMuted);
-  spdlog::info("PluggedUsbData: {}", state.PluggedUsbData);
-  spdlog::info("PluggedUsbPower: {}", state.PluggedUsbPower);
-  spdlog::info("PluggedExternalMic: {}", state.PluggedExternalMic);
-  spdlog::info("HapticLowPassFilter: {}", state.HapticLowPassFilter);
+template <typename T, typename U, typename V>
+T mult_frac(T x, U n, V d) {
+  T q = x / d;
+  T r = x % d;
+  return q * n + r * n / d;
+}
+
+void DualSense::PrintControllerStateUsb(
+    USBGetStateData const& state,
+    HardwareCalibrationData const& hw_cal_data) {
+  spdlog::info("Controller State (USB)");
+  spdlog::info("\tLeftStick: {}, {}", state.LeftStickX, state.LeftStickY);
+  spdlog::info("\tRightStick: {}, {}", state.RightStickX, state.RightStickY);
+  spdlog::info("\tDPad: {}", dpad_to_string(state.DPad));
+  spdlog::info("\tButtonSquare: {}", state.ButtonSquare);
+  spdlog::info("\tButtonCross: {}", state.ButtonCross);
+  spdlog::info("\tButtonCircle: {}", state.ButtonCircle);
+  spdlog::info("\tButtonTriangle: {}", state.ButtonTriangle);
+  spdlog::info("\tButtonL1: {}", state.ButtonL1);
+  spdlog::info("\tButtonR1: {}", state.ButtonR1);
+  spdlog::info("\tButtonL2: {}", state.ButtonL2);
+  spdlog::info("\tButtonR2: {}", state.ButtonR2);
+  spdlog::info("\tButtonCreate: {}", state.ButtonCreate);
+  spdlog::info("\tButtonOptions: {}", state.ButtonOptions);
+  spdlog::info("\tButtonL3: {}", state.ButtonL3);
+  spdlog::info("\tButtonR3: {}", state.ButtonR3);
+  spdlog::info("\tButtonHome: {}", state.ButtonHome);
+  spdlog::info("\tButtonPad: {}", state.ButtonPad);
+  spdlog::info("\tButtonMute: {}", state.ButtonMute);
+  spdlog::info("\tButtonLeftFunction: {}", state.ButtonLeftFunction);
+  spdlog::info("\tButtonRightFunction: {}", state.ButtonRightFunction);
+  spdlog::info("\tButtonLeftPaddle: {}", state.ButtonLeftPaddle);
+  spdlog::info("\tButtonRightPaddle: {}", state.ButtonRightPaddle);
+  spdlog::info("\tTimeStamp: {}", state.TimeStamp);
+  spdlog::info("\tAngularVelocity (Raw): {}, {}, {}", state.AngularVelocityX,
+               state.AngularVelocityY, state.AngularVelocityZ);
+
+  auto gyro_x = mult_frac<int32_t, int16_t, int32_t>(
+      hw_cal_data.gyro[0].sens_numer, state.AngularVelocityX,
+      hw_cal_data.gyro[0].sens_denom);
+  auto gyro_y = mult_frac<int32_t, int16_t, int32_t>(
+      hw_cal_data.gyro[1].sens_numer, state.AngularVelocityY,
+      hw_cal_data.gyro[1].sens_denom);
+  auto gyro_z = mult_frac<int32_t, int16_t, int32_t>(
+      hw_cal_data.gyro[2].sens_numer, state.AngularVelocityZ,
+      hw_cal_data.gyro[2].sens_denom);
+  spdlog::info("\tAngularVelocity (Cal): {}, {}, {}", gyro_x, gyro_y, gyro_z);
+
+  spdlog::info("\tAccelerometer (Raw): {}, {}, {}", state.AccelerometerX,
+               state.AccelerometerY, state.AccelerometerZ);
+
+  auto acc_x = mult_frac<int32_t, int16_t, int32_t>(
+      hw_cal_data.accel[0].sens_numer, state.AccelerometerX,
+      hw_cal_data.accel[0].sens_denom);
+  auto acc_y = mult_frac<int32_t, int16_t, int32_t>(
+      hw_cal_data.accel[1].sens_numer, state.AccelerometerY,
+      hw_cal_data.accel[1].sens_denom);
+  auto acc_z = mult_frac<int32_t, int16_t, int32_t>(
+      hw_cal_data.accel[2].sens_numer, state.AccelerometerZ,
+      hw_cal_data.accel[2].sens_denom);
+  spdlog::info("\tAccelerometer (Cal): {}, {}, {}", acc_x, acc_y, acc_z);
+
+  spdlog::info("\tSensorTimestamp: {}", state.SensorTimestamp);
+  spdlog::info("\tTemperature: {}", state.Temperature);
+  spdlog::info(
+      "\tTouchData: timestamp: {}, index: {}, X: {}, Y: {}, NotTouching: {}",
+      state.touchData.Timestamp, state.touchData.Finger[0].Index,
+      state.touchData.Finger[0].FingerX, state.touchData.Finger[0].FingerY,
+      state.touchData.Finger[0].NotTouching);
+  spdlog::info(
+      "\tTouchData: timestamp: {}, index: {}, X: {}, Y: {}, NotTouching: {}",
+      state.touchData.Timestamp, state.touchData.Finger[1].Index,
+      state.touchData.Finger[1].FingerX, state.touchData.Finger[1].FingerY,
+      state.touchData.Finger[1].NotTouching);
+  spdlog::info("\tTriggerRightStopLocation: {}",
+               state.TriggerRightStopLocation);
+  spdlog::info("\tTriggerRightStatus: {}", state.TriggerRightStatus);
+  spdlog::info("\tTriggerLeftStopLocation: {}", state.TriggerLeftStopLocation);
+  spdlog::info("\tTriggerLeftStatus: {}", state.TriggerLeftStatus);
+  spdlog::info("\tTriggerRightEffect: {}", state.TriggerRightEffect);
+  spdlog::info("\tTriggerLeftEffect: {}", state.TriggerLeftEffect);
+  spdlog::info("\tPowerPercent: {}", state.PowerPercent);
+  spdlog::info("\tPowerState: {}", power_state_to_string(state.powerState));
+  spdlog::info("\tPluggedHeadphones: {}", state.PluggedHeadphones);
+  spdlog::info("\tPluggedMic: {}", state.PluggedMic);
+  spdlog::info("\tMicMuted: {}", state.MicMuted);
+  spdlog::info("\tPluggedUsbData: {}", state.PluggedUsbData);
+  spdlog::info("\tPluggedUsbPower: {}", state.PluggedUsbPower);
+  spdlog::info("\tPluggedExternalMic: {}", state.PluggedExternalMic);
+  spdlog::info("\tHapticLowPassFilter: {}", state.HapticLowPassFilter);
 }
 
 void DualSense::PrintControllerStateBt(BTSimpleGetStateData const& state) {
-  spdlog::info("LeftStick: {}, {}", state.LeftStickX, state.LeftStickY);
-  spdlog::info("RightStick: {}, {}", state.RightStickX, state.RightStickY);
-  spdlog::info("DPad: {}", DpadToString(state.DPad));
-  spdlog::info("ButtonSquare: {}", state.ButtonSquare);
-  spdlog::info("ButtonCross: {}", state.ButtonCross);
-  spdlog::info("ButtonCircle: {}", state.ButtonCircle);
-  spdlog::info("ButtonTriangle: {}", state.ButtonTriangle);
-  spdlog::info("ButtonL1: {}", state.ButtonL1);
-  spdlog::info("ButtonR1: {}", state.ButtonR1);
-  spdlog::info("ButtonL2: {}", state.ButtonL2);
-  spdlog::info("ButtonR2: {}", state.ButtonR2);
-  spdlog::info("ButtonShare: {}", state.ButtonShare);
-  spdlog::info("ButtonOptions: {}", state.ButtonOptions);
-  spdlog::info("ButtonL3: {}", state.ButtonL3);
-  spdlog::info("ButtonR3: {}", state.ButtonR3);
-  spdlog::info("ButtonHome: {}", state.ButtonHome);
-  spdlog::info("ButtonPad: {}", state.ButtonPad);
-  spdlog::info("Counter: {}", state.Counter);
-  spdlog::info("TriggerLeft: {}", state.TriggerLeft);
-  spdlog::info("TriggerRight: {}", state.TriggerRight);
+  spdlog::info("Controller State (BT)");
+  spdlog::info("\tLeftStick: {}, {}", state.LeftStickX, state.LeftStickY);
+  spdlog::info("\tRightStick: {}, {}", state.RightStickX, state.RightStickY);
+  spdlog::info("\tDPad: {}", dpad_to_string(state.DPad));
+  spdlog::info("\tButtonSquare: {}", state.ButtonSquare);
+  spdlog::info("\tButtonCross: {}", state.ButtonCross);
+  spdlog::info("\tButtonCircle: {}", state.ButtonCircle);
+  spdlog::info("\tButtonTriangle: {}", state.ButtonTriangle);
+  spdlog::info("\tButtonL1: {}", state.ButtonL1);
+  spdlog::info("\tButtonR1: {}", state.ButtonR1);
+  spdlog::info("\tButtonL2: {}", state.ButtonL2);
+  spdlog::info("\tButtonR2: {}", state.ButtonR2);
+  spdlog::info("\tButtonShare: {}", state.ButtonShare);
+  spdlog::info("\tButtonOptions: {}", state.ButtonOptions);
+  spdlog::info("\tButtonL3: {}", state.ButtonL3);
+  spdlog::info("\tButtonR3: {}", state.ButtonR3);
+  spdlog::info("\tButtonHome: {}", state.ButtonHome);
+  spdlog::info("\tButtonPad: {}", state.ButtonPad);
+  spdlog::info("\tCounter: {}", state.Counter);
+  spdlog::info("\tTriggerLeft: {}", state.TriggerLeft);
+  spdlog::info("\tTriggerRight: {}", state.TriggerRight);
 }

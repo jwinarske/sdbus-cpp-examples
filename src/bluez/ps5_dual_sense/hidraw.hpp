@@ -488,9 +488,9 @@ class Hidraw {
     print_udev_properties("hidraw");
     for (const auto& properties :
          get_udev_properties("hidraw") | std::views::values) {
-      if (properties.contains(DEVNAME) && properties.contains(DEVPATH)) {
-        const auto dev_name = properties.at(DEVNAME);
-        if (compare_uhid_vid_pid(properties.at(DEVPATH), bus, vid, pid) == 0) {
+      if (properties.contains(DEV_NAME) && properties.contains(DEV_PATH)) {
+        const auto dev_name = properties.at(DEV_NAME);
+        if (compare_uhid_vid_pid(properties.at(DEV_PATH), bus, vid, pid) == 0) {
           devices.push_back(dev_name);
         }
       }
@@ -762,11 +762,14 @@ class Hidraw {
     spdlog::debug(ss.str());
 
     if (dev_info.bustype == BUS_USB) {
-      GetFeature(fd, 0x05);  // Get Calibration
-      // GetFeature(fd, 0x08); // Get bluetooth control
-      if (DualSense::ReportFeatureInMacAll report_feature_in_mac_all{};
-          DualSense::GetControllerMacAll(fd, report_feature_in_mac_all) == 0) {
-        DualSense::PrintControllerMacAll(report_feature_in_mac_all);
+      DualSense::HardwareCalibrationData hw_cal_data{};
+      if (DualSense::GetControllerCalibrationData(fd, hw_cal_data) == 0) {
+        DualSense::PrintCalibrationData(hw_cal_data);
+      }
+
+      if (DualSense::ReportFeatureInMacAll mac_all{};
+          DualSense::GetControllerMacAll(fd, mac_all) == 0) {
+        DualSense::PrintControllerMacAll(mac_all);
       }
       // GetFeature(fd, 0x0A); // Set bluetooth pairing
       // GetFeature(fd, 0x20); // Get Controller Version/Date
@@ -788,20 +791,26 @@ class Hidraw {
 
       if (DualSense::ReportIn01USB report_in_01_usb{};
           DualSense::GetControllerStateUsb(fd, report_in_01_usb) == 0) {
-        DualSense::PrintControllerStateUsb(report_in_01_usb.State);
+        DualSense::PrintControllerStateUsb(report_in_01_usb.State, hw_cal_data);
       }
     } else if (dev_info.bustype == BUS_BLUETOOTH) {
-      GetFeature(fd, 0x05);  // Get Calibration - enables report 0x31
-
-      GetFeature(fd, 0x08);  // Get bluetooth control
-      if (DualSense::ReportFeatureInMacAll report_feature_in_mac_all{};
-          DualSense::GetControllerMacAll(fd, report_feature_in_mac_all) == 0) {
-        DualSense::PrintControllerMacAll(report_feature_in_mac_all);
+      // enable report 0x31
+      DualSense::HardwareCalibrationData hw_cal_data{};
+      if (DualSense::GetControllerCalibrationData(fd, hw_cal_data) == 0) {
+        DualSense::PrintCalibrationData(hw_cal_data);
       }
 
-      DualSense::ReportFeatureInVersion version{};
-      DualSense::GetControllerVersion(fd, version);
-      DualSense::PrintControllerVersion(version);
+      // GetFeature(fd, 0x09);  // Get bluetooth pairing info
+
+      if (DualSense::ReportFeatureInMacAll mac_all{};
+          DualSense::GetControllerMacAll(fd, mac_all) == 0) {
+        DualSense::PrintControllerMacAll(mac_all);
+      }
+
+      if (DualSense::ReportFeatureInVersion version{};
+          DualSense::GetControllerVersion(fd, version) == 0) {
+        DualSense::PrintControllerVersion(version);
+      }
 
       GetFeature(fd, 0x22);  // Get Hardware Info
       // GetFeature(fd, 0x80); // Set test command
@@ -814,8 +823,12 @@ class Hidraw {
 
       if (DualSense::ReportIn31 report_in_31_bt{};
           DualSense::GetControllerStateBt(fd, report_in_31_bt) == 0) {
-        DualSense::PrintControllerStateUsb(
-            report_in_31_bt.Data.State.StateData);
+        spdlog::info("Sequence: {}, HasHID: {}, HasMic: {}",
+                     static_cast<int>(report_in_31_bt.Data.SeqNo),
+                     static_cast<int>(report_in_31_bt.Data.HasHID),
+                     static_cast<int>(report_in_31_bt.Data.HasMic));
+        DualSense::PrintControllerStateUsb(report_in_31_bt.Data.State.StateData,
+                                           hw_cal_data);
       }
     }
 
@@ -823,8 +836,8 @@ class Hidraw {
   }
 
  private:
-  static constexpr std::string DEVNAME = "DEVNAME";
-  static constexpr std::string DEVPATH = "DEVPATH";
+  static constexpr std::string DEV_NAME = "DEVNAME";
+  static constexpr std::string DEV_PATH = "DEVPATH";
 
   static const char* bus_str(const std::uint32_t bus) {
     switch (bus) {
