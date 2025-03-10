@@ -35,7 +35,7 @@
 #include <spdlog/spdlog.h>
 
 #include "hid/page/button.hpp"
-#include "hid/page/consumer.hpp"
+// #include "hid/page/consumer.hpp"
 #include "hid/page/generic_desktop.hpp"
 #include "hid/rdf/descriptor.hpp"
 #include "hid/report_protocol.hpp"
@@ -722,12 +722,12 @@ class Hidraw {
 
     if (dev_info.bustype == BUS_USB) {
       const hid::report_protocol rp(usb_report_desc);
-      print_report_protocol(rp);
+      // print_report_protocol(rp);
       assert(rp.descriptor.size() == desc_size);
     } else if (dev_info.bustype == BUS_BLUETOOTH) {
-      const hid::report_protocol rp(bt_report_desc);
-      print_report_protocol(rp);
-      //      assert(rp.descriptor.size() == desc_size);
+      // const hid::report_protocol rp(bt_report_desc);
+      // print_report_protocol(rp);
+      // assert(rp.descriptor.size() == desc_size);
     }
 
     // Report Descriptor
