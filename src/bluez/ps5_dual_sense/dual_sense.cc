@@ -16,7 +16,6 @@
 
 #include "hidraw.hpp"
 
-
 DualSense::DualSense(sdbus::IConnection& connection)
     : ProxyInterfaces(connection,
                       sdbus::ServiceName(INTERFACE_NAME),
@@ -320,4 +319,113 @@ bool DualSense::get_bt_hidraw_devices() {
     Hidraw::dump_info(value);
   }
   return !hidraw_devices_.empty();
+}
+
+void DualSense::print_state_data(USBGetStateData* state_data) {
+  spdlog::info("DPad: {}", static_cast<uint8_t>(state_data->DPad));
+  spdlog::info("ButtonSquare: {}",
+               static_cast<uint8_t>(state_data->ButtonSquare));
+  spdlog::info("ButtonCross: {}",
+               static_cast<uint8_t>(state_data->ButtonCross));
+  spdlog::info("ButtonCircle: {}",
+               static_cast<uint8_t>(state_data->ButtonCircle));
+  spdlog::info("ButtonTriangle: {}",
+               static_cast<uint8_t>(state_data->ButtonTriangle));
+  spdlog::info("ButtonL1: {}", static_cast<uint8_t>(state_data->ButtonL1));
+  spdlog::info("ButtonR1: {}", static_cast<uint8_t>(state_data->ButtonR1));
+  spdlog::info("ButtonL2: {}", static_cast<uint8_t>(state_data->ButtonL2));
+  spdlog::info("ButtonR2: {}", static_cast<uint8_t>(state_data->ButtonR2));
+  spdlog::info("ButtonCreate: {}",
+               static_cast<uint8_t>(state_data->ButtonCreate));
+  spdlog::info("ButtonOptions: {}",
+               static_cast<uint8_t>(state_data->ButtonOptions));
+  spdlog::info("ButtonL3: {}", static_cast<uint8_t>(state_data->ButtonL3));
+  spdlog::info("ButtonR3: {}", static_cast<uint8_t>(state_data->ButtonR3));
+  spdlog::info("ButtonHome: {}", static_cast<uint8_t>(state_data->ButtonHome));
+  spdlog::info("ButtonPad: {}", static_cast<uint8_t>(state_data->ButtonPad));
+  spdlog::info("ButtonMute: {}", static_cast<uint8_t>(state_data->ButtonMute));
+  spdlog::info("ButtonLeftFunction: {}",
+               static_cast<uint8_t>(state_data->ButtonLeftFunction));
+  spdlog::info("ButtonRightFunction: {}",
+               static_cast<uint8_t>(state_data->ButtonRightFunction));
+  spdlog::info("ButtonLeftPaddle: {}",
+               static_cast<uint8_t>(state_data->ButtonLeftPaddle));
+  spdlog::info("ButtonRightPaddle: {}",
+               static_cast<uint8_t>(state_data->ButtonRightPaddle));
+  spdlog::info("TriggerRightStopLocation: {}",
+               static_cast<uint8_t>(state_data->TriggerRightStopLocation));
+  spdlog::info("TriggerRightStatus: {}",
+               static_cast<uint8_t>(state_data->TriggerRightStatus));
+  spdlog::info("TriggerLeftStopLocation: {}",
+               static_cast<uint8_t>(state_data->TriggerLeftStopLocation));
+  spdlog::info("TriggerLeftStatus: {}",
+               static_cast<uint8_t>(state_data->TriggerLeftStatus));
+  spdlog::info("TriggerRightEffect: {}",
+               static_cast<uint8_t>(state_data->TriggerRightEffect));
+  spdlog::info("TriggerLeftEffect: {}",
+               static_cast<uint8_t>(state_data->TriggerLeftEffect));
+  spdlog::info("PowerPercent: {}",
+               static_cast<uint8_t>(state_data->PowerPercent));
+  spdlog::info("PluggedHeadphones: {}",
+               static_cast<uint8_t>(state_data->PluggedHeadphones));
+  spdlog::info("PluggedMic: {}", static_cast<uint8_t>(state_data->PluggedMic));
+  spdlog::info("MicMuted: {}", static_cast<uint8_t>(state_data->MicMuted));
+  spdlog::info("PluggedUsbData: {}",
+               static_cast<uint8_t>(state_data->PluggedUsbData));
+  spdlog::info("PluggedUsbPower: {}",
+               static_cast<uint8_t>(state_data->PluggedUsbPower));
+  spdlog::info("PluggedExternalMic: {}",
+               static_cast<uint8_t>(state_data->PluggedExternalMic));
+  spdlog::info("HapticLowPassFilter: {}",
+               static_cast<uint8_t>(state_data->HapticLowPassFilter));
+}
+
+int DualSense::GetControllerAndHostMAC(
+    const int fd,
+    ReportFeatureInMacAll& controller_and_host_mac) {
+  controller_and_host_mac.ReportID = 0x09;
+  if (const auto res = ioctl(fd, HIDIOCGFEATURE(20), &controller_and_host_mac);
+      res < 0) {
+    spdlog::error("GetControllerAndHostMAC failed: {}", strerror(errno));
+    return 1;
+  }
+  if (controller_and_host_mac.ReportID != 0x09 ||
+      controller_and_host_mac.Hard08 != 0x08 ||
+      controller_and_host_mac.Hard25 != 0x25 ||
+      controller_and_host_mac.Hard00 != 0x00) {
+    spdlog::error("GetControllerAndHostMAC invalid response");
+    return 1;
+  }
+  return 0;
+}
+
+void DualSense::PrintControllerAndHostMac(
+    ReportFeatureInMacAll const& controller_and_host_mac) {
+  std::ostringstream os;
+  os << "ReportID: " << std::hex << std::setw(2) << std::setfill('0')
+     << static_cast<int>(controller_and_host_mac.ReportID) << "\n";
+
+  for (int i = 0; i < 6; i++) {
+    os << "ClientMac[" << i << "]: " << std::hex << std::setw(2)
+       << std::setfill('0')
+       << static_cast<int>(controller_and_host_mac.ClientMac[i]) << "\n";
+  }
+  os << "Hard08: " << std::hex << std::setw(2) << std::setfill('0')
+     << static_cast<int>(controller_and_host_mac.Hard08) << "\n";
+  os << "Hard25: " << std::hex << std::setw(2) << std::setfill('0')
+     << static_cast<int>(controller_and_host_mac.Hard25) << "\n";
+  os << "Hard00: " << std::hex << std::setw(2) << std::setfill('0')
+     << static_cast<int>(controller_and_host_mac.Hard00) << "\n";
+
+  for (int i = 0; i < 6; i++) {
+    os << "HostMac[" << i << "]: " << std::hex << std::setw(2)
+       << std::setfill('0')
+       << static_cast<int>(controller_and_host_mac.HostMac[i]) << "\n";
+  }
+  for (int i = 0; i < 3; i++) {
+    os << "HostMac[" << i << "]: " << std::hex << std::setw(2)
+       << std::setfill('0') << static_cast<int>(controller_and_host_mac.Pad[i])
+       << "\n";
+  }
+  spdlog::info(os.str());
 }

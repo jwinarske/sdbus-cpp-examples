@@ -1,4 +1,16 @@
-// File: hidraw.hpp
+// Copyright (c) 2025 Joel Winarske
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #pragma once
 
@@ -40,338 +52,343 @@ class Hidraw {
   Hidraw();
   ~Hidraw();
 
-  static constexpr auto bt_report_desc = descriptor(
-      usage_page<generic_desktop>(),
-      usage(generic_desktop::GAMEPAD),
-      collection::application(
+  static constexpr auto bt_report_desc =
+      descriptor(usage_page<generic_desktop>(),
+                 usage(generic_desktop::GAMEPAD),
+                 collection::application(
 
-          report_id(1),
-          usage(generic_desktop::X),
-          usage(generic_desktop::Y),
-          usage(generic_desktop::Z),
-          usage(generic_desktop::RZ),
-          logical_limits<1, 2>(0, 255),
-          report_size(8),
-          report_count(4),
-          input::absolute_variable(),
+                     report_id(1),
+                     usage(generic_desktop::X),
+                     usage(generic_desktop::Y),
+                     usage(generic_desktop::Z),
+                     usage(generic_desktop::RZ),
+                     logical_limits<1, 2>(0, 255),
+                     report_size(8),
+                     report_count(4),
+                     input::absolute_variable(),
 
-          usage(generic_desktop::HAT_SWITCH),
-          logical_limits<1, 1>(0, 7),
-          physical_limits<1, 2>(0, 315),
-          unit::degree(),  // requires two bytes, not four - upstream fix needed
-          report_size(4),
-          report_count(1),
-          input::absolute_variable(main::field_flags::NULL_STATE),
-          unit::none(),  // requires two bytes, not four - upstream fix needed
+                     usage(generic_desktop::HAT_SWITCH),
+                     logical_limits<1, 1>(0, 7),
+                     physical_limits<1, 2>(0, 315),
+                     unit::degree::unit_item(),  // requires two bytes, not four
+                                                 // - upstream fix needed
+                     report_size(4),
+                     report_count(1),
+                     input::absolute_variable(main::field_flags::NULL_STATE),
+                     unit::none::unit_item(),  // requires two bytes, not four -
+                                               // upstream fix needed
 
-          usage_page<button>(),
-          usage_limits(button(1), button(14)),
-          logical_limits<1, 1>(0, 1),
-          report_size(1),
-          report_count(14),
-          input::absolute_variable(),
-          report_size(6),
-          report_count(1),
-          input::constant(),
+                     usage_page<button>(),
+                     usage_limits(button(1), button(14)),
+                     logical_limits<1, 1>(0, 1),
+                     report_size(1),
+                     report_count(14),
+                     input::absolute_variable(),
+                     // report_size(6),
+                     // report_count(1),
+                     // input::constant(),
+                     input::padding(6),
 
-          usage_page<generic_desktop>(),
-          usage(generic_desktop::RX),
-          usage(generic_desktop::RY),
+                     usage_page<generic_desktop>(),
+                     usage(generic_desktop::RX),
+                     usage(generic_desktop::RY),
 
-          logical_limits<1, 2>(0, 255),
-          report_size(8),
-          report_count(2),
-          input::absolute_variable(),
+                     logical_limits<1, 2>(0, 255),
+                     report_size(8),
+                     report_count(2),
+                     input::absolute_variable(),
 
-          usage_page<vendor>(),
+                     usage_page<vendor>(),
 
-          logical_limits<1, 2>(0, 255),
-          report_size(8),
-          report_count(77),
+                     logical_limits<1, 2>(0, 255),
+                     report_size(8),
+                     report_count(77),
 
-          report_id(0x31),
-          usage<1>(vendor::UNKNOWN_1),
-          output::absolute_variable(),
-          usage<1>(vendor::UNKNOWN_2),
-          input::absolute_variable(),
+                     report_id(0x31),
+                     usage<1>(vendor::UNKNOWN_1),
+                     output::absolute_variable(),
+                     usage<1>(vendor::UNKNOWN_2),
+                     input::absolute_variable(),
 
-          report_id(0x32),
-          usage<1>(vendor::UNKNOWN_3),
-          report_count(141),
-          output::absolute_variable(),
+                     report_id(0x32),
+                     usage<1>(vendor::UNKNOWN_3),
+                     report_count(141),
+                     output::absolute_variable(),
 
-          report_id(0x33),
-          usage<1>(vendor::UNKNOWN_4),
-          report_count(205),
-          output::absolute_variable(),
+                     report_id(0x33),
+                     usage<1>(vendor::UNKNOWN_4),
+                     report_count(205),
+                     output::absolute_variable(),
 
-          report_id(0x34),
-          usage<1>(vendor::UNKNOWN_5),
-          report_count<2>(269),
-          output::absolute_variable(),
+                     report_id(0x34),
+                     usage<1>(vendor::UNKNOWN_5),
+                     report_count<2>(269),
+                     output::absolute_variable(),
 
-          report_id(53),
-          usage<1>(vendor::UNKNOWN_6),
-          report_count<2>(333),
-          output::absolute_variable(),
+                     report_id(53),
+                     usage<1>(vendor::UNKNOWN_6),
+                     report_count<2>(333),
+                     output::absolute_variable(),
 
-          report_id(54),
-          usage<1>(vendor::UNKNOWN_7),
-          report_count<2>(397),
-          output::absolute_variable(),
+                     report_id(54),
+                     usage<1>(vendor::UNKNOWN_7),
+                     report_count<2>(397),
+                     output::absolute_variable(),
 
-          report_id(55),
-          usage<1>(vendor::UNKNOWN_8),
-          report_count<2>(461),
-          output::absolute_variable(),
+                     report_id(55),
+                     usage<1>(vendor::UNKNOWN_8),
+                     report_count<2>(461),
+                     output::absolute_variable(),
 
-          report_id(56),
-          usage<1>(vendor::UNKnOWN_9),
-          report_count<2>(525),
-          output::absolute_variable(),
+                     report_id(56),
+                     usage<1>(vendor::UNKnOWN_9),
+                     report_count<2>(525),
+                     output::absolute_variable(),
 
-          report_id(57),
-          usage<1>(vendor::UNKNOWN_10),
-          report_count<2>(546),
-          output::absolute_variable(),
+                     report_id(57),
+                     usage<1>(vendor::UNKNOWN_10),
+                     report_count<2>(546),
+                     output::absolute_variable(),
 
-          usage_page<vendor1>(),
+                     usage_page<vendor1>(),
 
-          report_id(5),
-          usage<1>(vendor1::UNKNOWN_1),
-          report_count(40),
-          feature::absolute_variable(),
+                     report_id(5),
+                     usage<1>(vendor1::UNKNOWN_1),
+                     report_count(40),
+                     feature::absolute_variable(),
 
-          report_id(8),
-          usage<1>(vendor1::UNKNOWN_2),
-          report_count(47),
-          feature::absolute_variable(),
+                     report_id(8),
+                     usage<1>(vendor1::UNKNOWN_2),
+                     report_count(47),
+                     feature::absolute_variable(),
 
-          report_id(9),
-          usage<1>(vendor1::UNKNOWN_3),
-          report_count(19),
-          feature::absolute_variable(),
+                     report_id(9),
+                     usage<1>(vendor1::UNKNOWN_3),
+                     report_count(19),
+                     feature::absolute_variable(),
 
-          report_id(32),
-          usage<1>(vendor1::UNKNOWN_4),
-          report_count(63),
-          feature::absolute_variable(),
+                     report_id(32),
+                     usage<1>(vendor1::UNKNOWN_4),
+                     report_count(63),
+                     feature::absolute_variable(),
 
-          report_id(34),
-          usage<1>(vendor1::UNKNOWN_5),
-          report_count(63),
-          feature::absolute_variable(),
+                     report_id(34),
+                     usage<1>(vendor1::UNKNOWN_5),
+                     report_count(63),
+                     feature::absolute_variable(),
 
-          report_id(0x80),
-          usage<1>(vendor1::UNKNOWN_6),
-          report_count(63),
-          feature::absolute_variable(),
+                     report_id(0x80),
+                     usage<1>(vendor1::UNKNOWN_6),
+                     report_count(63),
+                     feature::absolute_variable(),
 
-          report_id(0x81),
-          usage<1>(vendor1::UNKNOWN_7),
-          report_count(63),
-          feature::absolute_variable(),
+                     report_id(0x81),
+                     usage<1>(vendor1::UNKNOWN_7),
+                     report_count(63),
+                     feature::absolute_variable(),
 
-          report_id(0x82),
-          usage<1>(vendor1::UNKNOWN_8),
-          report_count(9),
-          feature::absolute_variable(),
+                     report_id(0x82),
+                     usage<1>(vendor1::UNKNOWN_8),
+                     report_count(9),
+                     feature::absolute_variable(),
 
-          report_id(0x83),
-          usage<1>(vendor1::UNKNOWN_9),
-          report_count(9),
-          feature::absolute_variable(),
+                     report_id(0x83),
+                     usage<1>(vendor1::UNKNOWN_9),
+                     report_count(9),
+                     feature::absolute_variable(),
 
-          report_id(0xF1),
-          usage<1>(vendor1::UNKNOWN_10),
-          report_count(64),
-          feature::absolute_variable(),
+                     report_id(0xF1),
+                     usage<1>(vendor1::UNKNOWN_10),
+                     report_count(64),
+                     feature::absolute_variable(),
 
-          report_id(0xF2),
-          usage<1>(vendor1::UNKNOWN_11),
-          report_count(15),
-          feature::absolute_variable(),
+                     report_id(0xF2),
+                     usage<1>(vendor1::UNKNOWN_11),
+                     report_count(15),
+                     feature::absolute_variable(),
 
-          report_id(0xF0),
-          usage<1>(vendor1::UNKNOWN_12),
-          report_count(63),
-          feature::absolute_variable(),
+                     report_id(0xF0),
+                     usage<1>(vendor1::UNKNOWN_12),
+                     report_count(63),
+                     feature::absolute_variable(),
 
-          report_id(0xF4),
-          usage<1>(vendor1::UNKNOWN_13),
-          report_count(63),
-          feature::absolute_variable(),
+                     report_id(0xF4),
+                     usage<1>(vendor1::UNKNOWN_13),
+                     report_count(63),
+                     feature::absolute_variable(),
 
-          report_id(0xF5),
-          usage<1>(vendor1::UNKNOWN_14),
-          report_count(7),
-          feature::absolute_variable(),
+                     report_id(0xF5),
+                     usage<1>(vendor1::UNKNOWN_14),
+                     report_count(7),
+                     feature::absolute_variable(),
 
-          report_id(0xF6),
-          usage<1>(vendor1::UNKNOWN_15),
-          report_count<2>(546),
-          feature::absolute_variable(),
+                     report_id(0xF6),
+                     usage<1>(vendor1::UNKNOWN_15),
+                     report_count<2>(546),
+                     feature::absolute_variable(),
 
-          report_id(0xF7),
-          usage<1>(vendor1::UNKNOWN_16),
-          report_count(7),
-          feature::absolute_variable()));
+                     report_id(0xF7),
+                     usage<1>(vendor1::UNKNOWN_16),
+                     report_count(7),
+                     feature::absolute_variable()));
 
-  static constexpr auto usb_report_desc = descriptor(
-      usage_page<generic_desktop>(),
-      usage(generic_desktop::GAMEPAD),
-      collection::application(
+  static constexpr auto usb_report_desc =
+      descriptor(usage_page<generic_desktop>(),
+                 usage(generic_desktop::GAMEPAD),
+                 collection::application(
 
-          report_id(1),
-          usage(generic_desktop::X),
-          usage(generic_desktop::Y),
-          usage(generic_desktop::Z),
-          usage(generic_desktop::RZ),
-          usage(generic_desktop::RX),
-          usage(generic_desktop::RY),
-          logical_limits<1, 2>(0, 255),
-          report_size(8),
-          report_count(6),
-          input::absolute_variable(),
+                     report_id(1),
+                     usage(generic_desktop::X),
+                     usage(generic_desktop::Y),
+                     usage(generic_desktop::Z),
+                     usage(generic_desktop::RZ),
+                     usage(generic_desktop::RX),
+                     usage(generic_desktop::RY),
+                     logical_limits<1, 2>(0, 255),
+                     report_size(8),
+                     report_count(6),
+                     input::absolute_variable(),
 
-          usage_page<vendor>(),
-          usage<1>(vendor::USB_1),
-          report_count(1),
-          input::absolute_variable(),
-          usage_page<generic_desktop>(),
+                     usage_page<vendor>(),
+                     usage<1>(vendor::USB_1),
+                     report_count(1),
+                     input::absolute_variable(),
+                     usage_page<generic_desktop>(),
 
-          usage(generic_desktop::HAT_SWITCH),
-          logical_limits<1, 1>(0, 7),
-          physical_limits<1, 2>(0, 315),
-          unit::degree(),  // requires two bytes, not four - upstream fix needed
-          report_size(4),
-          report_count(1),
-          input::absolute_variable(main::field_flags::NULL_STATE),
-          unit::none(),  // requires two bytes, not four - upstream fix needed
+                     usage(generic_desktop::HAT_SWITCH),
+                     logical_limits<1, 1>(0, 7),
+                     physical_limits<1, 2>(0, 315),
+                     unit::degree::unit_item(),  // requires two bytes, not four
+                                                 // - upstream fix needed
+                     report_size(4),
+                     report_count(1),
+                     input::absolute_variable(main::field_flags::NULL_STATE),
+                     unit::none::unit_item(),  // requires two bytes, not four -
+                                               // upstream fix needed
 
-          usage_page<button>(),
-          usage_limits(button(1), button(15)),
-          logical_limits<1, 1>(0, 1),
-          report_size(1),
-          report_count(15),
-          input::absolute_variable(),
+                     usage_page<button>(),
+                     usage_limits(button(1), button(15)),
+                     logical_limits<1, 1>(0, 1),
+                     report_size(1),
+                     report_count(15),
+                     input::absolute_variable(),
 
-          usage_page<vendor>(),
-          usage<1>(vendor::USB_2),
-          report_count(13),
-          input::absolute_variable(),
+                     usage_page<vendor>(),
+                     usage<1>(vendor::USB_2),
+                     report_count(13),
+                     input::absolute_variable(),
 
-          usage_page<vendor>(),
-          usage<1>(vendor::USB_3),
-          logical_limits<1, 2>(0, 255),
-          report_size(8),
-          report_count(52),
-          input::absolute_variable(),
+                     usage_page<vendor>(),
+                     usage<1>(vendor::USB_3),
+                     logical_limits<1, 2>(0, 255),
+                     report_size(8),
+                     report_count(52),
+                     input::absolute_variable(),
 
-          report_id(2),
-          usage<1>(vendor::USB_4),
-          report_count(47),
-          output::absolute_variable(),
+                     report_id(2),
+                     usage<1>(vendor::USB_4),
+                     report_count(47),
+                     output::absolute_variable(),
 
-          report_id(5),
-          usage<1>(vendor::UNKNOWN_4),
-          report_count(40),
-          feature::absolute_variable(),
+                     report_id(5),
+                     usage<1>(vendor::UNKNOWN_4),
+                     report_count(40),
+                     feature::absolute_variable(),
 
-          report_id(8),
-          usage<1>(vendor::UNKNOWN_5),
-          report_count(47),
-          feature::absolute_variable(),
+                     report_id(8),
+                     usage<1>(vendor::UNKNOWN_5),
+                     report_count(47),
+                     feature::absolute_variable(),
 
-          report_id(9),
-          usage<1>(vendor::USB_5),
-          report_count(19),
-          feature::absolute_variable(),
+                     report_id(9),
+                     usage<1>(vendor::USB_5),
+                     report_count(19),
+                     feature::absolute_variable(),
 
-          report_id(10),
-          usage<1>(vendor::USB_6),
-          report_count(26),
-          feature::absolute_variable(),
+                     report_id(10),
+                     usage<1>(vendor::USB_6),
+                     report_count(26),
+                     feature::absolute_variable(),
 
-          report_id(32),
-          usage<1>(vendor::USB_7),
-          report_count(63),
-          feature::absolute_variable(),
+                     report_id(32),
+                     usage<1>(vendor::USB_7),
+                     report_count(63),
+                     feature::absolute_variable(),
 
-          report_id(33),
-          usage<1>(vendor::USB_8),
-          report_count(4),
-          feature::absolute_variable(),
+                     report_id(33),
+                     usage<1>(vendor::USB_8),
+                     report_count(4),
+                     feature::absolute_variable(),
 
-          report_id(34),
-          usage<1>(vendor1::UNKNOWN_5),
-          report_count(63),
-          feature::absolute_variable(),
+                     report_id(34),
+                     usage<1>(vendor1::UNKNOWN_5),
+                     report_count(63),
+                     feature::absolute_variable(),
 
-          report_id(0x80),
-          usage<1>(vendor1::UNKNOWN_6),
-          report_count(63),
-          feature::absolute_variable(),
+                     report_id(0x80),
+                     usage<1>(vendor1::UNKNOWN_6),
+                     report_count(63),
+                     feature::absolute_variable(),
 
-          report_id(0x81),
-          usage<1>(vendor1::UNKNOWN_7),
-          report_count(63),
-          feature::absolute_variable(),
+                     report_id(0x81),
+                     usage<1>(vendor1::UNKNOWN_7),
+                     report_count(63),
+                     feature::absolute_variable(),
 
-          report_id(0x82),
-          usage<1>(vendor1::UNKNOWN_8),
-          report_count(9),
-          feature::absolute_variable(),
+                     report_id(0x82),
+                     usage<1>(vendor1::UNKNOWN_8),
+                     report_count(9),
+                     feature::absolute_variable(),
 
-          report_id(0x83),
-          usage<1>(vendor1::UNKNOWN_9),
-          report_count(63),
-          feature::absolute_variable(),
+                     report_id(0x83),
+                     usage<1>(vendor1::UNKNOWN_9),
+                     report_count(63),
+                     feature::absolute_variable(),
 
-          report_id(0x84),
-          usage<1>(vendor1::UNKNOWN_13),
-          report_count(63),
-          feature::absolute_variable(),
+                     report_id(0x84),
+                     usage<1>(vendor1::UNKNOWN_13),
+                     report_count(63),
+                     feature::absolute_variable(),
 
-          report_id(0x85),
-          usage<1>(vendor1::UNKNOWN_14),
-          report_count(2),
-          feature::absolute_variable(),
+                     report_id(0x85),
+                     usage<1>(vendor1::UNKNOWN_14),
+                     report_count(2),
+                     feature::absolute_variable(),
 
-          report_id(0xA0),
-          usage<1>(vendor1::UNKNOWN_15),
-          report_count(1),
-          feature::absolute_variable(),
+                     report_id(0xA0),
+                     usage<1>(vendor1::UNKNOWN_15),
+                     report_count(1),
+                     feature::absolute_variable(),
 
-          report_id(0xE0),
-          usage<1>(vendor1::UNKNOWN_16),
-          report_count(63),
-          feature::absolute_variable(),
+                     report_id(0xE0),
+                     usage<1>(vendor1::UNKNOWN_16),
+                     report_count(63),
+                     feature::absolute_variable(),
 
-          report_id(0xF0),
-          usage<1>(vendor1::UNKNOWN_12),
-          report_count(63),
-          feature::absolute_variable(),
+                     report_id(0xF0),
+                     usage<1>(vendor1::UNKNOWN_12),
+                     report_count(63),
+                     feature::absolute_variable(),
 
-          report_id(0xF1),
-          usage<1>(vendor1::UNKNOWN_10),
-          report_count(63),
-          feature::absolute_variable(),
+                     report_id(0xF1),
+                     usage<1>(vendor1::UNKNOWN_10),
+                     report_count(63),
+                     feature::absolute_variable(),
 
-          report_id(0xF2),
-          usage<1>(vendor1::UNKNOWN_11),
-          report_count(15),
-          feature::absolute_variable(),
+                     report_id(0xF2),
+                     usage<1>(vendor1::UNKNOWN_11),
+                     report_count(15),
+                     feature::absolute_variable(),
 
-          report_id(0xF4),
-          usage<1>(vendor::UNKNOWN_6),
-          report_count(63),
-          feature::absolute_variable(),
+                     report_id(0xF4),
+                     usage<1>(vendor::UNKNOWN_6),
+                     report_count(63),
+                     feature::absolute_variable(),
 
-          report_id(0xF5),
-          usage<1>(vendor::UNKNOWN_7),
-          report_count(3),
-          feature::absolute_variable()));
+                     report_id(0xF5),
+                     usage<1>(vendor::UNKNOWN_7),
+                     report_count(3),
+                     feature::absolute_variable()));
 
   static void print_udev_properties(
       const std::unordered_map<std::string, std::map<std::string, std::string>>&
@@ -501,7 +518,7 @@ class Hidraw {
     for (const auto& item : report_protocol.descriptor) {
       if (const auto type = item.type(); type == item_type::MAIN) {
         spdlog::info("** MAIN");
-        auto tag = item.main_tag();
+        const auto tag = item.main_tag();
         if (tag == main::tag::INPUT) {
           spdlog::info("\tINPUT: 0x{:02X}", item.value_unsigned());
         }
@@ -624,15 +641,31 @@ class Hidraw {
   }
 
   // compute the CRC32 checksum and write it to the last four bytes
-  static void appendChecksum(const std::uint8_t reportId,
+  static void AppendChecksum(const std::uint8_t reportId,
                              std::vector<std::uint8_t>& pkt) {
     const std::vector<std::uint8_t>& prefixBytes = {0xA2, reportId};
     const std::vector dataView(pkt.begin(), pkt.end() - 4);
     const std::uint32_t crc = crc32(prefixBytes, dataView);
-    pkt[pkt.size() - 4] = crc & 0xFF;
-    pkt[pkt.size() - 3] = (crc >> 8) & 0xFF;
-    pkt[pkt.size() - 2] = (crc >> 16) & 0xFF;
-    pkt[pkt.size() - 1] = (crc >> 24) & 0xFF;
+    const auto idx = pkt.size();
+    pkt[idx - 4] = crc & 0xFF;
+    pkt[idx - 3] = (crc >> 8) & 0xFF;
+    pkt[idx - 2] = (crc >> 16) & 0xFF;
+    pkt[idx - 1] = (crc >> 24) & 0xFF;
+  }
+
+  static void GetFeature(const int fd, const std::uint8_t id) {
+    std::uint8_t buf[256]{};
+    spdlog::info("GetFeature: 0x{:02x}", id);
+    buf[0] = id;  // Report Number
+    if (const auto res = ioctl(fd, HIDIOCGFEATURE(256), buf); res < 0) {
+      perror("HIDIOCGFEATURE");
+    } else {
+      printf("ioctl HIDIOCGFEATURE returned: %d\n", res);
+      printf("Report data:\n\t");
+      for (int i = 0; i < res; i++)
+        printf("%hhx ", buf[i]);
+      puts("\n");
+    }
   }
 
   static void dump_info(const std::string& device) {
@@ -644,7 +677,7 @@ class Hidraw {
     const int fd = open(device.c_str(), O_RDWR | O_NONBLOCK);
 
     if (fd < 0) {
-      spdlog::error("Unable to open device");
+      spdlog::error("unable to open device");
       return;
     }
 
@@ -682,7 +715,7 @@ class Hidraw {
     }
 
     // Raw Name
-    char buf[256]{};
+    std::uint8_t buf[256]{};
     res = ioctl(fd, HIDIOCGRAWNAME(sizeof(buf)), buf);
     if (res < 0)
       spdlog::error("HIDIOCGRAWNAME");
@@ -705,6 +738,7 @@ class Hidraw {
     } else {
       const auto view = hid::rdf::descriptor_view_base<reinterpret_iterator>(
           rpt_desc.value, rpt_desc.size);
+
       const auto usage_id = get_application_usage_id(view);
       spdlog::info("Usage page id: {}", usage_id.page_id());
       spdlog::info("Usage id: {}", usage_id.id());
@@ -714,6 +748,62 @@ class Hidraw {
         ss << "0x" << std::hex << std::setw(2) << std::setfill('0')
            << static_cast<int>(rpt_desc.value[i]) << ", ";
       ss << "\n";
+
+      ss << "Reference Report Descriptor:\n";
+      for (auto& b : usb_report_desc) {
+        ss << "0x" << std::hex << std::setw(2) << std::setfill('0')
+           << static_cast<int>(b) << ", ";
+      }
+    }
+    spdlog::debug(ss.str());
+
+    GetFeature(fd, 0x05);  // Get Calibration
+    // GetFeature(fd, 0x08); // Get bluetooth control
+
+    DualSense::ReportFeatureInMacAll report_feature_in_mac_all{};
+    DualSense::GetControllerAndHostMAC(fd, report_feature_in_mac_all);
+    DualSense::PrintControllerAndHostMac(report_feature_in_mac_all);
+
+    // GetFeature(fd, 0x0A); // Set bluetooth pairing
+    // GetFeature(fd, 0x20); // Get Controller Version/Date
+    // GetFeature(fd, 0x21); // Set audio control
+    // GetFeature(fd, 0x22); // Get Hardware Info
+    // GetFeature(fd, 0x80); // Set test command
+    // GetFeature(fd, 0x81); // Get test result
+    // GetFeature(fd, 0x82); // Set calibration command
+    // GetFeature(fd, 0x83); // Get calibration data
+    // GetFeature(fd, 0x84); // Set individual data
+    GetFeature(fd, 0x85);  // Get individual data result
+    // GetFeature(fd, 0xA0); // Set DFU enable
+    // GetFeature(fd, 0xE0); // Get system profile
+    // GetFeature(fd, 0xF0); // Flash command
+    // GetFeature(fd, 0xF1); // Get flash cmd status
+    GetFeature(fd, 0xF2);  //
+    // GetFeature(fd, 0xF4); // User update command
+    GetFeature(fd, 0xF5);  // User get update status
+
+    {
+      // Get a report from the device
+
+      if (const auto result = read(fd, buf, 64); result < 0) {
+        perror("read");
+      } else {
+        std::ostringstream os;
+        os << "read() read " << result << " bytes\n";
+        for (int i = 0; i < result; i++)
+          os << "0x" << std::hex << std::setw(2) << std::setfill('0') << buf[i]
+             << ", ";
+        os << "\n";
+        spdlog::debug(os.str());
+      }
+
+      spdlog::debug("Report ID: 0x{:02x}", buf[0]);
+
+      if (buf[0] == 0x01) {
+        const auto state_data =
+            reinterpret_cast<DualSense::USBGetStateData*>(&buf[1]);
+        DualSense::print_state_data(state_data);
+      }
     }
 
 #if 0
@@ -728,19 +818,6 @@ class Hidraw {
     else
       printf("ioctl HIDIOCSFEATURE returned: %d\n", res);
 
-    // Get Feature
-    buf[0] = 0x01;  // Report Number
-    res = ioctl(fd, HIDIOCGFEATURE(256), buf);
-    if (res < 0) {
-      perror("HIDIOCGFEATURE");
-    } else {
-      printf("ioctl HIDIOCGFEATURE returned: %d\n", res);
-      printf("Report data:\n\t");
-      for (int i = 0; i < res; i++)
-        printf("%hhx ", buf[i]);
-      puts("\n");
-    }
-
     // Set Feature
     buf[0] = 0x31;  // Report Number
     buf[1] = 0xff;
@@ -752,19 +829,6 @@ class Hidraw {
     else
       printf("ioctl HIDIOCSFEATURE returned: %d\n", res);
 
-    // Get Feature
-    buf[0] = 0x31;  // Report Number
-    res = ioctl(fd, HIDIOCGFEATURE(256), buf);
-    if (res < 0) {
-      perror("HIDIOCGFEATURE");
-    } else {
-      printf("ioctl HIDIOCGFEATURE returned: %d\n", res);
-      printf("Report data:\n\t");
-      for (int i = 0; i < res; i++)
-        printf("%hhx ", buf[i]);
-      puts("\n");
-    }
-
     // Send a Report to the Device
     buf[0] = 0x1;  // Report Number
     buf[1] = 0x77;
@@ -774,17 +838,6 @@ class Hidraw {
       perror("write");
     } else {
       printf("write() wrote %d bytes\n", res);
-    }
-
-    // Get a report from the device
-    res = read(fd, buf, 16);
-    if (res < 0) {
-      perror("read");
-    } else {
-      printf("read() read %d bytes:\n\t", res);
-      for (int i = 0; i < res; i++)
-        printf("%hhx ", buf[i]);
-      puts("\n");
     }
 #endif
     close(fd);

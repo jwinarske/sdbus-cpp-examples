@@ -14,4 +14,4 @@ if (ENABLE_LTO AND IPO_SUPPORT_RESULT)
     set_property(TARGET bluez_client PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif ()
 
-# add_subdirectory(ps5_dual_sense)
+add_subdirectory(ps5_dual_sense)
