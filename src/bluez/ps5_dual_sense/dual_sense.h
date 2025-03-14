@@ -162,7 +162,7 @@ class DualSense final
     int16_t AccelerometerZ;
     uint32_t SensorTimestamp;
     int8_t Temperature;
-    TouchData touchData;  // Renamed to avoid conflict
+    TouchData touchData;
     uint8_t TriggerRightStopLocation : 4;
     uint8_t TriggerRightStatus : 4;
     uint8_t TriggerLeftStopLocation : 4;

@@ -40,6 +40,8 @@
 #include "hid/rdf/descriptor.hpp"
 #include "hid/report_protocol.hpp"
 
+#include "report_parser.hpp"
+
 #include "vendor.hpp"
 #include "vendor1.hpp"
 
@@ -70,13 +72,11 @@ class Hidraw {
                      usage(generic_desktop::HAT_SWITCH),
                      logical_limits<1, 1>(0, 7),
                      physical_limits<1, 2>(0, 315),
-                     unit::degree::unit_item(),  // requires two bytes, not four
-                                                 // - upstream fix needed
+                     unit::degree::unit_item(),
                      report_size(4),
                      report_count(1),
                      input::absolute_variable(main::field_flags::NULL_STATE),
-                     unit::none::unit_item(),  // requires two bytes, not four -
-                                               // upstream fix needed
+                     unit::none::unit_item(),
 
                      usage_page<button>(),
                      usage_limits(button(1), button(14)),
@@ -84,22 +84,17 @@ class Hidraw {
                      report_size(1),
                      report_count(14),
                      input::absolute_variable(),
-                     // report_size(6),
-                     // report_count(1),
-                     // input::constant(),
                      input::padding(6),
 
                      usage_page<generic_desktop>(),
                      usage(generic_desktop::RX),
                      usage(generic_desktop::RY),
-
                      logical_limits<1, 2>(0, 255),
                      report_size(8),
                      report_count(2),
                      input::absolute_variable(),
 
                      usage_page<vendor>(),
-
                      logical_limits<1, 2>(0, 255),
                      report_size(8),
                      report_count(77),
@@ -250,21 +245,19 @@ class Hidraw {
                      input::absolute_variable(),
 
                      usage_page<vendor>(),
-                     usage<1>(vendor::USB_1),
+                     usage<1>(vendor::SeqNo),
                      report_count(1),
                      input::absolute_variable(),
-                     usage_page<generic_desktop>(),
 
+                     usage_page<generic_desktop>(),
                      usage(generic_desktop::HAT_SWITCH),
                      logical_limits<1, 1>(0, 7),
                      physical_limits<1, 2>(0, 315),
-                     unit::degree::unit_item(),  // requires two bytes, not four
-                                                 // - upstream fix needed
+                     unit::degree::unit_item(),
                      report_size(4),
                      report_count(1),
                      input::absolute_variable(main::field_flags::NULL_STATE),
-                     unit::none::unit_item(),  // requires two bytes, not four -
-                                               // upstream fix needed
+                     unit::none::unit_item(),
 
                      usage_page<button>(),
                      usage_limits(button(1), button(15)),
@@ -286,7 +279,7 @@ class Hidraw {
                      input::absolute_variable(),
 
                      report_id(2),
-                     usage<1>(vendor::USB_4),
+                     usage<1>(vendor::SetStateData),
                      report_count(47),
                      output::absolute_variable(),
 
@@ -627,9 +620,9 @@ class Hidraw {
   }
 
   // Compute CRC32 for prefixBytes concatenated with dataView
-  static std::uint32_t crc32(const std::vector<std::uint8_t>& prefixBytes,
+  static std::uint32_t crc32(const std::array<std::uint32_t, 256>& crcTable,
+                             const std::vector<std::uint8_t>& prefixBytes,
                              const std::vector<std::uint8_t>& dataView) {
-    static const auto crcTable = makeCRCTable();
     std::uint32_t crc = 0xFFFFFFFF;
     for (const auto& byte : prefixBytes) {
       crc = (crc >> 8) ^ crcTable[(crc ^ byte) & 0xFF];
@@ -641,16 +634,17 @@ class Hidraw {
   }
 
   // compute the CRC32 checksum and write it to the last four bytes
-  static void AppendChecksum(const std::uint8_t reportId,
-                             std::vector<std::uint8_t>& pkt) {
+  static void AppendChecksum(const std::array<std::uint32_t, 256>& crcTable,
+                             const std::uint8_t reportId,
+                             std::vector<std::uint8_t>& msg) {
     const std::vector<std::uint8_t>& prefixBytes = {0xA2, reportId};
-    const std::vector dataView(pkt.begin(), pkt.end() - 4);
-    const std::uint32_t crc = crc32(prefixBytes, dataView);
-    const auto idx = pkt.size();
-    pkt[idx - 4] = crc & 0xFF;
-    pkt[idx - 3] = (crc >> 8) & 0xFF;
-    pkt[idx - 2] = (crc >> 16) & 0xFF;
-    pkt[idx - 1] = (crc >> 24) & 0xFF;
+    const std::vector dataView(msg.begin(), msg.end() - 4);
+    const std::uint32_t crc = crc32(crcTable, prefixBytes, dataView);
+    const auto idx = msg.size();
+    msg[idx - 4] = crc & 0xFF;
+    msg[idx - 3] = (crc >> 8) & 0xFF;
+    msg[idx - 2] = (crc >> 16) & 0xFF;
+    msg[idx - 1] = (crc >> 24) & 0xFF;
   }
 
   static void GetFeature(const int fd, const std::uint8_t id) {
@@ -740,6 +734,8 @@ class Hidraw {
       const auto view = hid::rdf::descriptor_view_base<reinterpret_iterator>(
           rpt_desc.value, rpt_desc.size);
 
+      hid::report_parser::parser parser(view);
+
       const auto usage_id = get_application_usage_id(view);
       spdlog::info("Usage page id: {}", usage_id.page_id());
       spdlog::info("Usage id: {}", usage_id.id());
@@ -771,6 +767,7 @@ class Hidraw {
           DualSense::GetControllerMacAll(fd, mac_all) == 0) {
         DualSense::PrintControllerMacAll(mac_all);
       }
+
       // GetFeature(fd, 0x0A); // Set bluetooth pairing
       // GetFeature(fd, 0x20); // Get Controller Version/Date
       // GetFeature(fd, 0x21); // Set audio control
@@ -794,7 +791,7 @@ class Hidraw {
         DualSense::PrintControllerStateUsb(report_in_01_usb.State, hw_cal_data);
       }
     } else if (dev_info.bustype == BUS_BLUETOOTH) {
-      // enable report 0x31
+      // enables report 0x31
       DualSense::HardwareCalibrationData hw_cal_data{};
       if (DualSense::GetControllerCalibrationData(fd, hw_cal_data) == 0) {
         DualSense::PrintCalibrationData(hw_cal_data);
@@ -817,7 +814,7 @@ class Hidraw {
       // GetFeature(fd, 0x81); // Get test result
       // GetFeature(fd, 0x82); // Set calibration command
       GetFeature(fd, 0x83);  // Get calibration data
-      //  GetFeature(fd, 0xF0); // Flash command
+      // GetFeature(fd, 0xF0); // Flash command
       GetFeature(fd, 0xF1);  // Get flash cmd status
       GetFeature(fd, 0xF2);  //
 

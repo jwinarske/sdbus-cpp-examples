@@ -9,15 +9,15 @@ enum class vendor : std::uint16_t;
 template <>
 struct info<vendor> {
   constexpr static page_id_t page_id = 0xFF00;
-  constexpr static usage_id_t max_usage_id = 10;
+  constexpr static usage_id_t max_usage_id = 19;
   constexpr static auto name = "Vendor Defined";
 };
 
 enum class vendor : std::uint16_t {
-  USB_1 = 0x20,
+  SeqNo = 0x20,
   USB_2 = 0x21,
   USB_3 = 0x22,
-  USB_4 = 0x23,
+  SetStateData = 0x23,
   USB_5 = 0x24,
   USB_6 = 0x25,
   USB_7 = 0x26,

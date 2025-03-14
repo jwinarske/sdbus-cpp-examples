@@ -32,6 +32,21 @@ DualSense::DualSense(sdbus::IConnection& connection)
                       }
                     }
                   }) {
+  const auto view = hid::rdf::descriptor_view_base<reinterpret_iterator>(
+      Hidraw::usb_report_desc);
+  const hid::report_parser::parser parser(view);
+  spdlog::info("application usage id: {}", get_application_usage_id(view).id());
+  spdlog::info("application page id: {}",
+               get_application_usage_id(view).page_id());
+  spdlog::info("max_report_id: {}", parser.max_report_id());
+  spdlog::info("INPUT max_report_size: {}",
+               parser.max_report_size(hid::report::type::INPUT));
+  spdlog::info("OUTPUT max_report_size: {}",
+               parser.max_report_size(hid::report::type::OUTPUT));
+  spdlog::info("FEATURE max_report_size: {}",
+               parser.max_report_size(hid::report::type::FEATURE));
+  spdlog::info("uses_report_ids: {}", parser.uses_report_ids());
+
   if (!get_bt_hidraw_devices()) {
     get_usb_hidraw_devices();
   }
@@ -341,7 +356,6 @@ int DualSense::GetControllerStateUsb(const int fd, ReportIn01USB& state_data) {
   // data not available, use epoll to block until data is available
 
   if (poll_res == 0) {
-    spdlog::info("No data available to read");
     // Create an epoll instance
     const int epoll_fd = epoll_create1(0);
     if (epoll_fd == -1) {
@@ -694,13 +708,13 @@ void DualSense::PrintCalibrationData(
     HardwareCalibrationData const& hw_cal_data) {
   spdlog::info("HW Calibration Data");
   for (auto const& [abs_code, bias, sens_numer, sens_denom] :
-       hw_cal_data.gyro) {
-    spdlog::info("\tGyro {}: bias: {}, sens_numer: {}, sens_denom: {}",
+       hw_cal_data.accel) {
+    spdlog::info("\tAccel {}: bias: {}, sens_numer: {}, sens_denom: {}",
                  abs_code, bias, sens_numer, sens_denom);
   }
   for (auto const& [abs_code, bias, sens_numer, sens_denom] :
-       hw_cal_data.accel) {
-    spdlog::info("\tAccelerometer {}: bias: {}, sens_numer: {}, sens_denom: {}",
+       hw_cal_data.gyro) {
+    spdlog::info("\tGyro {}: bias: {}, sens_numer: {}, sens_denom: {}",
                  abs_code, bias, sens_numer, sens_denom);
   }
 }
