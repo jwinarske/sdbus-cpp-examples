@@ -15,3 +15,4 @@ if (ENABLE_LTO AND IPO_SUPPORT_RESULT)
 endif ()
 
 add_subdirectory(ps5_dual_sense)
+add_subdirectory(xbox_controller)

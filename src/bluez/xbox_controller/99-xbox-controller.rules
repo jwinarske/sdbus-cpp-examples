@@ -1,0 +1,11 @@
+99-xbox-controller.rules
+# UDEV rules to make XBox Wireless Controller read/write on Linux.
+# To use, copy this file to /etc/udev/rules.d/99-xbox-controller.rules and reconnect the controller.
+
+# Xbox Wireless Controller (USB)
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="045e", ATTRS{idProduct}=="0b12", MODE="0666"
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="045e", ATTRS{idProduct}=="02fc", MODE="0666"
+
+# Xbox Wireless Controller (Bluetooth)
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", KERNELS=="0005:045E:0B13.*", MODE="0666"
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", KERNELS=="0005:045E:02FD.*", MODE="0666"
