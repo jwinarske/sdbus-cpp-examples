@@ -332,7 +332,7 @@ class InputReader {
     spdlog::info("Y: {}", input_report01.BTN_GamepadButton5);
     spdlog::info("Button6: {}", input_report01.BTN_GamepadButton6);
     spdlog::info("Left Bumper: {}", input_report01.BTN_GamepadButton7);
-    spdlog::info("Button8: {}", input_report01.BTN_GamepadButton1);
+    spdlog::info("Right Bumper: {}", input_report01.BTN_GamepadButton8);
     spdlog::info("Button9: {}", input_report01.BTN_GamepadButton9);
     spdlog::info("Button10: {}", input_report01.BTN_GamepadButton10);
     spdlog::info("Button11: {}", input_report01.BTN_GamepadButton11);
