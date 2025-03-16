@@ -45,8 +45,6 @@ class InputReader {
 
   Task read_input();
 
-  static int GetInputReport(int fd, std::uint8_t* report, std::size_t length);
-
   static void PrintInputReport1(const inputReport01_t& input_report01);
 
   static void PrintInputReport2(const inputReport02_t& input_report02);

@@ -12,17 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#pragma once
+#ifndef SRC_BLUEZ_XBOX_CONTROLLER_HIDRAW_HPP_
+#define SRC_BLUEZ_XBOX_CONTROLLER_HIDRAW_HPP_
 
-#include <iomanip>
-#include <ostream>
 #include <ranges>
 #include <regex>
 #include <string>
 #include <vector>
-
-#include <fcntl.h>
-#include <unistd.h>
 
 #include <libudev.h>
 #include <linux/hidraw.h>
@@ -151,3 +147,5 @@ class Hidraw {
     return 1;
   }
 };
+
+#endif  // SRC_BLUEZ_XBOX_CONTROLLER_HIDRAW_HPP_

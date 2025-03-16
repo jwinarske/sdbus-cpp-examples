@@ -2,13 +2,12 @@
 #include <thread>
 #include <utility>
 
+#include <fcntl.h>
+#include <sys/epoll.h>
 #include <sys/poll.h>
 
 #include "hidraw.hpp"
-
 #include "input_reader.h"
-
-#include <sys/epoll.h>
 
 InputReader::InputReader(std::string device)
     : device_(std::move(device)), stop_flag_(false) {}
@@ -122,65 +121,6 @@ InputReader::Task InputReader::read_input() {
   stop();
 
   co_return;
-}
-
-int InputReader::GetInputReport(const int fd,
-                                std::uint8_t* report,
-                                const std::size_t length) {
-  pollfd pfd{};
-  pfd.fd = fd;
-  pfd.events = POLLIN;
-
-  const int poll_res = poll(&pfd, 1, 0);
-  if (poll_res == -1) {
-    spdlog::error("poll failed: {}", strerror(errno));
-    return 1;
-  }
-
-  // data not available, use epoll to block until data is available
-
-  if (poll_res == 0) {
-    // Create an epoll instance
-    const int epoll_fd = epoll_create1(0);
-    if (epoll_fd == -1) {
-      spdlog::error("Failed to create epoll instance: {}", strerror(errno));
-      return 1;
-    }
-
-    // Block using epoll to wait for data to be available
-
-    // Add the file descriptor to the epoll instance
-    epoll_event event{};
-    event.events = EPOLLIN;
-    event.data.fd = fd;
-    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &event) == -1) {
-      spdlog::error("Failed to add file descriptor to epoll: {}",
-                    strerror(errno));
-      close(epoll_fd);
-      return 1;
-    }
-
-    // Wait for events
-    epoll_event events[1];
-    if (const int n = epoll_wait(epoll_fd, events, 1, -1); n == -1) {
-      spdlog::error("epoll_wait failed: {}", strerror(errno));
-      close(epoll_fd);
-      return 1;
-    }
-    // Read data if available
-    if (!(events[0].events & EPOLLIN)) {
-      spdlog::error("epoll event EPOLLIN not set");
-    }
-    close(epoll_fd);
-  }
-
-  ssize_t result = 0;
-  if (result = read(fd, report, length); result < 0) {
-    spdlog::error("GetInputReport4 failed: {}", strerror(errno));
-    return 1;
-  }
-
-  return 0;
 }
 
 void InputReader::PrintInputReport1(const inputReport01_t& input_report01) {
