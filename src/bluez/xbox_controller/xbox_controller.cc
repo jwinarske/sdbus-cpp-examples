@@ -301,11 +301,11 @@ bool XboxController::get_usb_hidraw_devices() {
 
   // Get input devices matching the specified properties
   const auto usb_input_devices =
-      Hidraw::get_udev_properties("input", false,
+      Hidraw::get_udev_properties("input", true,
                                   {{"ID_BUS", "usb"},
                                    {"NAME", "\"Xbox Wireless Controller\""},
                                    {"ID_USB_VENDOR_ID", "045e"},
-                                   {"ID_USB_MODEL_ID", USB_PRODUCT_ID},
+                                   {"ID_USB_MODEL_ID", "02ea"},
                                    {"TAGS", ":seat:"}});
 
   if (usb_input_devices.empty()) {

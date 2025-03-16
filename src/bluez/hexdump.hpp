@@ -1,13 +1,13 @@
 #ifndef SRC_BLUEZ_HEXDUMP_HPP
 #define SRC_BLUEZ_HEXDUMP_HPP
 
-#include <cstdint>
 #include <cctype>
+#include <cstdint>
 #include <iomanip>
 #include <ostream>
 
 class IosFlagSaver {
-public:
+ public:
   explicit IosFlagSaver(std::ostream& _ios) : ios(_ios), f(_ios.flags()) {}
 
   ~IosFlagSaver() { ios.flags(f); }
@@ -16,7 +16,7 @@ public:
 
   IosFlagSaver& operator=(const IosFlagSaver& rhs) = delete;
 
-private:
+ private:
   std::ostream& ios;
   std::ios::fmtflags f;
 };

@@ -23,7 +23,7 @@
 #include "../input1.h"
 #include "udev_monitor.hpp"
 
-#include "input_reader.hpp"
+#include "input_reader.h"
 
 class UPowerDisplayDevice;
 class XboxController final
@@ -36,8 +36,6 @@ class XboxController final
 
  private:
   const std::string VENDOR_ID = "045E";
-  const std::string USB_PRODUCT_ID = "0b12";
-
   const std::string PRODUCT_ID0 = "02FD";
   const std::string PRODUCT_ID1 = "0B13";
 

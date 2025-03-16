@@ -4,6 +4,7 @@ pkg_check_modules(UDEV REQUIRED IMPORTED_TARGET libudev)
 
 add_executable(xbox_controller_client
         main.cc
+        input_reader.cc
         xbox_controller.cc
         ../../upower/upower_client.h
         ../../upower/upower_display_device.cc
