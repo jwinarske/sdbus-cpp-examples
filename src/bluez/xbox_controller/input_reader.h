@@ -18,7 +18,7 @@
 #include <atomic>
 #include <coroutine>
 
-#include "hidraw.hpp"
+#include "../hidraw.hpp"
 #include "xbox_wireless_controller_02fd.h"
 
 class InputReader {
@@ -59,6 +59,8 @@ class InputReader {
 
   Task read_input();
 
+  static std::string dpad_to_string(Direction dpad);
+
   static void PrintInputReport1(const inputReport01_t& input_report01);
 
   static void PrintInputReport2(const inputReport02_t& input_report02);
@@ -66,10 +68,6 @@ class InputReader {
   static void PrintOutputReport3(const outputReport03_t& output_report03);
 
   static void PrintInputReport4(const inputReport04_t& output_report04);
-
-  static const char* bus_str(std::uint32_t bus);
-
-  static std::string dpad_to_string(Direction dpad);
 };
 
 #endif  // SRC_BLUEZ_XBOX_CONTROLLER_INPUT_READER_HPP_

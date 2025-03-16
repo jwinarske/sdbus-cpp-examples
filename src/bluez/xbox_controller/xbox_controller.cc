@@ -16,7 +16,7 @@
 
 #include <poll.h>
 
-#include "hidraw.hpp"
+#include "../hidraw.hpp"
 
 XboxController::XboxController(sdbus::IConnection& connection)
     : ProxyInterfaces(connection,
@@ -35,13 +35,27 @@ XboxController::XboxController(sdbus::IConnection& connection)
                         input_reader_->stop();
                         input_reader_.reset();
                       }
-                      if (!get_bt_hidraw_devices()) {
-                        get_usb_hidraw_devices();
+                      if (!get_bt_hidraw_devices(
+                              {{"ID_BUS", "bluetooth"},
+                               {"NAME", "\"Xbox Wireless Controller\""},
+                               {"TAGS", ":seat:"}})) {
+                        get_usb_hidraw_devices(
+                            {{"ID_BUS", "usb"},
+                             {"NAME", "\"Xbox Wireless Controller\""},
+                             {"ID_USB_VENDOR_ID", "045e"},
+                             {"ID_USB_MODEL_ID", "02ea"},
+                             {"TAGS", ":seat:"}});
                       }
                     }
                   }) {
-  if (!get_bt_hidraw_devices()) {
-    get_usb_hidraw_devices();
+  if (!get_bt_hidraw_devices({{"ID_BUS", "bluetooth"},
+                              {"NAME", "\"Xbox Wireless Controller\""},
+                              {"TAGS", ":seat:"}})) {
+    get_usb_hidraw_devices({{"ID_BUS", "usb"},
+                            {"NAME", "\"Xbox Wireless Controller\""},
+                            {"ID_USB_VENDOR_ID", "045e"},
+                            {"ID_USB_MODEL_ID", "02ea"},
+                            {"TAGS", ":seat:"}});
   }
   registerProxy();
   for (const auto& [object, interfacesAndProperties] : GetManagedObjects()) {
@@ -105,20 +119,21 @@ void XboxController::onInterfacesAdded(
             if (props.connected && props.paired && props.trusted) {
               const auto dev_key =
                   create_device_key_from_serial_number(props.address);
-              hidraw_devices_mutex_.lock();
-              if (hidraw_devices_.contains(dev_key)) {
+              HidDevicesLock();
+              if (HidDevicesContains(dev_key)) {
                 spdlog::info("Adding hidraw device: {}", dev_key);
                 if (!input_reader_) {
-                  input_reader_ = std::make_unique<InputReader>(
-                      hidraw_devices_.at(dev_key));
+                  input_reader_ =
+                      std::make_unique<InputReader>(GetHidDevice(dev_key));
                   input_reader_->start();
                 }
               }
-              hidraw_devices_mutex_.unlock();
+              HidDevicesUnlock();
             }
 
             // Add UPower Display Device
-            if (std::string power_path = convert_mac_to_path(props.address);
+            if (std::string power_path =
+                    convert_mac_to_upower_path(props.address);
                 !upower_clients_.contains(power_path)) {
               upower_display_devices_mutex_.lock();
               spdlog::info("[Add] UPower Display Device: {}", power_path);
@@ -181,7 +196,8 @@ void XboxController::onInterfacesRemoved(
         spdlog::info("Removing: {}, {}, {}", vid, pid, did);
         if ((vid == VENDOR_ID && pid == PRODUCT_ID0) ||
             (vid == VENDOR_ID && pid == PRODUCT_ID1)) {
-          if (std::string power_path = convert_mac_to_path(props.address);
+          if (std::string power_path =
+                  convert_mac_to_upower_path(props.address);
               upower_clients_.contains(power_path)) {
             std::scoped_lock power_lock(upower_display_devices_mutex_);
             spdlog::info("[Remove] UPower Display Device: {}", power_path);
@@ -198,7 +214,7 @@ void XboxController::onInterfacesRemoved(
   }
 }
 
-std::string XboxController::convert_mac_to_path(
+std::string XboxController::convert_mac_to_upower_path(
     const std::string& mac_address) {
   std::string result =
       "/org/freedesktop/UPower/devices/battery_ps_controller_battery_";
@@ -207,133 +223,4 @@ std::string XboxController::convert_mac_to_path(
   std::ranges::transform(converted_mac, converted_mac.begin(), ::tolower);
   result += converted_mac;
   return result;
-}
-
-bool XboxController::compare_subsystem_device_paths(
-    const std::string& input_path,
-    const std::string& hidraw_path) {
-  const std::string prefix = "/sys/devices/";
-
-  // Check if both paths start with the prefix
-  if (input_path.compare(0, prefix.size(), prefix) != 0 ||
-      hidraw_path.compare(0, prefix.size(), prefix) != 0) {
-    return false;
-  }
-
-  // Extract the common part of the paths
-  const std::string input_common = input_path.substr(
-      prefix.size(), input_path.find("/input") - prefix.size());
-  const std::string hidraw_common = hidraw_path.substr(
-      prefix.size(), hidraw_path.find("/hidraw") - prefix.size());
-
-  // Compare the common parts
-  return input_common == hidraw_common;
-}
-
-std::string XboxController::create_device_key_from_serial_number(
-    const std::string& serial_number) {
-  std::string converted_serial = serial_number;
-
-  // Remove leading and trailing `"`
-  if (!converted_serial.empty() && converted_serial.front() == '"') {
-    converted_serial.erase(0, 1);
-  }
-  if (!converted_serial.empty() && converted_serial.back() == '"') {
-    converted_serial.pop_back();
-  }
-
-  // Convert to uppercase
-  std::ranges::transform(converted_serial, converted_serial.begin(), ::toupper);
-
-  // Replace ':' with '_'
-  std::ranges::replace(converted_serial, ':', '_');
-
-  const std::string key = "dev_" + converted_serial;
-  return key;
-}
-
-bool XboxController::get_bt_hidraw_devices() {
-  // Clear all contents of hidraw_devices_
-  //  std::scoped_lock lock(hidraw_devices_mutex_);
-  hidraw_devices_.clear();
-
-  // Get input devices matching the specified properties
-  const auto bt_input_devices =
-      Hidraw::get_udev_properties("input", false,
-                                  {{"ID_BUS", "bluetooth"},
-                                   {"NAME", "\"Xbox Wireless Controller\""},
-                                   {"TAGS", ":seat:"}});
-
-  if (bt_input_devices.empty()) {
-    spdlog::warn("No matching BT input devices found.");
-    return false;
-  }
-
-  // Get all hidraw devices
-  const auto hidraw_devices = Hidraw::get_udev_properties("hidraw");
-
-  for (const auto& [input_path, input_properties] : bt_input_devices) {
-    for (const auto& [hidraw_path, hidraw_properties] : hidraw_devices) {
-      if (compare_subsystem_device_paths(input_path, hidraw_path)) {
-        if (hidraw_properties.contains("DEVNAME")) {
-          const auto& hidraw_dev_name = hidraw_properties.at("DEVNAME");
-          auto serial_number = input_properties.at("UNIQ");
-          const auto dev_key =
-              create_device_key_from_serial_number(serial_number);
-          spdlog::info(
-              "Associated input device path: {} with hidraw device: {}",
-              input_path, hidraw_dev_name);
-          hidraw_devices_.insert_or_assign(dev_key, hidraw_dev_name);
-        }
-      }
-    }
-  }
-  for (const auto& value : hidraw_devices_ | std::views::values) {
-    spdlog::debug("hidraw device: {}", value);
-  }
-  return !hidraw_devices_.empty();
-}
-
-bool XboxController::get_usb_hidraw_devices() {
-  // Clear all contents of hidraw_devices_
-  std::scoped_lock lock(hidraw_devices_mutex_);
-  hidraw_devices_.clear();
-
-  // Get input devices matching the specified properties
-  const auto usb_input_devices =
-      Hidraw::get_udev_properties("input", true,
-                                  {{"ID_BUS", "usb"},
-                                   {"NAME", "\"Xbox Wireless Controller\""},
-                                   {"ID_USB_VENDOR_ID", "045e"},
-                                   {"ID_USB_MODEL_ID", "02ea"},
-                                   {"TAGS", ":seat:"}});
-
-  if (usb_input_devices.empty()) {
-    spdlog::warn("No matching USB input devices found.");
-    return false;
-  }
-
-  // Get all hidraw devices
-  const auto hidraw_devices = Hidraw::get_udev_properties("hidraw");
-
-  for (const auto& [input_path, input_properties] : usb_input_devices) {
-    for (const auto& [hidraw_path, hidraw_properties] : hidraw_devices) {
-      if (compare_subsystem_device_paths(input_path, hidraw_path)) {
-        if (hidraw_properties.contains("DEVNAME")) {
-          const auto& hidraw_dev_name = hidraw_properties.at("DEVNAME");
-          auto serial_number = input_properties.at("UNIQ");
-          const auto dev_key =
-              create_device_key_from_serial_number(serial_number);
-          spdlog::info(
-              "Associated input device path: {} with hidraw device: {}",
-              input_path, hidraw_dev_name);
-          hidraw_devices_[dev_key] = hidraw_dev_name;
-        }
-      }
-    }
-  }
-  for (const auto& value : hidraw_devices_ | std::views::values) {
-    spdlog::debug("hidraw device: {}", value);
-  }
-  return true;
 }

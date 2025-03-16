@@ -18,9 +18,8 @@
 
 #include <fcntl.h>
 #include <sys/epoll.h>
-#include <sys/poll.h>
 
-#include "hidraw.hpp"
+#include "../hidraw.hpp"
 #include "input_reader.h"
 
 InputReader::InputReader(std::string device)
@@ -58,7 +57,7 @@ InputReader::Task InputReader::read_input() {
       spdlog::error("HIDIOCGRAWINFO");
       break;
     }
-    spdlog::info("bustype: {}", bus_str(raw_dev_info.bustype));
+    spdlog::info("bustype: {}", Hidraw::bus_str(raw_dev_info.bustype));
     spdlog::info("Vendor ID: {:04X}", raw_dev_info.vendor);
     spdlog::info("Product ID: {:04X}", raw_dev_info.product);
 
@@ -137,6 +136,29 @@ InputReader::Task InputReader::read_input() {
   co_return;
 }
 
+std::string InputReader::dpad_to_string(const Direction dpad) {
+  switch (dpad) {
+    case Direction::North:
+      return "North";
+    case Direction::NorthEast:
+      return "NorthEast";
+    case Direction::East:
+      return "East";
+    case Direction::SouthEast:
+      return "SouthEast";
+    case Direction::South:
+      return "South";
+    case Direction::SouthWest:
+      return "SouthWest";
+    case Direction::West:
+      return "West";
+    case Direction::NorthWest:
+      return "NorthWest";
+    default:
+      return "None";
+  }
+}
+
 void InputReader::PrintInputReport1(const inputReport01_t& input_report01) {
   spdlog::info("Stick L/R: [{},{}] [{},{}] ", input_report01.GD_GamepadPointerX,
                input_report01.GD_GamepadPointerY,
@@ -193,42 +215,4 @@ void InputReader::PrintInputReport4(const inputReport04_t& output_report04) {
       100.0f;
   battery_percentage = std::round(battery_percentage);  // Round the percentage
   spdlog::info("Battery: {}", battery_percentage);
-}
-
-const char* InputReader::bus_str(const std::uint32_t bus) {
-  switch (bus) {
-    case BUS_USB:
-      return "USB";
-    case BUS_HIL:
-      return "HIL";
-    case BUS_BLUETOOTH:
-      return "Bluetooth";
-    case BUS_VIRTUAL:
-      return "Virtual";
-    default:
-      return "Other";
-  }
-}
-
-std::string InputReader::dpad_to_string(const Direction dpad) {
-  switch (dpad) {
-    case Direction::North:
-      return "North";
-    case Direction::NorthEast:
-      return "NorthEast";
-    case Direction::East:
-      return "East";
-    case Direction::SouthEast:
-      return "SouthEast";
-    case Direction::South:
-      return "South";
-    case Direction::SouthWest:
-      return "SouthWest";
-    case Direction::West:
-      return "West";
-    case Direction::NorthWest:
-      return "NorthWest";
-    default:
-      return "None";
-  }
 }

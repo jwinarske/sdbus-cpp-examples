@@ -21,13 +21,14 @@
 #include "../adapter1.h"
 #include "../device1.h"
 #include "../input1.h"
-#include "udev_monitor.hpp"
+#include "../udev_monitor.hpp"
 
 #include "input_reader.h"
 
 class UPowerDisplayDevice;
 class XboxController final
     : public sdbus::ProxyInterfaces<sdbus::ObjectManager_proxy>,
+      public Hidraw,
       public UdevMonitor {
  public:
   explicit XboxController(sdbus::IConnection& connection);
@@ -54,9 +55,6 @@ class XboxController final
   std::mutex input1_mutex_;
   std::map<sdbus::ObjectPath, std::unique_ptr<Input1>> input1_;
 
-  std::mutex hidraw_devices_mutex_;
-  std::map<std::string, std::string> hidraw_devices_;
-
   std::mutex upower_display_devices_mutex_;
   std::map<std::string, std::unique_ptr<UPowerClient>> upower_clients_;
 
@@ -72,17 +70,7 @@ class XboxController final
       const sdbus::ObjectPath& objectPath,
       const std::vector<sdbus::InterfaceName>& interfaces) override;
 
-  bool get_bt_hidraw_devices();
-
-  bool get_usb_hidraw_devices();
-
-  static std::string convert_mac_to_path(const std::string& mac_address);
-
-  static bool compare_subsystem_device_paths(const std::string& input_path,
-                                             const std::string& hidraw_path);
-
-  static std::string create_device_key_from_serial_number(
-      const std::string& serial_number);
+  static std::string convert_mac_to_upower_path(const std::string& mac_address);
 };
 
 #endif  // SRC_BLUEZ_XBOX_CONTROLLER_XBOX_CONTROLLER_H
