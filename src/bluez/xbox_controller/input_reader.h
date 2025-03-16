@@ -19,7 +19,7 @@
 #include <coroutine>
 
 #include "../hidraw.hpp"
-#include "xbox_wireless_controller_02fd.h"
+#include "xbox_controller_02fd.h"
 
 class InputReader {
  public:
