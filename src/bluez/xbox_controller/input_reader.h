@@ -3,7 +3,6 @@
 
 #include <atomic>
 #include <coroutine>
-#include <iostream>
 
 #include "hidraw.hpp"
 #include "xbox_wireless_controller_02fd.h"

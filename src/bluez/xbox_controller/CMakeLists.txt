@@ -15,7 +15,6 @@ target_link_libraries(xbox_controller_client
         utils
         sdbus-c++
         spdlog::spdlog
-        hid-rp
         PkgConfig::UDEV
 )
 if (ENABLE_LTO AND IPO_SUPPORT_RESULT)

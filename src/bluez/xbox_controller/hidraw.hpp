@@ -38,40 +38,6 @@ class Hidraw {
   Hidraw();
   ~Hidraw();
 
-  static void print_udev_properties(
-      const std::unordered_map<std::string, std::map<std::string, std::string>>&
-          property_map) {
-    std::ostringstream os;
-    os << "\n";
-    for (const auto& [path, properties] : property_map) {
-      os << "Path: " << path << "\n";
-      os << "Properties:\n";
-      for (const auto& [key, value] : properties) {
-        os << "  " << key << ": " << value << "\n";
-      }
-      os << "\n";
-    }
-    spdlog::info(os.str());
-  }
-
-  static void print_udev_properties(
-      const std::string& sub_system,
-      const std::vector<std::pair<std::string, std::string>>& match_params =
-          {}) {
-    std::ostringstream os;
-    os << "\n";
-    for (const auto& [path, properties] :
-         get_udev_properties(sub_system, false, match_params)) {
-      os << "Path: " << path << "\n";
-      os << "Properties:\n";
-      for (const auto& [key, value] : properties) {
-        os << "  " << key << ": " << value << "\n";
-      }
-      os << "\n";
-    }
-    spdlog::info(os.str());
-  }
-
   /**
    * \brief Retrieves the udev framebuffer system attributes.
    *
@@ -137,9 +103,8 @@ class Hidraw {
                                                      const std::string& vid,
                                                      const std::string& pid) {
     std::vector<std::string> devices;
-    print_udev_properties("hidraw");
     for (const auto& properties :
-         get_udev_properties("hidraw", false) | std::views::values) {
+         get_udev_properties("hidraw", true) | std::views::values) {
       if (properties.contains(DEV_NAME) && properties.contains(DEV_PATH)) {
         const auto dev_name = properties.at(DEV_NAME);
         if (compare_uhid_vid_pid(properties.at(DEV_PATH), bus, vid, pid) == 0) {
