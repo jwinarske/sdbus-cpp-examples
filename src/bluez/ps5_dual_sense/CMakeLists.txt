@@ -5,6 +5,7 @@ pkg_check_modules(UDEV REQUIRED IMPORTED_TARGET libudev)
 add_executable(dual_sense_client
         main.cc
         dual_sense.cc
+        input_reader.cc
         ../../upower/upower_client.h
         ../../upower/upower_display_device.cc
         ../../upower/upower_display_device.h
@@ -14,7 +15,6 @@ target_link_libraries(dual_sense_client
         utils
         sdbus-c++
         spdlog::spdlog
-        hid-rp
         PkgConfig::UDEV
 )
 if (ENABLE_LTO AND IPO_SUPPORT_RESULT)

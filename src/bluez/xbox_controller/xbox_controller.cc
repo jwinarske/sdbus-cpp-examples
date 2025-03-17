@@ -35,11 +35,11 @@ XboxController::XboxController(sdbus::IConnection& connection)
                         input_reader_->stop();
                         input_reader_.reset();
                       }
-                      if (!get_bt_hidraw_devices(
+                      if (!get_hidraw_devices(
                               {{"ID_BUS", "bluetooth"},
                                {"NAME", "\"Xbox Wireless Controller\""},
                                {"TAGS", ":seat:"}})) {
-                        get_usb_hidraw_devices(
+                        get_hidraw_devices(
                             {{"ID_BUS", "usb"},
                              {"NAME", "\"Xbox Wireless Controller\""},
                              {"ID_USB_VENDOR_ID", "045e"},
@@ -48,10 +48,10 @@ XboxController::XboxController(sdbus::IConnection& connection)
                       }
                     }
                   }) {
-  if (!get_bt_hidraw_devices({{"ID_BUS", "bluetooth"},
+  if (!get_hidraw_devices({{"ID_BUS", "bluetooth"},
                               {"NAME", "\"Xbox Wireless Controller\""},
                               {"TAGS", ":seat:"}})) {
-    get_usb_hidraw_devices({{"ID_BUS", "usb"},
+    get_hidraw_devices({{"ID_BUS", "usb"},
                             {"NAME", "\"Xbox Wireless Controller\""},
                             {"ID_USB_VENDOR_ID", "045e"},
                             {"ID_USB_MODEL_ID", "02ea"},

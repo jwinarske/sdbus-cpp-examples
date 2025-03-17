@@ -125,7 +125,7 @@ class Hidraw {
     return devices;
   }
 
-  bool get_bt_hidraw_devices(
+  bool get_hidraw_devices(
       const std::vector<std::pair<std::string, std::string>>& match_params =
           {}) {
     // Clear all contents of hidraw_devices_
@@ -133,59 +133,18 @@ class Hidraw {
     devices_.clear();
 
     // Get input devices matching the specified properties
-    const auto bt_input_devices =
-        Hidraw::get_udev_properties("input", false, match_params);
-
-    if (bt_input_devices.empty()) {
-      spdlog::warn("No matching BT input devices found.");
-      return false;
-    }
-
-    // Get all hidraw devices
-    const auto hidraw_devices = Hidraw::get_udev_properties("hidraw");
-
-    for (const auto& [input_path, input_properties] : bt_input_devices) {
-      for (const auto& [hidraw_path, hidraw_properties] : hidraw_devices) {
-        if (compare_subsystem_device_paths(input_path, hidraw_path)) {
-          if (hidraw_properties.contains(DEV_NAME)) {
-            const auto& hidraw_dev_name = hidraw_properties.at(DEV_NAME);
-            auto serial_number = input_properties.at("UNIQ");
-            const auto dev_key =
-                create_device_key_from_serial_number(serial_number);
-            spdlog::info(
-                "Associated input device path: {} with hidraw device: {}",
-                input_path, hidraw_dev_name);
-            devices_.insert_or_assign(dev_key, hidraw_dev_name);
-          }
-        }
-      }
-    }
-    for (const auto& value : devices_ | std::views::values) {
-      spdlog::debug("hidraw device: {}", value);
-    }
-    return !devices_.empty();
-  }
-
-  bool get_usb_hidraw_devices(
-      const std::vector<std::pair<std::string, std::string>>& match_params =
-          {}) {
-    // Clear all contents of hidraw_devices_
-    std::scoped_lock lock(devices_mutex_);
-    devices_.clear();
-
-    // Get input devices matching the specified properties
-    const auto usb_input_devices =
+    const auto input_devices =
         Hidraw::get_udev_properties("input", true, match_params);
 
-    if (usb_input_devices.empty()) {
-      spdlog::warn("No matching USB input devices found.");
+    if (input_devices.empty()) {
+      spdlog::warn("No matching input devices found.");
       return false;
     }
 
     // Get all hidraw devices
     const auto hidraw_devices = Hidraw::get_udev_properties("hidraw");
 
-    for (const auto& [input_path, input_properties] : usb_input_devices) {
+    for (const auto& [input_path, input_properties] : input_devices) {
       for (const auto& [hidraw_path, hidraw_properties] : hidraw_devices) {
         if (compare_subsystem_device_paths(input_path, hidraw_path)) {
           if (hidraw_properties.contains(DEV_NAME)) {
