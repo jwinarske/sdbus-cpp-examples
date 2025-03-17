@@ -14,16 +14,17 @@
 
 #include "dual_sense.h"
 
-const std::vector<std::pair<std::string, std::string>> input_match_params_bt = {
+const std::vector<std::pair<std::string, std::string>> input_match_bt = {
     {"ID_BUS", "bluetooth"},
     {"NAME", "\"DualSense Wireless Controller\""},
     {"PRODUCT", "5/54c/ce6/8100"}};
 
-const std::vector<std::pair<std::string, std::string>> input_match_params_usb =
-    {{"ID_BUS", "usb"},
-     {"ID_USB_VENDOR_ID", "054c"},
-     {"ID_USB_MODEL_ID", "0ce6"},
-     {"TAGS", ":seat:"}};
+const std::vector<std::pair<std::string, std::string>> input_match_usb = {
+    {"ID_BUS", "usb"},
+    {"ID_MODEL", "DualSense_Wireless_Controller"},
+    {"ID_VENDOR_ID", "054c"},
+    {"ID_MODEL_ID", "0ce6"},
+    {"TAGS", ":seat:"}};
 
 DualSense::DualSense(sdbus::IConnection& connection)
     : ProxyInterfaces(connection,
@@ -42,13 +43,13 @@ DualSense::DualSense(sdbus::IConnection& connection)
                         input_reader_->stop();
                         input_reader_.reset();
                       }
-                      if (!get_hidraw_devices(input_match_params_bt)) {
-                        get_hidraw_devices(input_match_params_usb);
+                      if (!get_hidraw_devices(input_match_bt)) {
+                        get_hidraw_devices(input_match_usb);
                       }
                     }
                   }) {
-  if (!get_hidraw_devices(input_match_params_bt)) {
-    get_hidraw_devices(input_match_params_usb);
+  if (!get_hidraw_devices(input_match_bt)) {
+    get_hidraw_devices(input_match_usb);
   }
 
   registerProxy();
@@ -111,8 +112,7 @@ void DualSense::onInterfacesAdded(
           if (vid == VENDOR_ID && pid == PRODUCT_ID) {
             // if connected, paired, trusted, and bonded a hidraw device should
             // be ready to use
-            if (props.bonded && props.connected && props.paired &&
-                props.trusted) {
+            if (props.connected && props.paired && props.trusted) {
               const auto dev_key =
                   create_device_key_from_serial_number(props.address);
               if (HidDevicesContains(dev_key)) {

@@ -136,7 +136,7 @@ class Hidraw {
 
     // Get input devices matching the specified properties
     const auto input_devices =
-        Hidraw::get_udev_properties("input", true, match_params);
+        get_udev_properties("input", false, match_params);
 
     if (input_devices.empty()) {
       spdlog::warn("No matching input devices found.");
@@ -144,7 +144,7 @@ class Hidraw {
     }
 
     // Get all hidraw devices
-    const auto hidraw_devices = Hidraw::get_udev_properties("hidraw");
+    const auto hidraw_devices = get_udev_properties("hidraw");
 
     for (const auto& [input_path, input_properties] : input_devices) {
       for (const auto& [hidraw_path, hidraw_properties] : hidraw_devices) {
