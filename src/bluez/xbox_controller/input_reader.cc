@@ -14,10 +14,10 @@
 
 #include <atomic>
 #include <thread>
-#include <utility>
 
 #include <fcntl.h>
 #include <sys/epoll.h>
+#include <unistd.h>
 
 #include "../hidraw.hpp"
 #include "input_reader.h"

@@ -20,9 +20,9 @@
 #include "../../upower/upower_client.h"
 #include "../adapter1.h"
 #include "../device1.h"
+#include "../hidraw.hpp"
 #include "../input1.h"
 #include "../udev_monitor.hpp"
-#include "../hidraw.hpp"
 
 #include "input_reader.h"
 
@@ -32,11 +32,9 @@ class DualSense final
       public Hidraw,
       public UdevMonitor {
  public:
-
   explicit DualSense(sdbus::IConnection& connection);
 
   ~DualSense() override;
-
 
  private:
   const std::string VENDOR_ID = "054C";

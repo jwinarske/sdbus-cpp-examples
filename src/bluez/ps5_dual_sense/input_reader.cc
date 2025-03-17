@@ -14,14 +14,14 @@
 
 #include <atomic>
 #include <thread>
-#include <utility>
 
 #include <fcntl.h>
 #include <sys/epoll.h>
-#include <sys/poll.h>
 
 #include "../hidraw.hpp"
 #include "input_reader.h"
+
+#include <unistd.h>
 
 InputReader::InputReader(std::string device)
     : device_(std::move(device)), stop_flag_(false) {}
@@ -103,7 +103,8 @@ InputReader::Task InputReader::read_input() {
     spdlog::info(os.str());
 
     // Get Features
-    GetControllerCalibrationData(fd, hw_cal_data_); // enables extended report for BT
+    GetControllerCalibrationData(
+        fd, hw_cal_data_);  // enables extended report for BT
     GetControllerMacAll(fd, controller_and_host_mac_);
     GetControllerVersion(fd, version_);
 

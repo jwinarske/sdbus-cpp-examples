@@ -14,6 +14,17 @@
 
 #include "dual_sense.h"
 
+const std::vector<std::pair<std::string, std::string>> input_match_params_bt = {
+    {"ID_BUS", "bluetooth"},
+    {"NAME", "\"DualSense Wireless Controller\""},
+    {"PRODUCT", "5/54c/ce6/8100"}};
+
+const std::vector<std::pair<std::string, std::string>> input_match_params_usb =
+    {{"ID_BUS", "usb"},
+     {"ID_USB_VENDOR_ID", "054c"},
+     {"ID_USB_MODEL_ID", "0ce6"},
+     {"TAGS", ":seat:"}};
+
 DualSense::DualSense(sdbus::IConnection& connection)
     : ProxyInterfaces(connection,
                       sdbus::ServiceName(INTERFACE_NAME),
@@ -31,26 +42,13 @@ DualSense::DualSense(sdbus::IConnection& connection)
                         input_reader_->stop();
                         input_reader_.reset();
                       }
-                      if (!get_hidraw_devices(
-                              {{"ID_BUS", "bluetooth"},
-                               {"NAME", "\"DualSense Wireless Controller\""},
-                               {"PRODUCT", "5/54c/ce6/8100"}})) {
-                        get_hidraw_devices({{"ID_BUS", "usb"},
-                                            {"ID_USB_VENDOR_ID", "054c"},
-                                            {"ID_USB_MODEL_ID", "0ce6"},
-                                            {"ID_USB_REVISION", "0100"},
-                                            {"TAGS", ":seat:"}});
+                      if (!get_hidraw_devices(input_match_params_bt)) {
+                        get_hidraw_devices(input_match_params_usb);
                       }
                     }
                   }) {
-  if (!get_hidraw_devices({{"ID_BUS", "bluetooth"},
-                           {"NAME", "\"DualSense Wireless Controller\""},
-                           {"PRODUCT", "5/54c/ce6/8100"}})) {
-    get_hidraw_devices({{"ID_BUS", "usb"},
-                        {"ID_USB_VENDOR_ID", "054c"},
-                        {"ID_USB_MODEL_ID", "0ce6"},
-                        {"ID_USB_REVISION", "0100"},
-                        {"TAGS", ":seat:"}});
+  if (!get_hidraw_devices(input_match_params_bt)) {
+    get_hidraw_devices(input_match_params_usb);
   }
 
   registerProxy();

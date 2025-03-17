@@ -16,9 +16,11 @@
 #define SRC_BLUEZ_XBOX_CONTROLLER_HIDRAW_HPP_
 
 #include <algorithm>
+#include <map>
 #include <ranges>
 #include <regex>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include <libudev.h>

@@ -18,6 +18,18 @@
 
 #include "../hidraw.hpp"
 
+const std::vector<std::pair<std::string, std::string>> input_match_params_bt = {
+    {"ID_BUS", "bluetooth"},
+    {"NAME", "\"Xbox Wireless Controller\""},
+    {"TAGS", ":seat:"}};
+
+const std::vector<std::pair<std::string, std::string>> input_match_params_usb =
+    {{"ID_BUS", "usb"},
+     {"NAME", "\"Xbox Wireless Controller\""},
+     {"ID_USB_VENDOR_ID", "045e"},
+     {"ID_USB_MODEL_ID", "02ea"},
+     {"TAGS", ":seat:"}};
+
 XboxController::XboxController(sdbus::IConnection& connection)
     : ProxyInterfaces(connection,
                       sdbus::ServiceName(INTERFACE_NAME),
@@ -35,27 +47,13 @@ XboxController::XboxController(sdbus::IConnection& connection)
                         input_reader_->stop();
                         input_reader_.reset();
                       }
-                      if (!get_hidraw_devices(
-                              {{"ID_BUS", "bluetooth"},
-                               {"NAME", "\"Xbox Wireless Controller\""},
-                               {"TAGS", ":seat:"}})) {
-                        get_hidraw_devices(
-                            {{"ID_BUS", "usb"},
-                             {"NAME", "\"Xbox Wireless Controller\""},
-                             {"ID_USB_VENDOR_ID", "045e"},
-                             {"ID_USB_MODEL_ID", "02ea"},
-                             {"TAGS", ":seat:"}});
+                      if (!get_hidraw_devices(input_match_params_bt)) {
+                        get_hidraw_devices(input_match_params_usb);
                       }
                     }
                   }) {
-  if (!get_hidraw_devices({{"ID_BUS", "bluetooth"},
-                              {"NAME", "\"Xbox Wireless Controller\""},
-                              {"TAGS", ":seat:"}})) {
-    get_hidraw_devices({{"ID_BUS", "usb"},
-                            {"NAME", "\"Xbox Wireless Controller\""},
-                            {"ID_USB_VENDOR_ID", "045e"},
-                            {"ID_USB_MODEL_ID", "02ea"},
-                            {"TAGS", ":seat:"}});
+  if (!get_hidraw_devices(input_match_params_bt)) {
+    get_hidraw_devices(input_match_params_usb);
   }
   registerProxy();
   for (const auto& [object, interfacesAndProperties] : GetManagedObjects()) {
