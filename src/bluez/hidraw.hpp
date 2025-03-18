@@ -116,7 +116,7 @@ class Hidraw {
                                                      const std::string& pid) {
     std::vector<std::string> devices;
     for (const auto& properties :
-         get_udev_properties("hidraw", true) | std::views::values) {
+         get_udev_properties("hidraw", false) | std::views::values) {
       if (properties.contains(DEV_NAME) && properties.contains(DEV_PATH)) {
         const auto dev_name = properties.at(DEV_NAME);
         if (compare_uhid_vid_pid(properties.at(DEV_PATH), bus, vid, pid) == 0) {
@@ -135,11 +135,9 @@ class Hidraw {
     devices_.clear();
 
     // Get input devices matching the specified properties
-    const auto input_devices =
-        get_udev_properties("input", false, match_params);
+    const auto input_devices = get_udev_properties("input", true, match_params);
 
     if (input_devices.empty()) {
-      spdlog::warn("No matching input devices found.");
       return false;
     }
 

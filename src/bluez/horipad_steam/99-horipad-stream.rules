@@ -1,0 +1,9 @@
+99-horipad-steam.rules
+# UDEV rules to make HORIPAD STEAM read/write on Linux.
+# To use, copy this file to /etc/udev/rules.d/99-horipad-steam.rules and reconnect the controller.
+
+# Horipad Steam Controller (USB)
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="0f0d", ATTRS{idProduct}=="01ab", MODE="0666"
+
+# Horipad Steam (Bluetooth)
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", KERNELS=="0005:0F0D:0196.*", MODE="0666"
