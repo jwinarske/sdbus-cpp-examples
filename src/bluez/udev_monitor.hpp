@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SRC_BLUEZ_XBOX_CONTROLLER_UDEV_MONITOR_HPP_
-#define SRC_BLUEZ_XBOX_CONTROLLER_UDEV_MONITOR_HPP_
+#ifndef SRC_BLUEZ_UDEV_MONITOR_HPP_
+#define SRC_BLUEZ_UDEV_MONITOR_HPP_
 
 #include <libudev.h>
 #include <spdlog/spdlog.h>
@@ -123,4 +123,4 @@ class UdevMonitor {
   }
 };
 
-#endif  // SRC_BLUEZ_XBOX_CONTROLLER_UDEV_MONITOR_HPP_
+#endif  // SRC_BLUEZ_UDEV_MONITOR_HPP_

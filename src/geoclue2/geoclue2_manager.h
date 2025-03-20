@@ -23,13 +23,25 @@ class GeoClue2Manager final
     : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,
                                     org::freedesktop::GeoClue2::Manager_proxy> {
  public:
-  explicit GeoClue2Manager(sdbus::IConnection& connection);
+  struct properties_t {
+    bool in_use;
+    std::uint32_t available_accuracy_level;
+  };
+
+  using LocationPropertiesChangedCallback =
+    std::function<void(const GeoClue2Location&)>;
+
+  explicit GeoClue2Manager(sdbus::IConnection& connection, LocationPropertiesChangedCallback callback = nullptr);
 
   virtual ~GeoClue2Manager();
 
-  [[nodiscard]] auto getClient() const { return client_; }
+  [[nodiscard]] auto Client() const { return client_; }
+
+  [[nodiscard]] properties_t Properties() const { return properties_; }
 
  private:
+  properties_t properties_{};
+
   static constexpr auto kBusName = "org.freedesktop.GeoClue2";
   static constexpr auto kObjectPath = "/org/freedesktop/GeoClue2/Manager";
 

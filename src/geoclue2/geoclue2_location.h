@@ -23,6 +23,20 @@ class GeoClue2Location final : public sdbus::ProxyInterfaces<
                                    sdbus::Properties_proxy,
                                    org::freedesktop::GeoClue2::Location_proxy> {
  public:
+  struct properties_t {
+    double Accuracy;
+    double Altitude;
+    std::string Description;
+    double Heading;
+    double Latitude;
+    double Longitude;
+    double Speed;
+    struct {
+      uint64_t tv_sec;
+      uint64_t tv_nsec;
+    } Timestamp;
+  };
+
   explicit GeoClue2Location(sdbus::IConnection& connection,
                             const sdbus::ObjectPath& objectPath)
       : ProxyInterfaces{connection, sdbus::ServiceName(kBusName), objectPath} {
@@ -34,24 +48,41 @@ class GeoClue2Location final : public sdbus::ProxyInterfaces<
 
   virtual ~GeoClue2Location() { unregisterProxy(); }
 
- private:
-  static constexpr auto kBusName = "org.freedesktop.GeoClue2";
+  [[nodiscard]] const properties_t& Properties() const { return properties_; }
 
   void onPropertiesChanged(
       const sdbus::InterfaceName& interfaceName,
       const std::map<sdbus::PropertyName, sdbus::Variant>& changedProperties,
       const std::vector<sdbus::PropertyName>& invalidatedProperties) override {
-    std::ostringstream os;
-    os << std::endl;
-    os << "[" << interfaceName << "] GeoClue2Location Properties changed"
-       << std::endl;
-    Utils::append_properties(changedProperties, os);
-    for (const auto& name : invalidatedProperties) {
-      os << "[" << interfaceName << "] Invalidated property: " << name
-         << std::endl;
+    for (const auto& [key, value] : changedProperties) {
+      if (key == "Accuracy") {
+        properties_.Accuracy = value.get<double>();
+      } else if (key == "Altitude") {
+        properties_.Altitude = value.get<double>();
+      } else if (key == "Description") {
+        properties_.Description = value.get<std::string>();
+      } else if (key == "Heading") {
+        properties_.Heading = value.get<double>();
+      } else if (key == "Latitude") {
+        properties_.Latitude = value.get<double>();
+      } else if (key == "Longitude") {
+        properties_.Longitude = value.get<double>();
+      } else if (key == "Speed") {
+        properties_.Speed = value.get<double>();
+      } else if (key == "Timestamp") {
+        const auto arg_tt = value.get<sdbus::Struct<uint64_t, uint64_t>>();
+        properties_.Timestamp.tv_sec = std::get<0>(arg_tt);
+        properties_.Timestamp.tv_nsec = std::get<1>(arg_tt);
+      } else {
+        Utils::print_changed_properties(interfaceName, changedProperties,
+                                        invalidatedProperties);
+      }
     }
-    spdlog::info(os.str());
   }
+
+ private:
+  properties_t properties_{};
+  static constexpr auto kBusName = "org.freedesktop.GeoClue2";
 };
 
 #endif  // SRC_GEOCLUE2_GEOCLUE2_LOCATION_H

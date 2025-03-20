@@ -16,7 +16,8 @@
 
 #include "../utils/utils.h"
 
-GeoClue2Manager::GeoClue2Manager(sdbus::IConnection& connection)
+GeoClue2Manager::GeoClue2Manager(sdbus::IConnection& connection,
+                                 LocationPropertiesChangedCallback callback)
     : ProxyInterfaces{connection, sdbus::ServiceName(kBusName),
                       sdbus::ObjectPath(kObjectPath)},
       object_path_(sdbus::ObjectPath(kObjectPath)) {
@@ -25,7 +26,8 @@ GeoClue2Manager::GeoClue2Manager(sdbus::IConnection& connection)
   GeoClue2Manager::onPropertiesChanged(sdbus::InterfaceName(kBusName),
                                        properties, {});
   if (auto client_path = this->GetClient(); !client_path.empty()) {
-    client_ = std::make_shared<GeoClue2Client>(connection, client_path);
+    client_ =
+        std::make_shared<GeoClue2Client>(connection, client_path, callback);
   }
 }
 
@@ -38,6 +40,14 @@ void GeoClue2Manager::onPropertiesChanged(
     const sdbus::InterfaceName& interfaceName,
     const std::map<sdbus::PropertyName, sdbus::Variant>& changedProperties,
     const std::vector<sdbus::PropertyName>& invalidatedProperties) {
-  Utils::print_changed_properties(interfaceName, changedProperties,
-                                  invalidatedProperties);
+  for (const auto& [key, value] : changedProperties) {
+    if (key == "InUse") {
+      properties_.in_use = value.get<bool>();
+    } else if (key == "AvailableAccuracyLevel") {
+      properties_.available_accuracy_level = value.get<std::uint32_t>();
+    } else {
+      Utils::print_changed_properties(interfaceName, changedProperties,
+                                      invalidatedProperties);
+    }
+  }
 }

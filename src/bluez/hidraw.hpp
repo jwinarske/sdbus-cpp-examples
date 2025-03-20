@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SRC_BLUEZ_XBOX_CONTROLLER_HIDRAW_HPP_
-#define SRC_BLUEZ_XBOX_CONTROLLER_HIDRAW_HPP_
+#ifndef SRC_BLUEZ_HIDRAW_HPP_
+#define SRC_BLUEZ_HIDRAW_HPP_
 
 #include <algorithm>
 #include <map>
@@ -135,7 +135,8 @@ class Hidraw {
     devices_.clear();
 
     // Get input devices matching the specified properties
-    const auto input_devices = get_udev_properties("input", true, match_params);
+    const auto input_devices =
+        get_udev_properties("input", false, match_params);
 
     if (input_devices.empty()) {
       return false;
@@ -249,4 +250,4 @@ class Hidraw {
   std::map<std::string, std::string> devices_;
 };
 
-#endif  // SRC_BLUEZ_XBOX_CONTROLLER_HIDRAW_HPP_
+#endif  // SRC_BLUEZ_HIDRAW_HPP_

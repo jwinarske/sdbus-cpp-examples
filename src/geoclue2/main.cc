@@ -20,18 +20,28 @@ int main() {
   const auto connection = sdbus::createSystemBusConnection();
   connection->enterEventLoopAsync();
 
-  const GeoClue2Manager manager(*connection);
+  const GeoClue2Manager manager(
+      *connection, [&](const GeoClue2Location& location) {
+        const auto [Accuracy, Altitude, Description, Heading, Latitude,
+                    Longitude, Speed, Timestamp] = location.Properties();
+        spdlog::info("Timestamp: {}.{}", Timestamp.tv_sec, Timestamp.tv_nsec);
+        spdlog::info("Lat/Long: {}, {}", Latitude, Longitude);
+        spdlog::info("Heading: {}", Heading);
+        spdlog::info("Speed: {}", Speed);
+        spdlog::info("Accuracy: {}", Accuracy);
+        spdlog::info("Altitude: {}", Altitude);
+        spdlog::info("Description: {}", Description);
+      });
 
-  const auto& client = manager.getClient();
+  const auto& client = manager.Client();
 
   // `desktop id` must be set for Start to work
   client->DesktopId("org.example.geoclue2");
   client->Start();
 
   using namespace std::chrono_literals;
-  std::this_thread::sleep_for(120000ms);
-
-  manager.getClient()->Stop();
+  std::this_thread::sleep_for(30000ms);
+  manager.Client()->Stop();
   connection->leaveEventLoop();
 
   return 0;
