@@ -15,6 +15,7 @@
 #include <sdbus-c++/sdbus-c++.h>
 #include <spdlog/spdlog.h>
 
+#include <chrono>
 #include <functional>
 #include <iomanip>
 #include <iostream>
@@ -23,6 +24,7 @@
 #include <mutex>
 #include <sstream>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include "../proxy/org/freedesktop/UDisks2/Block/block_proxy.h"
@@ -477,14 +479,14 @@ int main() {
     // Users can replace printDeviceInformation with their own lambda
     RemovableDeviceMonitor monitor(*connection, printDeviceInformation);
 
-    // Keep running until interrupted
-    // In a real daemon, you would handle signals appropriately
+    // Keep running until interrupted by signal (e.g., Ctrl+C)
+    // The event loop runs in a separate thread handling D-Bus messages
+    // Note: In a production daemon, implement proper signal handling (SIGTERM, SIGINT)
+    // to gracefully shut down and call connection->leaveEventLoop()
     using namespace std::chrono_literals;
     while (true) {
       std::this_thread::sleep_for(1000ms);
     }
-
-    connection->leaveEventLoop();
   } catch (const std::exception& e) {
     spdlog::error("Fatal error: {}", e.what());
     return 1;
