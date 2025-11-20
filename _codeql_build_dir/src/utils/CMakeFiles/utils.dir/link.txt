@@ -1,2 +1,0 @@
-"/usr/bin/gcc-ar-13" qc libutils.a CMakeFiles/utils.dir/utils.cc.o
-"/usr/bin/gcc-ranlib-13" libutils.a
