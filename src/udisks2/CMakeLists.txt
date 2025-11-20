@@ -13,3 +13,16 @@ target_link_libraries(udisks2_client
 if (ENABLE_LTO AND IPO_SUPPORT_RESULT)
     set_property(TARGET udisks2_client PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif ()
+
+add_executable(udisks2_monitor_daemon
+        udisks2_monitor_daemon.cpp
+)
+target_link_libraries(udisks2_monitor_daemon
+        PUBLIC
+        utils
+        sdbus-c++
+        spdlog::spdlog
+)
+if (ENABLE_LTO AND IPO_SUPPORT_RESULT)
+    set_property(TARGET udisks2_monitor_daemon PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+endif ()
