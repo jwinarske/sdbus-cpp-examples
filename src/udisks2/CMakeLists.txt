@@ -15,7 +15,7 @@ if (ENABLE_LTO AND IPO_SUPPORT_RESULT)
 endif ()
 
 add_executable(udisks2_monitor_daemon
-        udisks2_monitor_daemon.cpp
+        udisks2_monitor_daemon.cc
 )
 target_link_libraries(udisks2_monitor_daemon
         PUBLIC
