@@ -57,9 +57,6 @@ void Network1ManagerClient::enumerateLinks() {
     spdlog::info("[network1] Found {} link(s)", links_.size());
     for (const auto& l : links_) {
       spdlog::info("  ifindex={} name={} path={}", l.ifindex, l.name, static_cast<std::string>(l.path));
-      auto linkProxy = sdbus::createProxy(connection_, sdbus::ServiceName(SERVICE_NAME), l.path);
-      org::freedesktop::network1::Link_proxy linkIface(*linkProxy);
-      spdlog::info("    Link proxy instantiated");
     }
   } catch (const sdbus::Error& e) {
     spdlog::error("ListLinks failed: {} - {}", e.getName(), e.getMessage());
