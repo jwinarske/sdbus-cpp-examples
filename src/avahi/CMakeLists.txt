@@ -12,3 +12,6 @@ target_link_libraries(avahi_server_client
 if (ENABLE_LTO AND IPO_SUPPORT_RESULT)
     set_property(TARGET avahi_server_client PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif ()
+
+install(TARGETS avahi_server_client
+        RUNTIME DESTINATION usr/share/sdbus-cpp-examples)

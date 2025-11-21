@@ -14,6 +14,9 @@ if (ENABLE_LTO AND IPO_SUPPORT_RESULT)
     set_property(TARGET bluez_client PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif ()
 
+install(TARGETS bluez_client
+        RUNTIME DESTINATION usr/share/sdbus-cpp-examples)
+
 add_subdirectory(ps5_dual_sense)
 add_subdirectory(horipad_steam)
 add_subdirectory(xbox_controller)

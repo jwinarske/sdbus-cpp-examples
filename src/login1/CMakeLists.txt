@@ -13,3 +13,6 @@ target_link_libraries(login1_manager_client
 if (ENABLE_LTO AND IPO_SUPPORT_RESULT)
     set_property(TARGET login1_manager_client PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif ()
+
+install(TARGETS login1_manager_client
+        RUNTIME DESTINATION usr/share/sdbus-cpp-examples)

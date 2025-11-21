@@ -20,3 +20,6 @@ target_link_libraries(horipad_steam_client
 if (ENABLE_LTO AND IPO_SUPPORT_RESULT)
     set_property(TARGET horipad_steam_client PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif ()
+
+install(TARGETS horipad_steam_client
+        RUNTIME DESTINATION usr/share/sdbus-cpp-examples)

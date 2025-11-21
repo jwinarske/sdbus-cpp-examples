@@ -10,3 +10,6 @@ target_link_libraries(networkmanager_client
         sdbus-c++
         spdlog::spdlog
 )
+
+install(TARGETS networkmanager_client
+        RUNTIME DESTINATION usr/share/sdbus-cpp-examples)

@@ -15,3 +15,6 @@ target_link_libraries(packagekit_client
 if (ENABLE_LTO AND IPO_SUPPORT_RESULT)
     set_property(TARGET packagekit_client PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif ()
+
+install(TARGETS packagekit_client
+        RUNTIME DESTINATION usr/share/sdbus-cpp-examples)

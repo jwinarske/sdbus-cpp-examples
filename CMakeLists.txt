@@ -9,6 +9,11 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 project(sdbus-cpp-examples)
 
+# Set install prefix for packaging
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+    set(CMAKE_INSTALL_PREFIX "/" CACHE PATH "Install prefix" FORCE)
+endif()
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -64,3 +69,5 @@ add_subdirectory(src/upower)
 add_subdirectory(src/utils)
 
 add_subdirectory(third_party)
+
+include(packaging)
