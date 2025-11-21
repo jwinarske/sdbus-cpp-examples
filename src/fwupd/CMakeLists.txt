@@ -13,3 +13,6 @@ target_link_libraries(fwupd_client
 if (ENABLE_LTO AND IPO_SUPPORT_RESULT)
     set_property(TARGET fwupd_client PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif ()
+
+install(TARGETS fwupd_client
+        RUNTIME DESTINATION share/sdbus-cpp-examples)

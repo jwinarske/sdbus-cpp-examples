@@ -64,3 +64,5 @@ add_subdirectory(src/upower)
 add_subdirectory(src/utils)
 
 add_subdirectory(third_party)
+
+include (packaging)

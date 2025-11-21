@@ -13,3 +13,6 @@ target_link_libraries(timedate1_client
 if (ENABLE_LTO AND IPO_SUPPORT_RESULT)
     set_property(TARGET timedate1_client PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif ()
+
+install(TARGETS timedate1_client
+        RUNTIME DESTINATION share/sdbus-cpp-examples)
