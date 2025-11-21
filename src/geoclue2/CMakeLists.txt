@@ -15,3 +15,6 @@ target_link_libraries(geoclue2_client
 if (ENABLE_LTO AND IPO_SUPPORT_RESULT)
     set_property(TARGET geoclue2_client PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif ()
+
+install(TARGETS geoclue2_client
+        RUNTIME DESTINATION share/sdbus-cpp-examples)

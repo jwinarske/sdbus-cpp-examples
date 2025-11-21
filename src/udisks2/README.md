@@ -9,30 +9,35 @@ This directory contains examples for interacting with the UDisks2 D-Bus service 
 The basic UDisks2 client that demonstrates how to enumerate and monitor all storage devices on the system.
 
 **Usage:**
+
 ```bash
 ./udisks2_client
 ```
 
 ### udisks2_monitor_daemon
 
-A daemon that specifically monitors for removable device insertions (USB drives, SD cards, etc.) and prints comprehensive device information when detected.
+A daemon that specifically monitors for removable device insertions (USB drives, SD cards, etc.) and prints
+comprehensive device information when detected.
 
 **Features:**
+
 - Monitors D-Bus system bus for `org.freedesktop.UDisks2` `InterfacesAdded` signals
 - Filters for removable devices using the `Drive.Removable` property
 - Watches block device properties for filesystem readiness (`IdUsage` == 'filesystem')
 - Invokes a customizable C++ lambda callback to print device information
 - Prints comprehensive drive information including:
-  - Block device properties (device path, UUID, label, size, type)
-  - Filesystem properties (type, mount points)
-  - Device information (vendor, model, bus, serial, WWN, rotation rate)
+    - Block device properties (device path, UUID, label, size, type)
+    - Filesystem properties (type, mount points)
+    - Device information (vendor, model, bus, serial, WWN, rotation rate)
 
 **Usage:**
+
 ```bash
 ./udisks2_monitor_daemon
 ```
 
 **Example Output:**
+
 ```
 [2025-11-20 23:14:53.075] [info] Starting UDisks2 Removable Device Monitor Daemon
 [2025-11-20 23:14:53.075] [info] This daemon monitors for removable device insertions
@@ -76,7 +81,8 @@ Block Device Path: /org/freedesktop/UDisks2/block_devices/sdc1
 
 **Customization:**
 
-The daemon uses a callback function that can be easily customized. In the source code, you can replace the `printDeviceInformation` function with your own lambda:
+The daemon uses a callback function that can be easily customized. In the source code, you can replace the
+`printDeviceInformation` function with your own lambda:
 
 ```cpp
 // Example: Custom callback for your specific use case

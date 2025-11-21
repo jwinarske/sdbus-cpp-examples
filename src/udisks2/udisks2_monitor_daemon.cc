@@ -42,7 +42,7 @@ using DeviceReadyCallback = std::function<void(
     const std::map<sdbus::PropertyName, sdbus::Variant>& filesystemProperties)>;
 
 // Helper class to monitor a specific block device for filesystem readiness
-class BlockDeviceWatcher final
+class BlockDeviceWatcher
     : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,
                                     org::freedesktop::UDisks2::Block_proxy> {
  public:

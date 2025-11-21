@@ -29,9 +29,11 @@ class GeoClue2Manager final
   };
 
   using LocationPropertiesChangedCallback =
-    std::function<void(const GeoClue2Location&)>;
+      std::function<void(const GeoClue2Location&)>;
 
-  explicit GeoClue2Manager(sdbus::IConnection& connection, LocationPropertiesChangedCallback callback = nullptr);
+  explicit GeoClue2Manager(
+      sdbus::IConnection& connection,
+      LocationPropertiesChangedCallback callback = nullptr);
 
   virtual ~GeoClue2Manager();
 

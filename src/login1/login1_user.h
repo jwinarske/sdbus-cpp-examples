@@ -33,7 +33,7 @@ class Login1User final
       const auto props = this->GetAllAsync(
           User_proxy::INTERFACE_NAME,
           [this](std::optional<sdbus::Error> error,
-              std::map<sdbus::PropertyName, sdbus::Variant> values) {
+                 std::map<sdbus::PropertyName, sdbus::Variant> values) {
             if (!error) {
               onPropertiesChanged(
                   sdbus::InterfaceName(User_proxy::INTERFACE_NAME), values, {});
