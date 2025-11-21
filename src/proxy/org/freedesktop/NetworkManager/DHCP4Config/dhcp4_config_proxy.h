@@ -14,36 +14,38 @@ namespace org {
 namespace freedesktop {
 namespace NetworkManager {
 
-class DHCP4Config_proxy {
- public:
-  static constexpr const char* INTERFACE_NAME =
-      "org.freedesktop.NetworkManager.DHCP4Config";
+class DHCP4Config_proxy
+{
+public:
+    static constexpr const char* INTERFACE_NAME = "org.freedesktop.NetworkManager.DHCP4Config";
 
- protected:
-  DHCP4Config_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
+protected:
+    DHCP4Config_proxy(sdbus::IProxy& proxy)
+        : m_proxy(proxy)
+    {
+    }
 
-  DHCP4Config_proxy(const DHCP4Config_proxy&) = delete;
-  DHCP4Config_proxy& operator=(const DHCP4Config_proxy&) = delete;
-  DHCP4Config_proxy(DHCP4Config_proxy&&) = delete;
-  DHCP4Config_proxy& operator=(DHCP4Config_proxy&&) = delete;
+    DHCP4Config_proxy(const DHCP4Config_proxy&) = delete;
+    DHCP4Config_proxy& operator=(const DHCP4Config_proxy&) = delete;
+    DHCP4Config_proxy(DHCP4Config_proxy&&) = delete;
+    DHCP4Config_proxy& operator=(DHCP4Config_proxy&&) = delete;
 
-  ~DHCP4Config_proxy() = default;
+    ~DHCP4Config_proxy() = default;
 
-  void registerProxy() {}
+    void registerProxy()
+    {
+    }
 
- public:
-  std::map<std::string, sdbus::Variant> Options() {
-    return m_proxy.getProperty("Options")
-        .onInterface(INTERFACE_NAME)
-        .get<std::map<std::string, sdbus::Variant>>();
-  }
+public:
+    std::map<std::string, sdbus::Variant> Options()
+    {
+        return m_proxy.getProperty("Options").onInterface(INTERFACE_NAME).get<std::map<std::string, sdbus::Variant>>();
+    }
 
- private:
-  sdbus::IProxy& m_proxy;
+private:
+    sdbus::IProxy& m_proxy;
 };
 
-}  // namespace NetworkManager
-}  // namespace freedesktop
-}  // namespace org
+}}} // namespaces
 
 #endif

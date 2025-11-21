@@ -14,98 +14,83 @@ namespace org {
 namespace freedesktop {
 namespace NetworkManager {
 
-class IP6Config_proxy {
- public:
-  static constexpr const char* INTERFACE_NAME =
-      "org.freedesktop.NetworkManager.IP6Config";
+class IP6Config_proxy
+{
+public:
+    static constexpr const char* INTERFACE_NAME = "org.freedesktop.NetworkManager.IP6Config";
 
- protected:
-  IP6Config_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
+protected:
+    IP6Config_proxy(sdbus::IProxy& proxy)
+        : m_proxy(proxy)
+    {
+    }
 
-  IP6Config_proxy(const IP6Config_proxy&) = delete;
-  IP6Config_proxy& operator=(const IP6Config_proxy&) = delete;
-  IP6Config_proxy(IP6Config_proxy&&) = delete;
-  IP6Config_proxy& operator=(IP6Config_proxy&&) = delete;
+    IP6Config_proxy(const IP6Config_proxy&) = delete;
+    IP6Config_proxy& operator=(const IP6Config_proxy&) = delete;
+    IP6Config_proxy(IP6Config_proxy&&) = delete;
+    IP6Config_proxy& operator=(IP6Config_proxy&&) = delete;
 
-  ~IP6Config_proxy() = default;
+    ~IP6Config_proxy() = default;
 
-  void registerProxy() {}
+    void registerProxy()
+    {
+    }
 
- public:
-  std::vector<
-      sdbus::Struct<std::vector<uint8_t>, uint32_t, std::vector<uint8_t>>>
-  Addresses() {
-    return m_proxy.getProperty("Addresses")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<sdbus::Struct<std::vector<uint8_t>, uint32_t,
-                                       std::vector<uint8_t>>>>();
-  }
+public:
+    std::vector<sdbus::Struct<std::vector<uint8_t>, uint32_t, std::vector<uint8_t>>> Addresses()
+    {
+        return m_proxy.getProperty("Addresses").onInterface(INTERFACE_NAME).get<std::vector<sdbus::Struct<std::vector<uint8_t>, uint32_t, std::vector<uint8_t>>>>();
+    }
 
-  std::vector<std::map<std::string, sdbus::Variant>> AddressData() {
-    return m_proxy.getProperty("AddressData")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::map<std::string, sdbus::Variant>>>();
-  }
+    std::vector<std::map<std::string, sdbus::Variant>> AddressData()
+    {
+        return m_proxy.getProperty("AddressData").onInterface(INTERFACE_NAME).get<std::vector<std::map<std::string, sdbus::Variant>>>();
+    }
 
-  std::string Gateway() {
-    return m_proxy.getProperty("Gateway")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string Gateway()
+    {
+        return m_proxy.getProperty("Gateway").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::vector<sdbus::Struct<std::vector<uint8_t>,
-                            uint32_t,
-                            std::vector<uint8_t>,
-                            uint32_t>>
-  Routes() {
-    return m_proxy.getProperty("Routes")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<sdbus::Struct<std::vector<uint8_t>, uint32_t,
-                                       std::vector<uint8_t>, uint32_t>>>();
-  }
+    std::vector<sdbus::Struct<std::vector<uint8_t>, uint32_t, std::vector<uint8_t>, uint32_t>> Routes()
+    {
+        return m_proxy.getProperty("Routes").onInterface(INTERFACE_NAME).get<std::vector<sdbus::Struct<std::vector<uint8_t>, uint32_t, std::vector<uint8_t>, uint32_t>>>();
+    }
 
-  std::vector<std::map<std::string, sdbus::Variant>> RouteData() {
-    return m_proxy.getProperty("RouteData")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::map<std::string, sdbus::Variant>>>();
-  }
+    std::vector<std::map<std::string, sdbus::Variant>> RouteData()
+    {
+        return m_proxy.getProperty("RouteData").onInterface(INTERFACE_NAME).get<std::vector<std::map<std::string, sdbus::Variant>>>();
+    }
 
-  std::vector<std::vector<uint8_t>> Nameservers() {
-    return m_proxy.getProperty("Nameservers")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::vector<uint8_t>>>();
-  }
+    std::vector<std::vector<uint8_t>> Nameservers()
+    {
+        return m_proxy.getProperty("Nameservers").onInterface(INTERFACE_NAME).get<std::vector<std::vector<uint8_t>>>();
+    }
 
-  std::vector<std::string> Domains() {
-    return m_proxy.getProperty("Domains")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
+    std::vector<std::string> Domains()
+    {
+        return m_proxy.getProperty("Domains").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
 
-  std::vector<std::string> Searches() {
-    return m_proxy.getProperty("Searches")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
+    std::vector<std::string> Searches()
+    {
+        return m_proxy.getProperty("Searches").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
 
-  std::vector<std::string> DnsOptions() {
-    return m_proxy.getProperty("DnsOptions")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
+    std::vector<std::string> DnsOptions()
+    {
+        return m_proxy.getProperty("DnsOptions").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
 
-  int32_t DnsPriority() {
-    return m_proxy.getProperty("DnsPriority")
-        .onInterface(INTERFACE_NAME)
-        .get<int32_t>();
-  }
+    int32_t DnsPriority()
+    {
+        return m_proxy.getProperty("DnsPriority").onInterface(INTERFACE_NAME).get<int32_t>();
+    }
 
- private:
-  sdbus::IProxy& m_proxy;
+private:
+    sdbus::IProxy& m_proxy;
 };
 
-}  // namespace NetworkManager
-}  // namespace freedesktop
-}  // namespace org
+}}} // namespaces
 
 #endif

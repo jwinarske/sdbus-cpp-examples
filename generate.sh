@@ -66,10 +66,18 @@ ${XML2CPP} --verbose --proxy=${PROXY}/org/freedesktop/PackageKit/packagekit_prox
 ${XML2CPP} --verbose --proxy=${PROXY}/org/freedesktop/PackageKit/Offline/offline_proxy.h interfaces/org/freedesktop/PackageKit/Offline/Offline.xml
 ${XML2CPP} --verbose --proxy=${PROXY}/org/freedesktop/PackageKit/Transaction/transaction_proxy.h interfaces/org/freedesktop/PackageKit/Transaction/Transaction.xml
 
+mkdir -p ${PROXY}/org/freedesktop/RealtimeKit1 |true
+
+${XML2CPP} --verbose --proxy=${PROXY}/org/freedesktop/RealtimeKit1/realtime_kit1_proxy.h interfaces/org/freedesktop/RealtimeKit1/RealtimeKit1.xml
+
 mkdir -p ${PROXY}/org/freedesktop/Avahi/{Server,Server2} |true
 
 ${XML2CPP} --verbose --proxy=${PROXY}/org/freedesktop/Avahi/Server/server_proxy.h interfaces/org/freedesktop/Avahi/Server/Server.xml
 ${XML2CPP} --verbose --proxy=${PROXY}/org/freedesktop/Avahi/Server2/server2_proxy.h interfaces/org/freedesktop/Avahi/Server2/Server2.xml
+
+mkdir -p ${PROXY}/org/freedesktop/Flatpak/SystemHelper |true
+
+${XML2CPP} --verbose --proxy=${PROXY}/org/freedesktop/Flatpak/SystemHelper/system_helper_proxy.h interfaces/org/freedesktop/Flatpak/SystemHelper/SystemHelper.xml
 
 mkdir -p ${PROXY}/org/freedesktop/UDisks2/{Block,Drive,Manager,Manager/NVMe,NVMe/Controller,NVMe/Namespace,Filesystem,Partition,PartitionTable,Swapspace} |true
 
@@ -131,4 +139,3 @@ mkdir -p ${PROXY}/org/ofono/{HandsfreeAudioManager,Manager} |true
 
 ${XML2CPP} --verbose --proxy=${PROXY}/org/ofono/HandsfreeAudioManager/handsfree_audio_manager_proxy.h interfaces/org/ofono/HandsfreeAudioManager/HandsfreeAudioManager.xml
 ${XML2CPP} --verbose --proxy=${PROXY}/org/ofono/Manager/manager_proxy.h interfaces/org/ofono/Manager/Manager.xml
-

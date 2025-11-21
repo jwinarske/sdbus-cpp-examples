@@ -15,71 +15,61 @@ namespace freedesktop {
 namespace UDisks2 {
 namespace Manager {
 
-class NVMe_proxy {
- public:
-  static constexpr const char* INTERFACE_NAME =
-      "org.freedesktop.UDisks2.Manager.NVMe";
+class NVMe_proxy
+{
+public:
+    static constexpr const char* INTERFACE_NAME = "org.freedesktop.UDisks2.Manager.NVMe";
 
- protected:
-  NVMe_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
+protected:
+    NVMe_proxy(sdbus::IProxy& proxy)
+        : m_proxy(proxy)
+    {
+    }
 
-  NVMe_proxy(const NVMe_proxy&) = delete;
-  NVMe_proxy& operator=(const NVMe_proxy&) = delete;
-  NVMe_proxy(NVMe_proxy&&) = delete;
-  NVMe_proxy& operator=(NVMe_proxy&&) = delete;
+    NVMe_proxy(const NVMe_proxy&) = delete;
+    NVMe_proxy& operator=(const NVMe_proxy&) = delete;
+    NVMe_proxy(NVMe_proxy&&) = delete;
+    NVMe_proxy& operator=(NVMe_proxy&&) = delete;
 
-  ~NVMe_proxy() = default;
+    ~NVMe_proxy() = default;
 
-  void registerProxy() {}
+    void registerProxy()
+    {
+    }
 
- public:
-  void SetHostNQN(const std::vector<uint8_t>& hostnqn,
-                  const std::map<std::string, sdbus::Variant>& options) {
-    m_proxy.callMethod("SetHostNQN")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(hostnqn, options);
-  }
+public:
+    void SetHostNQN(const std::vector<uint8_t>& hostnqn, const std::map<std::string, sdbus::Variant>& options)
+    {
+        m_proxy.callMethod("SetHostNQN").onInterface(INTERFACE_NAME).withArguments(hostnqn, options);
+    }
 
-  void SetHostID(const std::vector<uint8_t>& hostid,
-                 const std::map<std::string, sdbus::Variant>& options) {
-    m_proxy.callMethod("SetHostID")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(hostid, options);
-  }
+    void SetHostID(const std::vector<uint8_t>& hostid, const std::map<std::string, sdbus::Variant>& options)
+    {
+        m_proxy.callMethod("SetHostID").onInterface(INTERFACE_NAME).withArguments(hostid, options);
+    }
 
-  sdbus::ObjectPath Connect(
-      const std::vector<uint8_t>& subsysnqn,
-      const std::string& transport,
-      const std::string& transport_addr,
-      const std::map<std::string, sdbus::Variant>& options) {
-    sdbus::ObjectPath result;
-    m_proxy.callMethod("Connect")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(subsysnqn, transport, transport_addr, options)
-        .storeResultsTo(result);
-    return result;
-  }
+    sdbus::ObjectPath Connect(const std::vector<uint8_t>& subsysnqn, const std::string& transport, const std::string& transport_addr, const std::map<std::string, sdbus::Variant>& options)
+    {
+        sdbus::ObjectPath result;
+        m_proxy.callMethod("Connect").onInterface(INTERFACE_NAME).withArguments(subsysnqn, transport, transport_addr, options).storeResultsTo(result);
+        return result;
+    }
 
- public:
-  std::vector<uint8_t> HostNQN() {
-    return m_proxy.getProperty("HostNQN")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<uint8_t>>();
-  }
+public:
+    std::vector<uint8_t> HostNQN()
+    {
+        return m_proxy.getProperty("HostNQN").onInterface(INTERFACE_NAME).get<std::vector<uint8_t>>();
+    }
 
-  std::vector<uint8_t> HostID() {
-    return m_proxy.getProperty("HostID")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<uint8_t>>();
-  }
+    std::vector<uint8_t> HostID()
+    {
+        return m_proxy.getProperty("HostID").onInterface(INTERFACE_NAME).get<std::vector<uint8_t>>();
+    }
 
- private:
-  sdbus::IProxy& m_proxy;
+private:
+    sdbus::IProxy& m_proxy;
 };
 
-}  // namespace Manager
-}  // namespace UDisks2
-}  // namespace freedesktop
-}  // namespace org
+}}}} // namespaces
 
 #endif

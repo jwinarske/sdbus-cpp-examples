@@ -14,140 +14,108 @@ namespace org {
 namespace freedesktop {
 namespace NetworkManager {
 
-class Settings_proxy {
- public:
-  static constexpr const char* INTERFACE_NAME =
-      "org.freedesktop.NetworkManager.Settings";
+class Settings_proxy
+{
+public:
+    static constexpr const char* INTERFACE_NAME = "org.freedesktop.NetworkManager.Settings";
 
- protected:
-  Settings_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
+protected:
+    Settings_proxy(sdbus::IProxy& proxy)
+        : m_proxy(proxy)
+    {
+    }
 
-  Settings_proxy(const Settings_proxy&) = delete;
-  Settings_proxy& operator=(const Settings_proxy&) = delete;
-  Settings_proxy(Settings_proxy&&) = delete;
-  Settings_proxy& operator=(Settings_proxy&&) = delete;
+    Settings_proxy(const Settings_proxy&) = delete;
+    Settings_proxy& operator=(const Settings_proxy&) = delete;
+    Settings_proxy(Settings_proxy&&) = delete;
+    Settings_proxy& operator=(Settings_proxy&&) = delete;
 
-  ~Settings_proxy() = default;
+    ~Settings_proxy() = default;
 
-  void registerProxy() {
-    m_proxy.uponSignal("NewConnection")
-        .onInterface(INTERFACE_NAME)
-        .call([this](const sdbus::ObjectPath& connection) {
-          this->onNewConnection(connection);
-        });
-    m_proxy.uponSignal("ConnectionRemoved")
-        .onInterface(INTERFACE_NAME)
-        .call([this](const sdbus::ObjectPath& connection) {
-          this->onConnectionRemoved(connection);
-        });
-  }
+    void registerProxy()
+    {
+        m_proxy.uponSignal("NewConnection").onInterface(INTERFACE_NAME).call([this](const sdbus::ObjectPath& connection){ this->onNewConnection(connection); });
+        m_proxy.uponSignal("ConnectionRemoved").onInterface(INTERFACE_NAME).call([this](const sdbus::ObjectPath& connection){ this->onConnectionRemoved(connection); });
+    }
 
-  virtual void onNewConnection(const sdbus::ObjectPath& connection) = 0;
-  virtual void onConnectionRemoved(const sdbus::ObjectPath& connection) = 0;
+    virtual void onNewConnection(const sdbus::ObjectPath& connection) = 0;
+    virtual void onConnectionRemoved(const sdbus::ObjectPath& connection) = 0;
 
- public:
-  std::vector<sdbus::ObjectPath> ListConnections() {
-    std::vector<sdbus::ObjectPath> result;
-    m_proxy.callMethod("ListConnections")
-        .onInterface(INTERFACE_NAME)
-        .storeResultsTo(result);
-    return result;
-  }
+public:
+    std::vector<sdbus::ObjectPath> ListConnections()
+    {
+        std::vector<sdbus::ObjectPath> result;
+        m_proxy.callMethod("ListConnections").onInterface(INTERFACE_NAME).storeResultsTo(result);
+        return result;
+    }
 
-  sdbus::ObjectPath GetConnectionByUuid(const std::string& uuid) {
-    sdbus::ObjectPath result;
-    m_proxy.callMethod("GetConnectionByUuid")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(uuid)
-        .storeResultsTo(result);
-    return result;
-  }
+    sdbus::ObjectPath GetConnectionByUuid(const std::string& uuid)
+    {
+        sdbus::ObjectPath result;
+        m_proxy.callMethod("GetConnectionByUuid").onInterface(INTERFACE_NAME).withArguments(uuid).storeResultsTo(result);
+        return result;
+    }
 
-  sdbus::ObjectPath AddConnection(
-      const std::map<std::string, std::map<std::string, sdbus::Variant>>&
-          connection) {
-    sdbus::ObjectPath result;
-    m_proxy.callMethod("AddConnection")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(connection)
-        .storeResultsTo(result);
-    return result;
-  }
+    sdbus::ObjectPath AddConnection(const std::map<std::string, std::map<std::string, sdbus::Variant>>& connection)
+    {
+        sdbus::ObjectPath result;
+        m_proxy.callMethod("AddConnection").onInterface(INTERFACE_NAME).withArguments(connection).storeResultsTo(result);
+        return result;
+    }
 
-  sdbus::ObjectPath AddConnectionUnsaved(
-      const std::map<std::string, std::map<std::string, sdbus::Variant>>&
-          connection) {
-    sdbus::ObjectPath result;
-    m_proxy.callMethod("AddConnectionUnsaved")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(connection)
-        .storeResultsTo(result);
-    return result;
-  }
+    sdbus::ObjectPath AddConnectionUnsaved(const std::map<std::string, std::map<std::string, sdbus::Variant>>& connection)
+    {
+        sdbus::ObjectPath result;
+        m_proxy.callMethod("AddConnectionUnsaved").onInterface(INTERFACE_NAME).withArguments(connection).storeResultsTo(result);
+        return result;
+    }
 
-  std::tuple<sdbus::ObjectPath, std::map<std::string, sdbus::Variant>>
-  AddConnection2(
-      const std::map<std::string, std::map<std::string, sdbus::Variant>>&
-          settings,
-      const uint32_t& flags,
-      const std::map<std::string, sdbus::Variant>& args) {
-    std::tuple<sdbus::ObjectPath, std::map<std::string, sdbus::Variant>> result;
-    m_proxy.callMethod("AddConnection2")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(settings, flags, args)
-        .storeResultsTo(result);
-    return result;
-  }
+    std::tuple<sdbus::ObjectPath, std::map<std::string, sdbus::Variant>> AddConnection2(const std::map<std::string, std::map<std::string, sdbus::Variant>>& settings, const uint32_t& flags, const std::map<std::string, sdbus::Variant>& args)
+    {
+        std::tuple<sdbus::ObjectPath, std::map<std::string, sdbus::Variant>> result;
+        m_proxy.callMethod("AddConnection2").onInterface(INTERFACE_NAME).withArguments(settings, flags, args).storeResultsTo(result);
+        return result;
+    }
 
-  std::tuple<bool, std::vector<std::string>> LoadConnections(
-      const std::vector<std::string>& filenames) {
-    std::tuple<bool, std::vector<std::string>> result;
-    m_proxy.callMethod("LoadConnections")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(filenames)
-        .storeResultsTo(result);
-    return result;
-  }
+    std::tuple<bool, std::vector<std::string>> LoadConnections(const std::vector<std::string>& filenames)
+    {
+        std::tuple<bool, std::vector<std::string>> result;
+        m_proxy.callMethod("LoadConnections").onInterface(INTERFACE_NAME).withArguments(filenames).storeResultsTo(result);
+        return result;
+    }
 
-  bool ReloadConnections() {
-    bool result;
-    m_proxy.callMethod("ReloadConnections")
-        .onInterface(INTERFACE_NAME)
-        .storeResultsTo(result);
-    return result;
-  }
+    bool ReloadConnections()
+    {
+        bool result;
+        m_proxy.callMethod("ReloadConnections").onInterface(INTERFACE_NAME).storeResultsTo(result);
+        return result;
+    }
 
-  void SaveHostname(const std::string& hostname) {
-    m_proxy.callMethod("SaveHostname")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(hostname);
-  }
+    void SaveHostname(const std::string& hostname)
+    {
+        m_proxy.callMethod("SaveHostname").onInterface(INTERFACE_NAME).withArguments(hostname);
+    }
 
- public:
-  std::vector<sdbus::ObjectPath> Connections() {
-    return m_proxy.getProperty("Connections")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<sdbus::ObjectPath>>();
-  }
+public:
+    std::vector<sdbus::ObjectPath> Connections()
+    {
+        return m_proxy.getProperty("Connections").onInterface(INTERFACE_NAME).get<std::vector<sdbus::ObjectPath>>();
+    }
 
-  std::string Hostname() {
-    return m_proxy.getProperty("Hostname")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string Hostname()
+    {
+        return m_proxy.getProperty("Hostname").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  bool CanModify() {
-    return m_proxy.getProperty("CanModify")
-        .onInterface(INTERFACE_NAME)
-        .get<bool>();
-  }
+    bool CanModify()
+    {
+        return m_proxy.getProperty("CanModify").onInterface(INTERFACE_NAME).get<bool>();
+    }
 
- private:
-  sdbus::IProxy& m_proxy;
+private:
+    sdbus::IProxy& m_proxy;
 };
 
-}  // namespace NetworkManager
-}  // namespace freedesktop
-}  // namespace org
+}}} // namespaces
 
 #endif

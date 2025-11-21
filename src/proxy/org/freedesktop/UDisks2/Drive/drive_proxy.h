@@ -14,223 +14,194 @@ namespace org {
 namespace freedesktop {
 namespace UDisks2 {
 
-class Drive_proxy {
- public:
-  static constexpr const char* INTERFACE_NAME = "org.freedesktop.UDisks2.Drive";
+class Drive_proxy
+{
+public:
+    static constexpr const char* INTERFACE_NAME = "org.freedesktop.UDisks2.Drive";
 
- protected:
-  Drive_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
+protected:
+    Drive_proxy(sdbus::IProxy& proxy)
+        : m_proxy(proxy)
+    {
+    }
 
-  Drive_proxy(const Drive_proxy&) = delete;
-  Drive_proxy& operator=(const Drive_proxy&) = delete;
-  Drive_proxy(Drive_proxy&&) = delete;
-  Drive_proxy& operator=(Drive_proxy&&) = delete;
+    Drive_proxy(const Drive_proxy&) = delete;
+    Drive_proxy& operator=(const Drive_proxy&) = delete;
+    Drive_proxy(Drive_proxy&&) = delete;
+    Drive_proxy& operator=(Drive_proxy&&) = delete;
 
-  ~Drive_proxy() = default;
+    ~Drive_proxy() = default;
 
-  void registerProxy() {}
+    void registerProxy()
+    {
+    }
 
- public:
-  void Eject(const std::map<std::string, sdbus::Variant>& options) {
-    m_proxy.callMethod("Eject")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(options);
-  }
+public:
+    void Eject(const std::map<std::string, sdbus::Variant>& options)
+    {
+        m_proxy.callMethod("Eject").onInterface(INTERFACE_NAME).withArguments(options);
+    }
 
-  void SetConfiguration(const std::map<std::string, sdbus::Variant>& value,
-                        const std::map<std::string, sdbus::Variant>& options) {
-    m_proxy.callMethod("SetConfiguration")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(value, options);
-  }
+    void SetConfiguration(const std::map<std::string, sdbus::Variant>& value, const std::map<std::string, sdbus::Variant>& options)
+    {
+        m_proxy.callMethod("SetConfiguration").onInterface(INTERFACE_NAME).withArguments(value, options);
+    }
 
-  void PowerOff(const std::map<std::string, sdbus::Variant>& options) {
-    m_proxy.callMethod("PowerOff")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(options);
-  }
+    void PowerOff(const std::map<std::string, sdbus::Variant>& options)
+    {
+        m_proxy.callMethod("PowerOff").onInterface(INTERFACE_NAME).withArguments(options);
+    }
 
- public:
-  std::string Vendor() {
-    return m_proxy.getProperty("Vendor")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+public:
+    std::string Vendor()
+    {
+        return m_proxy.getProperty("Vendor").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::string Model() {
-    return m_proxy.getProperty("Model")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string Model()
+    {
+        return m_proxy.getProperty("Model").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::string Revision() {
-    return m_proxy.getProperty("Revision")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string Revision()
+    {
+        return m_proxy.getProperty("Revision").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::string Serial() {
-    return m_proxy.getProperty("Serial")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string Serial()
+    {
+        return m_proxy.getProperty("Serial").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::string WWN() {
-    return m_proxy.getProperty("WWN")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string WWN()
+    {
+        return m_proxy.getProperty("WWN").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::string Id() {
-    return m_proxy.getProperty("Id")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string Id()
+    {
+        return m_proxy.getProperty("Id").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::map<std::string, sdbus::Variant> Configuration() {
-    return m_proxy.getProperty("Configuration")
-        .onInterface(INTERFACE_NAME)
-        .get<std::map<std::string, sdbus::Variant>>();
-  }
+    std::map<std::string, sdbus::Variant> Configuration()
+    {
+        return m_proxy.getProperty("Configuration").onInterface(INTERFACE_NAME).get<std::map<std::string, sdbus::Variant>>();
+    }
 
-  std::string Media() {
-    return m_proxy.getProperty("Media")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string Media()
+    {
+        return m_proxy.getProperty("Media").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::vector<std::string> MediaCompatibility() {
-    return m_proxy.getProperty("MediaCompatibility")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
+    std::vector<std::string> MediaCompatibility()
+    {
+        return m_proxy.getProperty("MediaCompatibility").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
 
-  bool MediaRemovable() {
-    return m_proxy.getProperty("MediaRemovable")
-        .onInterface(INTERFACE_NAME)
-        .get<bool>();
-  }
+    bool MediaRemovable()
+    {
+        return m_proxy.getProperty("MediaRemovable").onInterface(INTERFACE_NAME).get<bool>();
+    }
 
-  bool MediaAvailable() {
-    return m_proxy.getProperty("MediaAvailable")
-        .onInterface(INTERFACE_NAME)
-        .get<bool>();
-  }
+    bool MediaAvailable()
+    {
+        return m_proxy.getProperty("MediaAvailable").onInterface(INTERFACE_NAME).get<bool>();
+    }
 
-  bool MediaChangeDetected() {
-    return m_proxy.getProperty("MediaChangeDetected")
-        .onInterface(INTERFACE_NAME)
-        .get<bool>();
-  }
+    bool MediaChangeDetected()
+    {
+        return m_proxy.getProperty("MediaChangeDetected").onInterface(INTERFACE_NAME).get<bool>();
+    }
 
-  uint64_t Size() {
-    return m_proxy.getProperty("Size")
-        .onInterface(INTERFACE_NAME)
-        .get<uint64_t>();
-  }
+    uint64_t Size()
+    {
+        return m_proxy.getProperty("Size").onInterface(INTERFACE_NAME).get<uint64_t>();
+    }
 
-  uint64_t TimeDetected() {
-    return m_proxy.getProperty("TimeDetected")
-        .onInterface(INTERFACE_NAME)
-        .get<uint64_t>();
-  }
+    uint64_t TimeDetected()
+    {
+        return m_proxy.getProperty("TimeDetected").onInterface(INTERFACE_NAME).get<uint64_t>();
+    }
 
-  uint64_t TimeMediaDetected() {
-    return m_proxy.getProperty("TimeMediaDetected")
-        .onInterface(INTERFACE_NAME)
-        .get<uint64_t>();
-  }
+    uint64_t TimeMediaDetected()
+    {
+        return m_proxy.getProperty("TimeMediaDetected").onInterface(INTERFACE_NAME).get<uint64_t>();
+    }
 
-  bool Optical() {
-    return m_proxy.getProperty("Optical")
-        .onInterface(INTERFACE_NAME)
-        .get<bool>();
-  }
+    bool Optical()
+    {
+        return m_proxy.getProperty("Optical").onInterface(INTERFACE_NAME).get<bool>();
+    }
 
-  bool OpticalBlank() {
-    return m_proxy.getProperty("OpticalBlank")
-        .onInterface(INTERFACE_NAME)
-        .get<bool>();
-  }
+    bool OpticalBlank()
+    {
+        return m_proxy.getProperty("OpticalBlank").onInterface(INTERFACE_NAME).get<bool>();
+    }
 
-  uint32_t OpticalNumTracks() {
-    return m_proxy.getProperty("OpticalNumTracks")
-        .onInterface(INTERFACE_NAME)
-        .get<uint32_t>();
-  }
+    uint32_t OpticalNumTracks()
+    {
+        return m_proxy.getProperty("OpticalNumTracks").onInterface(INTERFACE_NAME).get<uint32_t>();
+    }
 
-  uint32_t OpticalNumAudioTracks() {
-    return m_proxy.getProperty("OpticalNumAudioTracks")
-        .onInterface(INTERFACE_NAME)
-        .get<uint32_t>();
-  }
+    uint32_t OpticalNumAudioTracks()
+    {
+        return m_proxy.getProperty("OpticalNumAudioTracks").onInterface(INTERFACE_NAME).get<uint32_t>();
+    }
 
-  uint32_t OpticalNumDataTracks() {
-    return m_proxy.getProperty("OpticalNumDataTracks")
-        .onInterface(INTERFACE_NAME)
-        .get<uint32_t>();
-  }
+    uint32_t OpticalNumDataTracks()
+    {
+        return m_proxy.getProperty("OpticalNumDataTracks").onInterface(INTERFACE_NAME).get<uint32_t>();
+    }
 
-  uint32_t OpticalNumSessions() {
-    return m_proxy.getProperty("OpticalNumSessions")
-        .onInterface(INTERFACE_NAME)
-        .get<uint32_t>();
-  }
+    uint32_t OpticalNumSessions()
+    {
+        return m_proxy.getProperty("OpticalNumSessions").onInterface(INTERFACE_NAME).get<uint32_t>();
+    }
 
-  int32_t RotationRate() {
-    return m_proxy.getProperty("RotationRate")
-        .onInterface(INTERFACE_NAME)
-        .get<int32_t>();
-  }
+    int32_t RotationRate()
+    {
+        return m_proxy.getProperty("RotationRate").onInterface(INTERFACE_NAME).get<int32_t>();
+    }
 
-  std::string ConnectionBus() {
-    return m_proxy.getProperty("ConnectionBus")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string ConnectionBus()
+    {
+        return m_proxy.getProperty("ConnectionBus").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::string Seat() {
-    return m_proxy.getProperty("Seat")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string Seat()
+    {
+        return m_proxy.getProperty("Seat").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  bool Removable() {
-    return m_proxy.getProperty("Removable")
-        .onInterface(INTERFACE_NAME)
-        .get<bool>();
-  }
+    bool Removable()
+    {
+        return m_proxy.getProperty("Removable").onInterface(INTERFACE_NAME).get<bool>();
+    }
 
-  bool Ejectable() {
-    return m_proxy.getProperty("Ejectable")
-        .onInterface(INTERFACE_NAME)
-        .get<bool>();
-  }
+    bool Ejectable()
+    {
+        return m_proxy.getProperty("Ejectable").onInterface(INTERFACE_NAME).get<bool>();
+    }
 
-  std::string SortKey() {
-    return m_proxy.getProperty("SortKey")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string SortKey()
+    {
+        return m_proxy.getProperty("SortKey").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  bool CanPowerOff() {
-    return m_proxy.getProperty("CanPowerOff")
-        .onInterface(INTERFACE_NAME)
-        .get<bool>();
-  }
+    bool CanPowerOff()
+    {
+        return m_proxy.getProperty("CanPowerOff").onInterface(INTERFACE_NAME).get<bool>();
+    }
 
-  std::string SiblingId() {
-    return m_proxy.getProperty("SiblingId")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string SiblingId()
+    {
+        return m_proxy.getProperty("SiblingId").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
- private:
-  sdbus::IProxy& m_proxy;
+private:
+    sdbus::IProxy& m_proxy;
 };
 
-}  // namespace UDisks2
-}  // namespace freedesktop
-}  // namespace org
+}}} // namespaces
 
 #endif

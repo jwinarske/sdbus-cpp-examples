@@ -13,52 +13,53 @@
 namespace org {
 namespace bluez {
 
-class GattService1_proxy {
- public:
-  static constexpr const char* INTERFACE_NAME = "org.bluez.GattService1";
+class GattService1_proxy
+{
+public:
+    static constexpr const char* INTERFACE_NAME = "org.bluez.GattService1";
 
- protected:
-  GattService1_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
+protected:
+    GattService1_proxy(sdbus::IProxy& proxy)
+        : m_proxy(proxy)
+    {
+    }
 
-  GattService1_proxy(const GattService1_proxy&) = delete;
-  GattService1_proxy& operator=(const GattService1_proxy&) = delete;
-  GattService1_proxy(GattService1_proxy&&) = delete;
-  GattService1_proxy& operator=(GattService1_proxy&&) = delete;
+    GattService1_proxy(const GattService1_proxy&) = delete;
+    GattService1_proxy& operator=(const GattService1_proxy&) = delete;
+    GattService1_proxy(GattService1_proxy&&) = delete;
+    GattService1_proxy& operator=(GattService1_proxy&&) = delete;
 
-  ~GattService1_proxy() = default;
+    ~GattService1_proxy() = default;
 
-  void registerProxy() {}
+    void registerProxy()
+    {
+    }
 
- public:
-  std::string UUID() {
-    return m_proxy.getProperty("UUID")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+public:
+    std::string UUID()
+    {
+        return m_proxy.getProperty("UUID").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  sdbus::ObjectPath Device() {
-    return m_proxy.getProperty("Device")
-        .onInterface(INTERFACE_NAME)
-        .get<sdbus::ObjectPath>();
-  }
+    sdbus::ObjectPath Device()
+    {
+        return m_proxy.getProperty("Device").onInterface(INTERFACE_NAME).get<sdbus::ObjectPath>();
+    }
 
-  bool Primary() {
-    return m_proxy.getProperty("Primary")
-        .onInterface(INTERFACE_NAME)
-        .get<bool>();
-  }
+    bool Primary()
+    {
+        return m_proxy.getProperty("Primary").onInterface(INTERFACE_NAME).get<bool>();
+    }
 
-  std::vector<sdbus::ObjectPath> Includes() {
-    return m_proxy.getProperty("Includes")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<sdbus::ObjectPath>>();
-  }
+    std::vector<sdbus::ObjectPath> Includes()
+    {
+        return m_proxy.getProperty("Includes").onInterface(INTERFACE_NAME).get<std::vector<sdbus::ObjectPath>>();
+    }
 
- private:
-  sdbus::IProxy& m_proxy;
+private:
+    sdbus::IProxy& m_proxy;
 };
 
-}  // namespace bluez
-}  // namespace org
+}} // namespaces
 
 #endif

@@ -14,169 +14,156 @@ namespace org {
 namespace freedesktop {
 namespace network1 {
 
-class Link_proxy {
- public:
-  static constexpr const char* INTERFACE_NAME = "org.freedesktop.network1.Link";
+class Link_proxy
+{
+public:
+    static constexpr const char* INTERFACE_NAME = "org.freedesktop.network1.Link";
 
- protected:
-  Link_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
+protected:
+    Link_proxy(sdbus::IProxy& proxy)
+        : m_proxy(proxy)
+    {
+    }
 
-  Link_proxy(const Link_proxy&) = delete;
-  Link_proxy& operator=(const Link_proxy&) = delete;
-  Link_proxy(Link_proxy&&) = delete;
-  Link_proxy& operator=(Link_proxy&&) = delete;
+    Link_proxy(const Link_proxy&) = delete;
+    Link_proxy& operator=(const Link_proxy&) = delete;
+    Link_proxy(Link_proxy&&) = delete;
+    Link_proxy& operator=(Link_proxy&&) = delete;
 
-  ~Link_proxy() = default;
+    ~Link_proxy() = default;
 
-  void registerProxy() {}
+    void registerProxy()
+    {
+    }
 
- public:
-  void SetNTP(const std::vector<std::string>& servers) {
-    m_proxy.callMethod("SetNTP")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(servers);
-  }
+public:
+    void SetNTP(const std::vector<std::string>& servers)
+    {
+        m_proxy.callMethod("SetNTP").onInterface(INTERFACE_NAME).withArguments(servers);
+    }
 
-  void SetDNS(const std::vector<sdbus::Struct<int32_t, std::vector<uint8_t>>>&
-                  addresses) {
-    m_proxy.callMethod("SetDNS")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(addresses);
-  }
+    void SetDNS(const std::vector<sdbus::Struct<int32_t, std::vector<uint8_t>>>& addresses)
+    {
+        m_proxy.callMethod("SetDNS").onInterface(INTERFACE_NAME).withArguments(addresses);
+    }
 
-  void SetDNSEx(
-      const std::vector<
-          sdbus::Struct<int32_t, std::vector<uint8_t>, uint16_t, std::string>>&
-          addresses) {
-    m_proxy.callMethod("SetDNSEx")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(addresses);
-  }
+    void SetDNSEx(const std::vector<sdbus::Struct<int32_t, std::vector<uint8_t>, uint16_t, std::string>>& addresses)
+    {
+        m_proxy.callMethod("SetDNSEx").onInterface(INTERFACE_NAME).withArguments(addresses);
+    }
 
-  void SetDomains(
-      const std::vector<sdbus::Struct<std::string, bool>>& domains) {
-    m_proxy.callMethod("SetDomains")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(domains);
-  }
+    void SetDomains(const std::vector<sdbus::Struct<std::string, bool>>& domains)
+    {
+        m_proxy.callMethod("SetDomains").onInterface(INTERFACE_NAME).withArguments(domains);
+    }
 
-  void SetDefaultRoute(const bool& enable) {
-    m_proxy.callMethod("SetDefaultRoute")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(enable);
-  }
+    void SetDefaultRoute(const bool& enable)
+    {
+        m_proxy.callMethod("SetDefaultRoute").onInterface(INTERFACE_NAME).withArguments(enable);
+    }
 
-  void SetLLMNR(const std::string& mode) {
-    m_proxy.callMethod("SetLLMNR")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(mode);
-  }
+    void SetLLMNR(const std::string& mode)
+    {
+        m_proxy.callMethod("SetLLMNR").onInterface(INTERFACE_NAME).withArguments(mode);
+    }
 
-  void SetMulticastDNS(const std::string& mode) {
-    m_proxy.callMethod("SetMulticastDNS")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(mode);
-  }
+    void SetMulticastDNS(const std::string& mode)
+    {
+        m_proxy.callMethod("SetMulticastDNS").onInterface(INTERFACE_NAME).withArguments(mode);
+    }
 
-  void SetDNSOverTLS(const std::string& mode) {
-    m_proxy.callMethod("SetDNSOverTLS")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(mode);
-  }
+    void SetDNSOverTLS(const std::string& mode)
+    {
+        m_proxy.callMethod("SetDNSOverTLS").onInterface(INTERFACE_NAME).withArguments(mode);
+    }
 
-  void SetDNSSEC(const std::string& mode) {
-    m_proxy.callMethod("SetDNSSEC")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(mode);
-  }
+    void SetDNSSEC(const std::string& mode)
+    {
+        m_proxy.callMethod("SetDNSSEC").onInterface(INTERFACE_NAME).withArguments(mode);
+    }
 
-  void SetDNSSECNegativeTrustAnchors(const std::vector<std::string>& names) {
-    m_proxy.callMethod("SetDNSSECNegativeTrustAnchors")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(names);
-  }
+    void SetDNSSECNegativeTrustAnchors(const std::vector<std::string>& names)
+    {
+        m_proxy.callMethod("SetDNSSECNegativeTrustAnchors").onInterface(INTERFACE_NAME).withArguments(names);
+    }
 
-  void RevertNTP() {
-    m_proxy.callMethod("RevertNTP").onInterface(INTERFACE_NAME);
-  }
+    void RevertNTP()
+    {
+        m_proxy.callMethod("RevertNTP").onInterface(INTERFACE_NAME);
+    }
 
-  void RevertDNS() {
-    m_proxy.callMethod("RevertDNS").onInterface(INTERFACE_NAME);
-  }
+    void RevertDNS()
+    {
+        m_proxy.callMethod("RevertDNS").onInterface(INTERFACE_NAME);
+    }
 
-  void Renew() { m_proxy.callMethod("Renew").onInterface(INTERFACE_NAME); }
+    void Renew()
+    {
+        m_proxy.callMethod("Renew").onInterface(INTERFACE_NAME);
+    }
 
-  void ForceRenew() {
-    m_proxy.callMethod("ForceRenew").onInterface(INTERFACE_NAME);
-  }
+    void ForceRenew()
+    {
+        m_proxy.callMethod("ForceRenew").onInterface(INTERFACE_NAME);
+    }
 
-  void Reconfigure() {
-    m_proxy.callMethod("Reconfigure").onInterface(INTERFACE_NAME);
-  }
+    void Reconfigure()
+    {
+        m_proxy.callMethod("Reconfigure").onInterface(INTERFACE_NAME);
+    }
 
-  std::string Describe() {
-    std::string result;
-    m_proxy.callMethod("Describe")
-        .onInterface(INTERFACE_NAME)
-        .storeResultsTo(result);
-    return result;
-  }
+    std::string Describe()
+    {
+        std::string result;
+        m_proxy.callMethod("Describe").onInterface(INTERFACE_NAME).storeResultsTo(result);
+        return result;
+    }
 
- public:
-  std::string OperationalState() {
-    return m_proxy.getProperty("OperationalState")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+public:
+    std::string OperationalState()
+    {
+        return m_proxy.getProperty("OperationalState").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::string CarrierState() {
-    return m_proxy.getProperty("CarrierState")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string CarrierState()
+    {
+        return m_proxy.getProperty("CarrierState").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::string AddressState() {
-    return m_proxy.getProperty("AddressState")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string AddressState()
+    {
+        return m_proxy.getProperty("AddressState").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::string IPv4AddressState() {
-    return m_proxy.getProperty("IPv4AddressState")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string IPv4AddressState()
+    {
+        return m_proxy.getProperty("IPv4AddressState").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::string IPv6AddressState() {
-    return m_proxy.getProperty("IPv6AddressState")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string IPv6AddressState()
+    {
+        return m_proxy.getProperty("IPv6AddressState").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::string OnlineState() {
-    return m_proxy.getProperty("OnlineState")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string OnlineState()
+    {
+        return m_proxy.getProperty("OnlineState").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::string AdministrativeState() {
-    return m_proxy.getProperty("AdministrativeState")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string AdministrativeState()
+    {
+        return m_proxy.getProperty("AdministrativeState").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  sdbus::Struct<uint64_t, uint64_t> BitRates() {
-    return m_proxy.getProperty("BitRates")
-        .onInterface(INTERFACE_NAME)
-        .get<sdbus::Struct<uint64_t, uint64_t>>();
-  }
+    sdbus::Struct<uint64_t, uint64_t> BitRates()
+    {
+        return m_proxy.getProperty("BitRates").onInterface(INTERFACE_NAME).get<sdbus::Struct<uint64_t, uint64_t>>();
+    }
 
- private:
-  sdbus::IProxy& m_proxy;
+private:
+    sdbus::IProxy& m_proxy;
 };
 
-}  // namespace network1
-}  // namespace freedesktop
-}  // namespace org
+}}} // namespaces
 
 #endif

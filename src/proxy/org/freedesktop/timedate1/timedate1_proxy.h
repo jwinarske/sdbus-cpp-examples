@@ -13,105 +13,96 @@
 namespace org {
 namespace freedesktop {
 
-class timedate1_proxy {
- public:
-  static constexpr const char* INTERFACE_NAME = "org.freedesktop.timedate1";
+class timedate1_proxy
+{
+public:
+    static constexpr const char* INTERFACE_NAME = "org.freedesktop.timedate1";
 
- protected:
-  timedate1_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
+protected:
+    timedate1_proxy(sdbus::IProxy& proxy)
+        : m_proxy(proxy)
+    {
+    }
 
-  timedate1_proxy(const timedate1_proxy&) = delete;
-  timedate1_proxy& operator=(const timedate1_proxy&) = delete;
-  timedate1_proxy(timedate1_proxy&&) = delete;
-  timedate1_proxy& operator=(timedate1_proxy&&) = delete;
+    timedate1_proxy(const timedate1_proxy&) = delete;
+    timedate1_proxy& operator=(const timedate1_proxy&) = delete;
+    timedate1_proxy(timedate1_proxy&&) = delete;
+    timedate1_proxy& operator=(timedate1_proxy&&) = delete;
 
-  ~timedate1_proxy() = default;
+    ~timedate1_proxy() = default;
 
-  void registerProxy() {}
+    void registerProxy()
+    {
+    }
 
- public:
-  void SetTime(const int64_t& usec_utc,
-               const bool& relative,
-               const bool& interactive) {
-    m_proxy.callMethod("SetTime")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(usec_utc, relative, interactive);
-  }
+public:
+    void SetTime(const int64_t& usec_utc, const bool& relative, const bool& interactive)
+    {
+        m_proxy.callMethod("SetTime").onInterface(INTERFACE_NAME).withArguments(usec_utc, relative, interactive);
+    }
 
-  void SetTimezone(const std::string& timezone, const bool& interactive) {
-    m_proxy.callMethod("SetTimezone")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(timezone, interactive);
-  }
+    void SetTimezone(const std::string& timezone, const bool& interactive)
+    {
+        m_proxy.callMethod("SetTimezone").onInterface(INTERFACE_NAME).withArguments(timezone, interactive);
+    }
 
-  void SetLocalRTC(const bool& local_rtc,
-                   const bool& fix_system,
-                   const bool& interactive) {
-    m_proxy.callMethod("SetLocalRTC")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(local_rtc, fix_system, interactive);
-  }
+    void SetLocalRTC(const bool& local_rtc, const bool& fix_system, const bool& interactive)
+    {
+        m_proxy.callMethod("SetLocalRTC").onInterface(INTERFACE_NAME).withArguments(local_rtc, fix_system, interactive);
+    }
 
-  void SetNTP(const bool& use_ntp, const bool& interactive) {
-    m_proxy.callMethod("SetNTP")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(use_ntp, interactive);
-  }
+    void SetNTP(const bool& use_ntp, const bool& interactive)
+    {
+        m_proxy.callMethod("SetNTP").onInterface(INTERFACE_NAME).withArguments(use_ntp, interactive);
+    }
 
-  std::vector<std::string> ListTimezones() {
-    std::vector<std::string> result;
-    m_proxy.callMethod("ListTimezones")
-        .onInterface(INTERFACE_NAME)
-        .storeResultsTo(result);
-    return result;
-  }
+    std::vector<std::string> ListTimezones()
+    {
+        std::vector<std::string> result;
+        m_proxy.callMethod("ListTimezones").onInterface(INTERFACE_NAME).storeResultsTo(result);
+        return result;
+    }
 
- public:
-  std::string Timezone() {
-    return m_proxy.getProperty("Timezone")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+public:
+    std::string Timezone()
+    {
+        return m_proxy.getProperty("Timezone").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  bool LocalRTC() {
-    return m_proxy.getProperty("LocalRTC")
-        .onInterface(INTERFACE_NAME)
-        .get<bool>();
-  }
+    bool LocalRTC()
+    {
+        return m_proxy.getProperty("LocalRTC").onInterface(INTERFACE_NAME).get<bool>();
+    }
 
-  bool CanNTP() {
-    return m_proxy.getProperty("CanNTP")
-        .onInterface(INTERFACE_NAME)
-        .get<bool>();
-  }
+    bool CanNTP()
+    {
+        return m_proxy.getProperty("CanNTP").onInterface(INTERFACE_NAME).get<bool>();
+    }
 
-  bool NTP() {
-    return m_proxy.getProperty("NTP").onInterface(INTERFACE_NAME).get<bool>();
-  }
+    bool NTP()
+    {
+        return m_proxy.getProperty("NTP").onInterface(INTERFACE_NAME).get<bool>();
+    }
 
-  bool NTPSynchronized() {
-    return m_proxy.getProperty("NTPSynchronized")
-        .onInterface(INTERFACE_NAME)
-        .get<bool>();
-  }
+    bool NTPSynchronized()
+    {
+        return m_proxy.getProperty("NTPSynchronized").onInterface(INTERFACE_NAME).get<bool>();
+    }
 
-  uint64_t TimeUSec() {
-    return m_proxy.getProperty("TimeUSec")
-        .onInterface(INTERFACE_NAME)
-        .get<uint64_t>();
-  }
+    uint64_t TimeUSec()
+    {
+        return m_proxy.getProperty("TimeUSec").onInterface(INTERFACE_NAME).get<uint64_t>();
+    }
 
-  uint64_t RTCTimeUSec() {
-    return m_proxy.getProperty("RTCTimeUSec")
-        .onInterface(INTERFACE_NAME)
-        .get<uint64_t>();
-  }
+    uint64_t RTCTimeUSec()
+    {
+        return m_proxy.getProperty("RTCTimeUSec").onInterface(INTERFACE_NAME).get<uint64_t>();
+    }
 
- private:
-  sdbus::IProxy& m_proxy;
+private:
+    sdbus::IProxy& m_proxy;
 };
 
-}  // namespace freedesktop
-}  // namespace org
+}} // namespaces
 
 #endif

@@ -13,242 +13,152 @@
 namespace net {
 namespace connman {
 
-class Manager_proxy {
- public:
-  static constexpr const char* INTERFACE_NAME = "net.connman.Manager";
+class Manager_proxy
+{
+public:
+    static constexpr const char* INTERFACE_NAME = "net.connman.Manager";
 
- protected:
-  Manager_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
+protected:
+    Manager_proxy(sdbus::IProxy& proxy)
+        : m_proxy(proxy)
+    {
+    }
 
-  Manager_proxy(const Manager_proxy&) = delete;
-  Manager_proxy& operator=(const Manager_proxy&) = delete;
-  Manager_proxy(Manager_proxy&&) = delete;
-  Manager_proxy& operator=(Manager_proxy&&) = delete;
+    Manager_proxy(const Manager_proxy&) = delete;
+    Manager_proxy& operator=(const Manager_proxy&) = delete;
+    Manager_proxy(Manager_proxy&&) = delete;
+    Manager_proxy& operator=(Manager_proxy&&) = delete;
 
-  ~Manager_proxy() = default;
+    ~Manager_proxy() = default;
 
-  void registerProxy() {
-    m_proxy.uponSignal("PropertyChanged")
-        .onInterface(INTERFACE_NAME)
-        .call([this](const std::string& name, const sdbus::Variant& value) {
-          this->onPropertyChanged(name, value);
-        });
-    m_proxy.uponSignal("TechnologyAdded")
-        .onInterface(INTERFACE_NAME)
-        .call([this](const sdbus::ObjectPath& path,
-                     const std::map<std::string, sdbus::Variant>& properties) {
-          this->onTechnologyAdded(path, properties);
-        });
-    m_proxy.uponSignal("TechnologyRemoved")
-        .onInterface(INTERFACE_NAME)
-        .call([this](const sdbus::ObjectPath& path) {
-          this->onTechnologyRemoved(path);
-        });
-    m_proxy.uponSignal("ServicesChanged")
-        .onInterface(INTERFACE_NAME)
-        .call(
-            [this](
-                const std::vector<sdbus::Struct<
-                    sdbus::ObjectPath, std::map<std::string, sdbus::Variant>>>&
-                    changed,
-                const std::vector<sdbus::ObjectPath>& removed) {
-              this->onServicesChanged(changed, removed);
-            });
-    m_proxy.uponSignal("PeersChanged")
-        .onInterface(INTERFACE_NAME)
-        .call(
-            [this](
-                const std::vector<sdbus::Struct<
-                    sdbus::ObjectPath, std::map<std::string, sdbus::Variant>>>&
-                    changed,
-                const std::vector<sdbus::ObjectPath>& removed) {
-              this->onPeersChanged(changed, removed);
-            });
-    m_proxy.uponSignal("TetheringClientsChanged")
-        .onInterface(INTERFACE_NAME)
-        .call([this](const std::vector<std::string>& registered,
-                     const std::vector<std::string>& removed) {
-          this->onTetheringClientsChanged(registered, removed);
-        });
-  }
+    void registerProxy()
+    {
+        m_proxy.uponSignal("PropertyChanged").onInterface(INTERFACE_NAME).call([this](const std::string& name, const sdbus::Variant& value){ this->onPropertyChanged(name, value); });
+        m_proxy.uponSignal("TechnologyAdded").onInterface(INTERFACE_NAME).call([this](const sdbus::ObjectPath& path, const std::map<std::string, sdbus::Variant>& properties){ this->onTechnologyAdded(path, properties); });
+        m_proxy.uponSignal("TechnologyRemoved").onInterface(INTERFACE_NAME).call([this](const sdbus::ObjectPath& path){ this->onTechnologyRemoved(path); });
+        m_proxy.uponSignal("ServicesChanged").onInterface(INTERFACE_NAME).call([this](const std::vector<sdbus::Struct<sdbus::ObjectPath, std::map<std::string, sdbus::Variant>>>& changed, const std::vector<sdbus::ObjectPath>& removed){ this->onServicesChanged(changed, removed); });
+        m_proxy.uponSignal("PeersChanged").onInterface(INTERFACE_NAME).call([this](const std::vector<sdbus::Struct<sdbus::ObjectPath, std::map<std::string, sdbus::Variant>>>& changed, const std::vector<sdbus::ObjectPath>& removed){ this->onPeersChanged(changed, removed); });
+        m_proxy.uponSignal("TetheringClientsChanged").onInterface(INTERFACE_NAME).call([this](const std::vector<std::string>& registered, const std::vector<std::string>& removed){ this->onTetheringClientsChanged(registered, removed); });
+    }
 
-  virtual void onPropertyChanged(const std::string& name,
-                                 const sdbus::Variant& value) = 0;
-  virtual void onTechnologyAdded(
-      const sdbus::ObjectPath& path,
-      const std::map<std::string, sdbus::Variant>& properties) = 0;
-  virtual void onTechnologyRemoved(const sdbus::ObjectPath& path) = 0;
-  virtual void onServicesChanged(
-      const std::vector<sdbus::Struct<sdbus::ObjectPath,
-                                      std::map<std::string, sdbus::Variant>>>&
-          changed,
-      const std::vector<sdbus::ObjectPath>& removed) = 0;
-  virtual void onPeersChanged(
-      const std::vector<sdbus::Struct<sdbus::ObjectPath,
-                                      std::map<std::string, sdbus::Variant>>>&
-          changed,
-      const std::vector<sdbus::ObjectPath>& removed) = 0;
-  virtual void onTetheringClientsChanged(
-      const std::vector<std::string>& registered,
-      const std::vector<std::string>& removed) = 0;
+    virtual void onPropertyChanged(const std::string& name, const sdbus::Variant& value) = 0;
+    virtual void onTechnologyAdded(const sdbus::ObjectPath& path, const std::map<std::string, sdbus::Variant>& properties) = 0;
+    virtual void onTechnologyRemoved(const sdbus::ObjectPath& path) = 0;
+    virtual void onServicesChanged(const std::vector<sdbus::Struct<sdbus::ObjectPath, std::map<std::string, sdbus::Variant>>>& changed, const std::vector<sdbus::ObjectPath>& removed) = 0;
+    virtual void onPeersChanged(const std::vector<sdbus::Struct<sdbus::ObjectPath, std::map<std::string, sdbus::Variant>>>& changed, const std::vector<sdbus::ObjectPath>& removed) = 0;
+    virtual void onTetheringClientsChanged(const std::vector<std::string>& registered, const std::vector<std::string>& removed) = 0;
 
- public:
-  std::map<std::string, sdbus::Variant> GetProperties() {
-    std::map<std::string, sdbus::Variant> result;
-    m_proxy.callMethod("GetProperties")
-        .onInterface(INTERFACE_NAME)
-        .storeResultsTo(result);
-    return result;
-  }
+public:
+    std::map<std::string, sdbus::Variant> GetProperties()
+    {
+        std::map<std::string, sdbus::Variant> result;
+        m_proxy.callMethod("GetProperties").onInterface(INTERFACE_NAME).storeResultsTo(result);
+        return result;
+    }
 
-  void SetProperty(const std::string& name, const sdbus::Variant& value) {
-    m_proxy.callMethod("SetProperty")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(name, value);
-  }
+    void SetProperty(const std::string& name, const sdbus::Variant& value)
+    {
+        m_proxy.callMethod("SetProperty").onInterface(INTERFACE_NAME).withArguments(name, value);
+    }
 
-  std::vector<
-      sdbus::Struct<sdbus::ObjectPath, std::map<std::string, sdbus::Variant>>>
-  GetTechnologies() {
-    std::vector<
-        sdbus::Struct<sdbus::ObjectPath, std::map<std::string, sdbus::Variant>>>
-        result;
-    m_proxy.callMethod("GetTechnologies")
-        .onInterface(INTERFACE_NAME)
-        .storeResultsTo(result);
-    return result;
-  }
+    std::vector<sdbus::Struct<sdbus::ObjectPath, std::map<std::string, sdbus::Variant>>> GetTechnologies()
+    {
+        std::vector<sdbus::Struct<sdbus::ObjectPath, std::map<std::string, sdbus::Variant>>> result;
+        m_proxy.callMethod("GetTechnologies").onInterface(INTERFACE_NAME).storeResultsTo(result);
+        return result;
+    }
 
-  void RemoveProvider(const sdbus::ObjectPath& provider) {
-    m_proxy.callMethod("RemoveProvider")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(provider);
-  }
+    void RemoveProvider(const sdbus::ObjectPath& provider)
+    {
+        m_proxy.callMethod("RemoveProvider").onInterface(INTERFACE_NAME).withArguments(provider);
+    }
 
-  std::vector<
-      sdbus::Struct<sdbus::ObjectPath, std::map<std::string, sdbus::Variant>>>
-  GetServices() {
-    std::vector<
-        sdbus::Struct<sdbus::ObjectPath, std::map<std::string, sdbus::Variant>>>
-        result;
-    m_proxy.callMethod("GetServices")
-        .onInterface(INTERFACE_NAME)
-        .storeResultsTo(result);
-    return result;
-  }
+    std::vector<sdbus::Struct<sdbus::ObjectPath, std::map<std::string, sdbus::Variant>>> GetServices()
+    {
+        std::vector<sdbus::Struct<sdbus::ObjectPath, std::map<std::string, sdbus::Variant>>> result;
+        m_proxy.callMethod("GetServices").onInterface(INTERFACE_NAME).storeResultsTo(result);
+        return result;
+    }
 
-  std::vector<
-      sdbus::Struct<sdbus::ObjectPath, std::map<std::string, sdbus::Variant>>>
-  GetPeers() {
-    std::vector<
-        sdbus::Struct<sdbus::ObjectPath, std::map<std::string, sdbus::Variant>>>
-        result;
-    m_proxy.callMethod("GetPeers")
-        .onInterface(INTERFACE_NAME)
-        .storeResultsTo(result);
-    return result;
-  }
+    std::vector<sdbus::Struct<sdbus::ObjectPath, std::map<std::string, sdbus::Variant>>> GetPeers()
+    {
+        std::vector<sdbus::Struct<sdbus::ObjectPath, std::map<std::string, sdbus::Variant>>> result;
+        m_proxy.callMethod("GetPeers").onInterface(INTERFACE_NAME).storeResultsTo(result);
+        return result;
+    }
 
-  std::vector<std::string> GetTetheringClients() {
-    std::vector<std::string> result;
-    m_proxy.callMethod("GetTetheringClients")
-        .onInterface(INTERFACE_NAME)
-        .storeResultsTo(result);
-    return result;
-  }
+    std::vector<std::string> GetTetheringClients()
+    {
+        std::vector<std::string> result;
+        m_proxy.callMethod("GetTetheringClients").onInterface(INTERFACE_NAME).storeResultsTo(result);
+        return result;
+    }
 
-  sdbus::ObjectPath ConnectProvider(
-      const std::map<std::string, sdbus::Variant>& provider) {
-    sdbus::ObjectPath result;
-    m_proxy.callMethod("ConnectProvider")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(provider)
-        .storeResultsTo(result);
-    return result;
-  }
+    sdbus::ObjectPath ConnectProvider(const std::map<std::string, sdbus::Variant>& provider)
+    {
+        sdbus::ObjectPath result;
+        m_proxy.callMethod("ConnectProvider").onInterface(INTERFACE_NAME).withArguments(provider).storeResultsTo(result);
+        return result;
+    }
 
-  void RegisterAgent(const sdbus::ObjectPath& path) {
-    m_proxy.callMethod("RegisterAgent")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(path);
-  }
+    void RegisterAgent(const sdbus::ObjectPath& path)
+    {
+        m_proxy.callMethod("RegisterAgent").onInterface(INTERFACE_NAME).withArguments(path);
+    }
 
-  void UnregisterAgent(const sdbus::ObjectPath& path) {
-    m_proxy.callMethod("UnregisterAgent")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(path);
-  }
+    void UnregisterAgent(const sdbus::ObjectPath& path)
+    {
+        m_proxy.callMethod("UnregisterAgent").onInterface(INTERFACE_NAME).withArguments(path);
+    }
 
-  void RegisterCounter(const sdbus::ObjectPath& path,
-                       const uint32_t& accuracy,
-                       const uint32_t& period) {
-    m_proxy.callMethod("RegisterCounter")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(path, accuracy, period);
-  }
+    void RegisterCounter(const sdbus::ObjectPath& path, const uint32_t& accuracy, const uint32_t& period)
+    {
+        m_proxy.callMethod("RegisterCounter").onInterface(INTERFACE_NAME).withArguments(path, accuracy, period);
+    }
 
-  void UnregisterCounter(const sdbus::ObjectPath& path) {
-    m_proxy.callMethod("UnregisterCounter")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(path);
-  }
+    void UnregisterCounter(const sdbus::ObjectPath& path)
+    {
+        m_proxy.callMethod("UnregisterCounter").onInterface(INTERFACE_NAME).withArguments(path);
+    }
 
-  sdbus::ObjectPath CreateSession(
-      const std::map<std::string, sdbus::Variant>& settings,
-      const sdbus::ObjectPath& notifier) {
-    sdbus::ObjectPath result;
-    m_proxy.callMethod("CreateSession")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(settings, notifier)
-        .storeResultsTo(result);
-    return result;
-  }
+    sdbus::ObjectPath CreateSession(const std::map<std::string, sdbus::Variant>& settings, const sdbus::ObjectPath& notifier)
+    {
+        sdbus::ObjectPath result;
+        m_proxy.callMethod("CreateSession").onInterface(INTERFACE_NAME).withArguments(settings, notifier).storeResultsTo(result);
+        return result;
+    }
 
-  void DestroySession(const sdbus::ObjectPath& session) {
-    m_proxy.callMethod("DestroySession")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(session);
-  }
+    void DestroySession(const sdbus::ObjectPath& session)
+    {
+        m_proxy.callMethod("DestroySession").onInterface(INTERFACE_NAME).withArguments(session);
+    }
 
-  std::tuple<sdbus::ObjectPath,
-             std::map<std::string, sdbus::Variant>,
-             sdbus::UnixFd>
-  RequestPrivateNetwork() {
-    std::tuple<sdbus::ObjectPath, std::map<std::string, sdbus::Variant>,
-               sdbus::UnixFd>
-        result;
-    m_proxy.callMethod("RequestPrivateNetwork")
-        .onInterface(INTERFACE_NAME)
-        .storeResultsTo(result);
-    return result;
-  }
+    std::tuple<sdbus::ObjectPath, std::map<std::string, sdbus::Variant>, sdbus::UnixFd> RequestPrivateNetwork()
+    {
+        std::tuple<sdbus::ObjectPath, std::map<std::string, sdbus::Variant>, sdbus::UnixFd> result;
+        m_proxy.callMethod("RequestPrivateNetwork").onInterface(INTERFACE_NAME).storeResultsTo(result);
+        return result;
+    }
 
-  void ReleasePrivateNetwork(const sdbus::ObjectPath& path) {
-    m_proxy.callMethod("ReleasePrivateNetwork")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(path);
-  }
+    void ReleasePrivateNetwork(const sdbus::ObjectPath& path)
+    {
+        m_proxy.callMethod("ReleasePrivateNetwork").onInterface(INTERFACE_NAME).withArguments(path);
+    }
 
-  void RegisterPeerService(
-      const std::map<std::string, sdbus::Variant>& specification,
-      const bool& master) {
-    m_proxy.callMethod("RegisterPeerService")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(specification, master);
-  }
+    void RegisterPeerService(const std::map<std::string, sdbus::Variant>& specification, const bool& master)
+    {
+        m_proxy.callMethod("RegisterPeerService").onInterface(INTERFACE_NAME).withArguments(specification, master);
+    }
 
-  void UnregisterPeerService(
-      const std::map<std::string, sdbus::Variant>& specification) {
-    m_proxy.callMethod("UnregisterPeerService")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(specification);
-  }
+    void UnregisterPeerService(const std::map<std::string, sdbus::Variant>& specification)
+    {
+        m_proxy.callMethod("UnregisterPeerService").onInterface(INTERFACE_NAME).withArguments(specification);
+    }
 
- private:
-  sdbus::IProxy& m_proxy;
+private:
+    sdbus::IProxy& m_proxy;
 };
 
-}  // namespace connman
-}  // namespace net
+}} // namespaces
 
 #endif

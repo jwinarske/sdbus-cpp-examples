@@ -15,30 +15,32 @@ namespace freedesktop {
 namespace NetworkManager {
 namespace Device {
 
-class Loopback_proxy {
- public:
-  static constexpr const char* INTERFACE_NAME =
-      "org.freedesktop.NetworkManager.Device.Loopback";
+class Loopback_proxy
+{
+public:
+    static constexpr const char* INTERFACE_NAME = "org.freedesktop.NetworkManager.Device.Loopback";
 
- protected:
-  Loopback_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
+protected:
+    Loopback_proxy(sdbus::IProxy& proxy)
+        : m_proxy(proxy)
+    {
+    }
 
-  Loopback_proxy(const Loopback_proxy&) = delete;
-  Loopback_proxy& operator=(const Loopback_proxy&) = delete;
-  Loopback_proxy(Loopback_proxy&&) = delete;
-  Loopback_proxy& operator=(Loopback_proxy&&) = delete;
+    Loopback_proxy(const Loopback_proxy&) = delete;
+    Loopback_proxy& operator=(const Loopback_proxy&) = delete;
+    Loopback_proxy(Loopback_proxy&&) = delete;
+    Loopback_proxy& operator=(Loopback_proxy&&) = delete;
 
-  ~Loopback_proxy() = default;
+    ~Loopback_proxy() = default;
 
-  void registerProxy() {}
+    void registerProxy()
+    {
+    }
 
- private:
-  sdbus::IProxy& m_proxy;
+private:
+    sdbus::IProxy& m_proxy;
 };
 
-}  // namespace Device
-}  // namespace NetworkManager
-}  // namespace freedesktop
-}  // namespace org
+}}}} // namespaces
 
 #endif

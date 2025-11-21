@@ -13,42 +13,43 @@
 namespace org {
 namespace bluez {
 
-class GattManager1_proxy {
- public:
-  static constexpr const char* INTERFACE_NAME = "org.bluez.GattManager1";
+class GattManager1_proxy
+{
+public:
+    static constexpr const char* INTERFACE_NAME = "org.bluez.GattManager1";
 
- protected:
-  GattManager1_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
+protected:
+    GattManager1_proxy(sdbus::IProxy& proxy)
+        : m_proxy(proxy)
+    {
+    }
 
-  GattManager1_proxy(const GattManager1_proxy&) = delete;
-  GattManager1_proxy& operator=(const GattManager1_proxy&) = delete;
-  GattManager1_proxy(GattManager1_proxy&&) = delete;
-  GattManager1_proxy& operator=(GattManager1_proxy&&) = delete;
+    GattManager1_proxy(const GattManager1_proxy&) = delete;
+    GattManager1_proxy& operator=(const GattManager1_proxy&) = delete;
+    GattManager1_proxy(GattManager1_proxy&&) = delete;
+    GattManager1_proxy& operator=(GattManager1_proxy&&) = delete;
 
-  ~GattManager1_proxy() = default;
+    ~GattManager1_proxy() = default;
 
-  void registerProxy() {}
+    void registerProxy()
+    {
+    }
 
- public:
-  void RegisterApplication(
-      const sdbus::ObjectPath& application,
-      const std::map<std::string, sdbus::Variant>& options) {
-    m_proxy.callMethod("RegisterApplication")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(application, options);
-  }
+public:
+    void RegisterApplication(const sdbus::ObjectPath& application, const std::map<std::string, sdbus::Variant>& options)
+    {
+        m_proxy.callMethod("RegisterApplication").onInterface(INTERFACE_NAME).withArguments(application, options);
+    }
 
-  void UnregisterApplication(const sdbus::ObjectPath& application) {
-    m_proxy.callMethod("UnregisterApplication")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(application);
-  }
+    void UnregisterApplication(const sdbus::ObjectPath& application)
+    {
+        m_proxy.callMethod("UnregisterApplication").onInterface(INTERFACE_NAME).withArguments(application);
+    }
 
- private:
-  sdbus::IProxy& m_proxy;
+private:
+    sdbus::IProxy& m_proxy;
 };
 
-}  // namespace bluez
-}  // namespace org
+}} // namespaces
 
 #endif

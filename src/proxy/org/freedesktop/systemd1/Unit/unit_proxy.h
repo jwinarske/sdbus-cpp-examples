@@ -14,760 +14,635 @@ namespace org {
 namespace freedesktop {
 namespace systemd1 {
 
-class Unit_proxy {
- public:
-  static constexpr const char* INTERFACE_NAME = "org.freedesktop.systemd1.Unit";
-
- protected:
-  Unit_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
-
-  Unit_proxy(const Unit_proxy&) = delete;
-  Unit_proxy& operator=(const Unit_proxy&) = delete;
-  Unit_proxy(Unit_proxy&&) = delete;
-  Unit_proxy& operator=(Unit_proxy&&) = delete;
-
-  ~Unit_proxy() = default;
-
-  void registerProxy() {}
-
- public:
-  sdbus::ObjectPath Start(const std::string& mode) {
-    sdbus::ObjectPath result;
-    m_proxy.callMethod("Start")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(mode)
-        .storeResultsTo(result);
-    return result;
-  }
-
-  sdbus::ObjectPath Stop(const std::string& mode) {
-    sdbus::ObjectPath result;
-    m_proxy.callMethod("Stop")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(mode)
-        .storeResultsTo(result);
-    return result;
-  }
-
-  sdbus::ObjectPath Reload(const std::string& mode) {
-    sdbus::ObjectPath result;
-    m_proxy.callMethod("Reload")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(mode)
-        .storeResultsTo(result);
-    return result;
-  }
-
-  sdbus::ObjectPath Restart(const std::string& mode) {
-    sdbus::ObjectPath result;
-    m_proxy.callMethod("Restart")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(mode)
-        .storeResultsTo(result);
-    return result;
-  }
-
-  sdbus::ObjectPath TryRestart(const std::string& mode) {
-    sdbus::ObjectPath result;
-    m_proxy.callMethod("TryRestart")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(mode)
-        .storeResultsTo(result);
-    return result;
-  }
-
-  sdbus::ObjectPath ReloadOrRestart(const std::string& mode) {
-    sdbus::ObjectPath result;
-    m_proxy.callMethod("ReloadOrRestart")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(mode)
-        .storeResultsTo(result);
-    return result;
-  }
-
-  sdbus::ObjectPath ReloadOrTryRestart(const std::string& mode) {
-    sdbus::ObjectPath result;
-    m_proxy.callMethod("ReloadOrTryRestart")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(mode)
-        .storeResultsTo(result);
-    return result;
-  }
-
-  std::tuple<uint32_t,
-             sdbus::ObjectPath,
-             std::string,
-             sdbus::ObjectPath,
-             std::string,
-             std::vector<sdbus::Struct<uint32_t,
-                                       sdbus::ObjectPath,
-                                       std::string,
-                                       sdbus::ObjectPath,
-                                       std::string>>>
-  EnqueueJob(const std::string& job_type, const std::string& job_mode) {
-    std::tuple<
-        uint32_t, sdbus::ObjectPath, std::string, sdbus::ObjectPath,
-        std::string,
-        std::vector<sdbus::Struct<uint32_t, sdbus::ObjectPath, std::string,
-                                  sdbus::ObjectPath, std::string>>>
-        result;
-    m_proxy.callMethod("EnqueueJob")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(job_type, job_mode)
-        .storeResultsTo(result);
-    return result;
-  }
-
-  void Kill(const std::string& whom, const int32_t& signal) {
-    m_proxy.callMethod("Kill")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(whom, signal);
-  }
-
-  void QueueSignal(const std::string& whom,
-                   const int32_t& signal,
-                   const int32_t& value) {
-    m_proxy.callMethod("QueueSignal")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(whom, signal, value);
-  }
-
-  void ResetFailed() {
-    m_proxy.callMethod("ResetFailed").onInterface(INTERFACE_NAME);
-  }
-
-  void SetProperties(
-      const bool& runtime,
-      const std::vector<sdbus::Struct<std::string, sdbus::Variant>>&
-          properties) {
-    m_proxy.callMethod("SetProperties")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(runtime, properties);
-  }
-
-  void Ref() { m_proxy.callMethod("Ref").onInterface(INTERFACE_NAME); }
-
-  void Unref() { m_proxy.callMethod("Unref").onInterface(INTERFACE_NAME); }
-
-  void Clean(const std::vector<std::string>& mask) {
-    m_proxy.callMethod("Clean").onInterface(INTERFACE_NAME).withArguments(mask);
-  }
-
-  void Freeze() { m_proxy.callMethod("Freeze").onInterface(INTERFACE_NAME); }
-
-  void Thaw() { m_proxy.callMethod("Thaw").onInterface(INTERFACE_NAME); }
-
- public:
-  std::string Id() {
-    return m_proxy.getProperty("Id")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
-
-  std::vector<std::string> Names() {
-    return m_proxy.getProperty("Names")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
-
-  std::string Following() {
-    return m_proxy.getProperty("Following")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
-
-  std::vector<std::string> Requires() {
-    return m_proxy.getProperty("Requires")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
-
-  std::vector<std::string> Requisite() {
-    return m_proxy.getProperty("Requisite")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
-
-  std::vector<std::string> Wants() {
-    return m_proxy.getProperty("Wants")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
-
-  std::vector<std::string> BindsTo() {
-    return m_proxy.getProperty("BindsTo")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
-
-  std::vector<std::string> PartOf() {
-    return m_proxy.getProperty("PartOf")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
-
-  std::vector<std::string> Upholds() {
-    return m_proxy.getProperty("Upholds")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
-
-  std::vector<std::string> RequiredBy() {
-    return m_proxy.getProperty("RequiredBy")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
-
-  std::vector<std::string> RequisiteOf() {
-    return m_proxy.getProperty("RequisiteOf")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
-
-  std::vector<std::string> WantedBy() {
-    return m_proxy.getProperty("WantedBy")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
-
-  std::vector<std::string> BoundBy() {
-    return m_proxy.getProperty("BoundBy")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
-
-  std::vector<std::string> UpheldBy() {
-    return m_proxy.getProperty("UpheldBy")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
-
-  std::vector<std::string> ConsistsOf() {
-    return m_proxy.getProperty("ConsistsOf")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
-
-  std::vector<std::string> Conflicts() {
-    return m_proxy.getProperty("Conflicts")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
-
-  std::vector<std::string> ConflictedBy() {
-    return m_proxy.getProperty("ConflictedBy")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
-
-  std::vector<std::string> Before() {
-    return m_proxy.getProperty("Before")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
-
-  std::vector<std::string> After() {
-    return m_proxy.getProperty("After")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
-
-  std::vector<std::string> OnSuccess() {
-    return m_proxy.getProperty("OnSuccess")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
-
-  std::vector<std::string> OnSuccessOf() {
-    return m_proxy.getProperty("OnSuccessOf")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
-
-  std::vector<std::string> OnFailure() {
-    return m_proxy.getProperty("OnFailure")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
-
-  std::vector<std::string> OnFailureOf() {
-    return m_proxy.getProperty("OnFailureOf")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
-
-  std::vector<std::string> Triggers() {
-    return m_proxy.getProperty("Triggers")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
-
-  std::vector<std::string> TriggeredBy() {
-    return m_proxy.getProperty("TriggeredBy")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
-
-  std::vector<std::string> PropagatesReloadTo() {
-    return m_proxy.getProperty("PropagatesReloadTo")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
-
-  std::vector<std::string> ReloadPropagatedFrom() {
-    return m_proxy.getProperty("ReloadPropagatedFrom")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
-
-  std::vector<std::string> PropagatesStopTo() {
-    return m_proxy.getProperty("PropagatesStopTo")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
-
-  std::vector<std::string> StopPropagatedFrom() {
-    return m_proxy.getProperty("StopPropagatedFrom")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
-
-  std::vector<std::string> JoinsNamespaceOf() {
-    return m_proxy.getProperty("JoinsNamespaceOf")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
-
-  std::vector<std::string> SliceOf() {
-    return m_proxy.getProperty("SliceOf")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
-
-  std::vector<std::string> RequiresMountsFor() {
-    return m_proxy.getProperty("RequiresMountsFor")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
-
-  std::vector<std::string> WantsMountsFor() {
-    return m_proxy.getProperty("WantsMountsFor")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
-
-  std::vector<std::string> Documentation() {
-    return m_proxy.getProperty("Documentation")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
-
-  std::string Description() {
-    return m_proxy.getProperty("Description")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
-
-  std::string AccessSELinuxContext() {
-    return m_proxy.getProperty("AccessSELinuxContext")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
-
-  std::string LoadState() {
-    return m_proxy.getProperty("LoadState")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
-
-  std::string ActiveState() {
-    return m_proxy.getProperty("ActiveState")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
-
-  std::string FreezerState() {
-    return m_proxy.getProperty("FreezerState")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
-
-  std::string SubState() {
-    return m_proxy.getProperty("SubState")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
-
-  std::string FragmentPath() {
-    return m_proxy.getProperty("FragmentPath")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
-
-  std::string SourcePath() {
-    return m_proxy.getProperty("SourcePath")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
-
-  std::vector<std::string> DropInPaths() {
-    return m_proxy.getProperty("DropInPaths")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
-
-  std::string UnitFileState() {
-    return m_proxy.getProperty("UnitFileState")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
-
-  std::string UnitFilePreset() {
-    return m_proxy.getProperty("UnitFilePreset")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
-
-  uint64_t StateChangeTimestamp() {
-    return m_proxy.getProperty("StateChangeTimestamp")
-        .onInterface(INTERFACE_NAME)
-        .get<uint64_t>();
-  }
-
-  uint64_t StateChangeTimestampMonotonic() {
-    return m_proxy.getProperty("StateChangeTimestampMonotonic")
-        .onInterface(INTERFACE_NAME)
-        .get<uint64_t>();
-  }
-
-  uint64_t InactiveExitTimestamp() {
-    return m_proxy.getProperty("InactiveExitTimestamp")
-        .onInterface(INTERFACE_NAME)
-        .get<uint64_t>();
-  }
-
-  uint64_t InactiveExitTimestampMonotonic() {
-    return m_proxy.getProperty("InactiveExitTimestampMonotonic")
-        .onInterface(INTERFACE_NAME)
-        .get<uint64_t>();
-  }
-
-  uint64_t ActiveEnterTimestamp() {
-    return m_proxy.getProperty("ActiveEnterTimestamp")
-        .onInterface(INTERFACE_NAME)
-        .get<uint64_t>();
-  }
-
-  uint64_t ActiveEnterTimestampMonotonic() {
-    return m_proxy.getProperty("ActiveEnterTimestampMonotonic")
-        .onInterface(INTERFACE_NAME)
-        .get<uint64_t>();
-  }
-
-  uint64_t ActiveExitTimestamp() {
-    return m_proxy.getProperty("ActiveExitTimestamp")
-        .onInterface(INTERFACE_NAME)
-        .get<uint64_t>();
-  }
-
-  uint64_t ActiveExitTimestampMonotonic() {
-    return m_proxy.getProperty("ActiveExitTimestampMonotonic")
-        .onInterface(INTERFACE_NAME)
-        .get<uint64_t>();
-  }
-
-  uint64_t InactiveEnterTimestamp() {
-    return m_proxy.getProperty("InactiveEnterTimestamp")
-        .onInterface(INTERFACE_NAME)
-        .get<uint64_t>();
-  }
-
-  uint64_t InactiveEnterTimestampMonotonic() {
-    return m_proxy.getProperty("InactiveEnterTimestampMonotonic")
-        .onInterface(INTERFACE_NAME)
-        .get<uint64_t>();
-  }
-
-  bool CanStart() {
-    return m_proxy.getProperty("CanStart")
-        .onInterface(INTERFACE_NAME)
-        .get<bool>();
-  }
-
-  bool CanStop() {
-    return m_proxy.getProperty("CanStop")
-        .onInterface(INTERFACE_NAME)
-        .get<bool>();
-  }
-
-  bool CanReload() {
-    return m_proxy.getProperty("CanReload")
-        .onInterface(INTERFACE_NAME)
-        .get<bool>();
-  }
-
-  bool CanIsolate() {
-    return m_proxy.getProperty("CanIsolate")
-        .onInterface(INTERFACE_NAME)
-        .get<bool>();
-  }
-
-  std::vector<std::string> CanClean() {
-    return m_proxy.getProperty("CanClean")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
-
-  bool CanFreeze() {
-    return m_proxy.getProperty("CanFreeze")
-        .onInterface(INTERFACE_NAME)
-        .get<bool>();
-  }
-
-  sdbus::Struct<uint32_t, sdbus::ObjectPath> Job() {
-    return m_proxy.getProperty("Job")
-        .onInterface(INTERFACE_NAME)
-        .get<sdbus::Struct<uint32_t, sdbus::ObjectPath>>();
-  }
-
-  bool StopWhenUnneeded() {
-    return m_proxy.getProperty("StopWhenUnneeded")
-        .onInterface(INTERFACE_NAME)
-        .get<bool>();
-  }
-
-  bool RefuseManualStart() {
-    return m_proxy.getProperty("RefuseManualStart")
-        .onInterface(INTERFACE_NAME)
-        .get<bool>();
-  }
-
-  bool RefuseManualStop() {
-    return m_proxy.getProperty("RefuseManualStop")
-        .onInterface(INTERFACE_NAME)
-        .get<bool>();
-  }
-
-  bool AllowIsolate() {
-    return m_proxy.getProperty("AllowIsolate")
-        .onInterface(INTERFACE_NAME)
-        .get<bool>();
-  }
-
-  bool DefaultDependencies() {
-    return m_proxy.getProperty("DefaultDependencies")
-        .onInterface(INTERFACE_NAME)
-        .get<bool>();
-  }
-
-  bool SurviveFinalKillSignal() {
-    return m_proxy.getProperty("SurviveFinalKillSignal")
-        .onInterface(INTERFACE_NAME)
-        .get<bool>();
-  }
-
-  std::string OnSuccessJobMode() {
-    return m_proxy.getProperty("OnSuccessJobMode")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
-
-  std::string OnFailureJobMode() {
-    return m_proxy.getProperty("OnFailureJobMode")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
-
-  bool IgnoreOnIsolate() {
-    return m_proxy.getProperty("IgnoreOnIsolate")
-        .onInterface(INTERFACE_NAME)
-        .get<bool>();
-  }
-
-  bool NeedDaemonReload() {
-    return m_proxy.getProperty("NeedDaemonReload")
-        .onInterface(INTERFACE_NAME)
-        .get<bool>();
-  }
-
-  std::vector<std::string> Markers() {
-    return m_proxy.getProperty("Markers")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
-
-  uint64_t JobTimeoutUSec() {
-    return m_proxy.getProperty("JobTimeoutUSec")
-        .onInterface(INTERFACE_NAME)
-        .get<uint64_t>();
-  }
-
-  uint64_t JobRunningTimeoutUSec() {
-    return m_proxy.getProperty("JobRunningTimeoutUSec")
-        .onInterface(INTERFACE_NAME)
-        .get<uint64_t>();
-  }
-
-  std::string JobTimeoutAction() {
-    return m_proxy.getProperty("JobTimeoutAction")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
-
-  std::string JobTimeoutRebootArgument() {
-    return m_proxy.getProperty("JobTimeoutRebootArgument")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
-
-  bool ConditionResult() {
-    return m_proxy.getProperty("ConditionResult")
-        .onInterface(INTERFACE_NAME)
-        .get<bool>();
-  }
-
-  bool AssertResult() {
-    return m_proxy.getProperty("AssertResult")
-        .onInterface(INTERFACE_NAME)
-        .get<bool>();
-  }
-
-  uint64_t ConditionTimestamp() {
-    return m_proxy.getProperty("ConditionTimestamp")
-        .onInterface(INTERFACE_NAME)
-        .get<uint64_t>();
-  }
-
-  uint64_t ConditionTimestampMonotonic() {
-    return m_proxy.getProperty("ConditionTimestampMonotonic")
-        .onInterface(INTERFACE_NAME)
-        .get<uint64_t>();
-  }
-
-  uint64_t AssertTimestamp() {
-    return m_proxy.getProperty("AssertTimestamp")
-        .onInterface(INTERFACE_NAME)
-        .get<uint64_t>();
-  }
-
-  uint64_t AssertTimestampMonotonic() {
-    return m_proxy.getProperty("AssertTimestampMonotonic")
-        .onInterface(INTERFACE_NAME)
-        .get<uint64_t>();
-  }
-
-  std::vector<sdbus::Struct<std::string, bool, bool, std::string, int32_t>>
-  Conditions() {
-    return m_proxy.getProperty("Conditions")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<
-            sdbus::Struct<std::string, bool, bool, std::string, int32_t>>>();
-  }
-
-  std::vector<sdbus::Struct<std::string, bool, bool, std::string, int32_t>>
-  Asserts() {
-    return m_proxy.getProperty("Asserts")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<
-            sdbus::Struct<std::string, bool, bool, std::string, int32_t>>>();
-  }
-
-  sdbus::Struct<std::string, std::string> LoadError() {
-    return m_proxy.getProperty("LoadError")
-        .onInterface(INTERFACE_NAME)
-        .get<sdbus::Struct<std::string, std::string>>();
-  }
-
-  bool Transient() {
-    return m_proxy.getProperty("Transient")
-        .onInterface(INTERFACE_NAME)
-        .get<bool>();
-  }
-
-  bool Perpetual() {
-    return m_proxy.getProperty("Perpetual")
-        .onInterface(INTERFACE_NAME)
-        .get<bool>();
-  }
-
-  uint64_t StartLimitIntervalUSec() {
-    return m_proxy.getProperty("StartLimitIntervalUSec")
-        .onInterface(INTERFACE_NAME)
-        .get<uint64_t>();
-  }
-
-  uint32_t StartLimitBurst() {
-    return m_proxy.getProperty("StartLimitBurst")
-        .onInterface(INTERFACE_NAME)
-        .get<uint32_t>();
-  }
-
-  std::string StartLimitAction() {
-    return m_proxy.getProperty("StartLimitAction")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
-
-  std::string FailureAction() {
-    return m_proxy.getProperty("FailureAction")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
-
-  int32_t FailureActionExitStatus() {
-    return m_proxy.getProperty("FailureActionExitStatus")
-        .onInterface(INTERFACE_NAME)
-        .get<int32_t>();
-  }
-
-  std::string SuccessAction() {
-    return m_proxy.getProperty("SuccessAction")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
-
-  int32_t SuccessActionExitStatus() {
-    return m_proxy.getProperty("SuccessActionExitStatus")
-        .onInterface(INTERFACE_NAME)
-        .get<int32_t>();
-  }
-
-  std::string RebootArgument() {
-    return m_proxy.getProperty("RebootArgument")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
-
-  std::vector<uint8_t> InvocationID() {
-    return m_proxy.getProperty("InvocationID")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<uint8_t>>();
-  }
-
-  std::string CollectMode() {
-    return m_proxy.getProperty("CollectMode")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
-
-  std::vector<std::string> Refs() {
-    return m_proxy.getProperty("Refs")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<std::string>>();
-  }
-
-  std::vector<sdbus::Struct<std::string, std::string>> ActivationDetails() {
-    return m_proxy.getProperty("ActivationDetails")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<sdbus::Struct<std::string, std::string>>>();
-  }
-
- private:
-  sdbus::IProxy& m_proxy;
+class Unit_proxy
+{
+public:
+    static constexpr const char* INTERFACE_NAME = "org.freedesktop.systemd1.Unit";
+
+protected:
+    Unit_proxy(sdbus::IProxy& proxy)
+        : m_proxy(proxy)
+    {
+    }
+
+    Unit_proxy(const Unit_proxy&) = delete;
+    Unit_proxy& operator=(const Unit_proxy&) = delete;
+    Unit_proxy(Unit_proxy&&) = delete;
+    Unit_proxy& operator=(Unit_proxy&&) = delete;
+
+    ~Unit_proxy() = default;
+
+    void registerProxy()
+    {
+    }
+
+public:
+    sdbus::ObjectPath Start(const std::string& mode)
+    {
+        sdbus::ObjectPath result;
+        m_proxy.callMethod("Start").onInterface(INTERFACE_NAME).withArguments(mode).storeResultsTo(result);
+        return result;
+    }
+
+    sdbus::ObjectPath Stop(const std::string& mode)
+    {
+        sdbus::ObjectPath result;
+        m_proxy.callMethod("Stop").onInterface(INTERFACE_NAME).withArguments(mode).storeResultsTo(result);
+        return result;
+    }
+
+    sdbus::ObjectPath Reload(const std::string& mode)
+    {
+        sdbus::ObjectPath result;
+        m_proxy.callMethod("Reload").onInterface(INTERFACE_NAME).withArguments(mode).storeResultsTo(result);
+        return result;
+    }
+
+    sdbus::ObjectPath Restart(const std::string& mode)
+    {
+        sdbus::ObjectPath result;
+        m_proxy.callMethod("Restart").onInterface(INTERFACE_NAME).withArguments(mode).storeResultsTo(result);
+        return result;
+    }
+
+    sdbus::ObjectPath TryRestart(const std::string& mode)
+    {
+        sdbus::ObjectPath result;
+        m_proxy.callMethod("TryRestart").onInterface(INTERFACE_NAME).withArguments(mode).storeResultsTo(result);
+        return result;
+    }
+
+    sdbus::ObjectPath ReloadOrRestart(const std::string& mode)
+    {
+        sdbus::ObjectPath result;
+        m_proxy.callMethod("ReloadOrRestart").onInterface(INTERFACE_NAME).withArguments(mode).storeResultsTo(result);
+        return result;
+    }
+
+    sdbus::ObjectPath ReloadOrTryRestart(const std::string& mode)
+    {
+        sdbus::ObjectPath result;
+        m_proxy.callMethod("ReloadOrTryRestart").onInterface(INTERFACE_NAME).withArguments(mode).storeResultsTo(result);
+        return result;
+    }
+
+    std::tuple<uint32_t, sdbus::ObjectPath, std::string, sdbus::ObjectPath, std::string, std::vector<sdbus::Struct<uint32_t, sdbus::ObjectPath, std::string, sdbus::ObjectPath, std::string>>> EnqueueJob(const std::string& job_type, const std::string& job_mode)
+    {
+        std::tuple<uint32_t, sdbus::ObjectPath, std::string, sdbus::ObjectPath, std::string, std::vector<sdbus::Struct<uint32_t, sdbus::ObjectPath, std::string, sdbus::ObjectPath, std::string>>> result;
+        m_proxy.callMethod("EnqueueJob").onInterface(INTERFACE_NAME).withArguments(job_type, job_mode).storeResultsTo(result);
+        return result;
+    }
+
+    void Kill(const std::string& whom, const int32_t& signal)
+    {
+        m_proxy.callMethod("Kill").onInterface(INTERFACE_NAME).withArguments(whom, signal);
+    }
+
+    void QueueSignal(const std::string& whom, const int32_t& signal, const int32_t& value)
+    {
+        m_proxy.callMethod("QueueSignal").onInterface(INTERFACE_NAME).withArguments(whom, signal, value);
+    }
+
+    void ResetFailed()
+    {
+        m_proxy.callMethod("ResetFailed").onInterface(INTERFACE_NAME);
+    }
+
+    void SetProperties(const bool& runtime, const std::vector<sdbus::Struct<std::string, sdbus::Variant>>& properties)
+    {
+        m_proxy.callMethod("SetProperties").onInterface(INTERFACE_NAME).withArguments(runtime, properties);
+    }
+
+    void Ref()
+    {
+        m_proxy.callMethod("Ref").onInterface(INTERFACE_NAME);
+    }
+
+    void Unref()
+    {
+        m_proxy.callMethod("Unref").onInterface(INTERFACE_NAME);
+    }
+
+    void Clean(const std::vector<std::string>& mask)
+    {
+        m_proxy.callMethod("Clean").onInterface(INTERFACE_NAME).withArguments(mask);
+    }
+
+    void Freeze()
+    {
+        m_proxy.callMethod("Freeze").onInterface(INTERFACE_NAME);
+    }
+
+    void Thaw()
+    {
+        m_proxy.callMethod("Thaw").onInterface(INTERFACE_NAME);
+    }
+
+public:
+    std::string Id()
+    {
+        return m_proxy.getProperty("Id").onInterface(INTERFACE_NAME).get<std::string>();
+    }
+
+    std::vector<std::string> Names()
+    {
+        return m_proxy.getProperty("Names").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
+
+    std::string Following()
+    {
+        return m_proxy.getProperty("Following").onInterface(INTERFACE_NAME).get<std::string>();
+    }
+
+    std::vector<std::string> Requires()
+    {
+        return m_proxy.getProperty("Requires").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
+
+    std::vector<std::string> Requisite()
+    {
+        return m_proxy.getProperty("Requisite").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
+
+    std::vector<std::string> Wants()
+    {
+        return m_proxy.getProperty("Wants").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
+
+    std::vector<std::string> BindsTo()
+    {
+        return m_proxy.getProperty("BindsTo").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
+
+    std::vector<std::string> PartOf()
+    {
+        return m_proxy.getProperty("PartOf").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
+
+    std::vector<std::string> Upholds()
+    {
+        return m_proxy.getProperty("Upholds").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
+
+    std::vector<std::string> RequiredBy()
+    {
+        return m_proxy.getProperty("RequiredBy").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
+
+    std::vector<std::string> RequisiteOf()
+    {
+        return m_proxy.getProperty("RequisiteOf").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
+
+    std::vector<std::string> WantedBy()
+    {
+        return m_proxy.getProperty("WantedBy").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
+
+    std::vector<std::string> BoundBy()
+    {
+        return m_proxy.getProperty("BoundBy").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
+
+    std::vector<std::string> UpheldBy()
+    {
+        return m_proxy.getProperty("UpheldBy").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
+
+    std::vector<std::string> ConsistsOf()
+    {
+        return m_proxy.getProperty("ConsistsOf").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
+
+    std::vector<std::string> Conflicts()
+    {
+        return m_proxy.getProperty("Conflicts").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
+
+    std::vector<std::string> ConflictedBy()
+    {
+        return m_proxy.getProperty("ConflictedBy").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
+
+    std::vector<std::string> Before()
+    {
+        return m_proxy.getProperty("Before").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
+
+    std::vector<std::string> After()
+    {
+        return m_proxy.getProperty("After").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
+
+    std::vector<std::string> OnSuccess()
+    {
+        return m_proxy.getProperty("OnSuccess").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
+
+    std::vector<std::string> OnSuccessOf()
+    {
+        return m_proxy.getProperty("OnSuccessOf").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
+
+    std::vector<std::string> OnFailure()
+    {
+        return m_proxy.getProperty("OnFailure").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
+
+    std::vector<std::string> OnFailureOf()
+    {
+        return m_proxy.getProperty("OnFailureOf").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
+
+    std::vector<std::string> Triggers()
+    {
+        return m_proxy.getProperty("Triggers").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
+
+    std::vector<std::string> TriggeredBy()
+    {
+        return m_proxy.getProperty("TriggeredBy").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
+
+    std::vector<std::string> PropagatesReloadTo()
+    {
+        return m_proxy.getProperty("PropagatesReloadTo").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
+
+    std::vector<std::string> ReloadPropagatedFrom()
+    {
+        return m_proxy.getProperty("ReloadPropagatedFrom").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
+
+    std::vector<std::string> PropagatesStopTo()
+    {
+        return m_proxy.getProperty("PropagatesStopTo").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
+
+    std::vector<std::string> StopPropagatedFrom()
+    {
+        return m_proxy.getProperty("StopPropagatedFrom").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
+
+    std::vector<std::string> JoinsNamespaceOf()
+    {
+        return m_proxy.getProperty("JoinsNamespaceOf").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
+
+    std::vector<std::string> SliceOf()
+    {
+        return m_proxy.getProperty("SliceOf").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
+
+    std::vector<std::string> RequiresMountsFor()
+    {
+        return m_proxy.getProperty("RequiresMountsFor").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
+
+    std::vector<std::string> WantsMountsFor()
+    {
+        return m_proxy.getProperty("WantsMountsFor").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
+
+    std::vector<std::string> Documentation()
+    {
+        return m_proxy.getProperty("Documentation").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
+
+    std::string Description()
+    {
+        return m_proxy.getProperty("Description").onInterface(INTERFACE_NAME).get<std::string>();
+    }
+
+    std::string AccessSELinuxContext()
+    {
+        return m_proxy.getProperty("AccessSELinuxContext").onInterface(INTERFACE_NAME).get<std::string>();
+    }
+
+    std::string LoadState()
+    {
+        return m_proxy.getProperty("LoadState").onInterface(INTERFACE_NAME).get<std::string>();
+    }
+
+    std::string ActiveState()
+    {
+        return m_proxy.getProperty("ActiveState").onInterface(INTERFACE_NAME).get<std::string>();
+    }
+
+    std::string FreezerState()
+    {
+        return m_proxy.getProperty("FreezerState").onInterface(INTERFACE_NAME).get<std::string>();
+    }
+
+    std::string SubState()
+    {
+        return m_proxy.getProperty("SubState").onInterface(INTERFACE_NAME).get<std::string>();
+    }
+
+    std::string FragmentPath()
+    {
+        return m_proxy.getProperty("FragmentPath").onInterface(INTERFACE_NAME).get<std::string>();
+    }
+
+    std::string SourcePath()
+    {
+        return m_proxy.getProperty("SourcePath").onInterface(INTERFACE_NAME).get<std::string>();
+    }
+
+    std::vector<std::string> DropInPaths()
+    {
+        return m_proxy.getProperty("DropInPaths").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
+
+    std::string UnitFileState()
+    {
+        return m_proxy.getProperty("UnitFileState").onInterface(INTERFACE_NAME).get<std::string>();
+    }
+
+    std::string UnitFilePreset()
+    {
+        return m_proxy.getProperty("UnitFilePreset").onInterface(INTERFACE_NAME).get<std::string>();
+    }
+
+    uint64_t StateChangeTimestamp()
+    {
+        return m_proxy.getProperty("StateChangeTimestamp").onInterface(INTERFACE_NAME).get<uint64_t>();
+    }
+
+    uint64_t StateChangeTimestampMonotonic()
+    {
+        return m_proxy.getProperty("StateChangeTimestampMonotonic").onInterface(INTERFACE_NAME).get<uint64_t>();
+    }
+
+    uint64_t InactiveExitTimestamp()
+    {
+        return m_proxy.getProperty("InactiveExitTimestamp").onInterface(INTERFACE_NAME).get<uint64_t>();
+    }
+
+    uint64_t InactiveExitTimestampMonotonic()
+    {
+        return m_proxy.getProperty("InactiveExitTimestampMonotonic").onInterface(INTERFACE_NAME).get<uint64_t>();
+    }
+
+    uint64_t ActiveEnterTimestamp()
+    {
+        return m_proxy.getProperty("ActiveEnterTimestamp").onInterface(INTERFACE_NAME).get<uint64_t>();
+    }
+
+    uint64_t ActiveEnterTimestampMonotonic()
+    {
+        return m_proxy.getProperty("ActiveEnterTimestampMonotonic").onInterface(INTERFACE_NAME).get<uint64_t>();
+    }
+
+    uint64_t ActiveExitTimestamp()
+    {
+        return m_proxy.getProperty("ActiveExitTimestamp").onInterface(INTERFACE_NAME).get<uint64_t>();
+    }
+
+    uint64_t ActiveExitTimestampMonotonic()
+    {
+        return m_proxy.getProperty("ActiveExitTimestampMonotonic").onInterface(INTERFACE_NAME).get<uint64_t>();
+    }
+
+    uint64_t InactiveEnterTimestamp()
+    {
+        return m_proxy.getProperty("InactiveEnterTimestamp").onInterface(INTERFACE_NAME).get<uint64_t>();
+    }
+
+    uint64_t InactiveEnterTimestampMonotonic()
+    {
+        return m_proxy.getProperty("InactiveEnterTimestampMonotonic").onInterface(INTERFACE_NAME).get<uint64_t>();
+    }
+
+    bool CanStart()
+    {
+        return m_proxy.getProperty("CanStart").onInterface(INTERFACE_NAME).get<bool>();
+    }
+
+    bool CanStop()
+    {
+        return m_proxy.getProperty("CanStop").onInterface(INTERFACE_NAME).get<bool>();
+    }
+
+    bool CanReload()
+    {
+        return m_proxy.getProperty("CanReload").onInterface(INTERFACE_NAME).get<bool>();
+    }
+
+    bool CanIsolate()
+    {
+        return m_proxy.getProperty("CanIsolate").onInterface(INTERFACE_NAME).get<bool>();
+    }
+
+    std::vector<std::string> CanClean()
+    {
+        return m_proxy.getProperty("CanClean").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
+
+    bool CanFreeze()
+    {
+        return m_proxy.getProperty("CanFreeze").onInterface(INTERFACE_NAME).get<bool>();
+    }
+
+    sdbus::Struct<uint32_t, sdbus::ObjectPath> Job()
+    {
+        return m_proxy.getProperty("Job").onInterface(INTERFACE_NAME).get<sdbus::Struct<uint32_t, sdbus::ObjectPath>>();
+    }
+
+    bool StopWhenUnneeded()
+    {
+        return m_proxy.getProperty("StopWhenUnneeded").onInterface(INTERFACE_NAME).get<bool>();
+    }
+
+    bool RefuseManualStart()
+    {
+        return m_proxy.getProperty("RefuseManualStart").onInterface(INTERFACE_NAME).get<bool>();
+    }
+
+    bool RefuseManualStop()
+    {
+        return m_proxy.getProperty("RefuseManualStop").onInterface(INTERFACE_NAME).get<bool>();
+    }
+
+    bool AllowIsolate()
+    {
+        return m_proxy.getProperty("AllowIsolate").onInterface(INTERFACE_NAME).get<bool>();
+    }
+
+    bool DefaultDependencies()
+    {
+        return m_proxy.getProperty("DefaultDependencies").onInterface(INTERFACE_NAME).get<bool>();
+    }
+
+    bool SurviveFinalKillSignal()
+    {
+        return m_proxy.getProperty("SurviveFinalKillSignal").onInterface(INTERFACE_NAME).get<bool>();
+    }
+
+    std::string OnSuccessJobMode()
+    {
+        return m_proxy.getProperty("OnSuccessJobMode").onInterface(INTERFACE_NAME).get<std::string>();
+    }
+
+    std::string OnFailureJobMode()
+    {
+        return m_proxy.getProperty("OnFailureJobMode").onInterface(INTERFACE_NAME).get<std::string>();
+    }
+
+    bool IgnoreOnIsolate()
+    {
+        return m_proxy.getProperty("IgnoreOnIsolate").onInterface(INTERFACE_NAME).get<bool>();
+    }
+
+    bool NeedDaemonReload()
+    {
+        return m_proxy.getProperty("NeedDaemonReload").onInterface(INTERFACE_NAME).get<bool>();
+    }
+
+    std::vector<std::string> Markers()
+    {
+        return m_proxy.getProperty("Markers").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
+
+    uint64_t JobTimeoutUSec()
+    {
+        return m_proxy.getProperty("JobTimeoutUSec").onInterface(INTERFACE_NAME).get<uint64_t>();
+    }
+
+    uint64_t JobRunningTimeoutUSec()
+    {
+        return m_proxy.getProperty("JobRunningTimeoutUSec").onInterface(INTERFACE_NAME).get<uint64_t>();
+    }
+
+    std::string JobTimeoutAction()
+    {
+        return m_proxy.getProperty("JobTimeoutAction").onInterface(INTERFACE_NAME).get<std::string>();
+    }
+
+    std::string JobTimeoutRebootArgument()
+    {
+        return m_proxy.getProperty("JobTimeoutRebootArgument").onInterface(INTERFACE_NAME).get<std::string>();
+    }
+
+    bool ConditionResult()
+    {
+        return m_proxy.getProperty("ConditionResult").onInterface(INTERFACE_NAME).get<bool>();
+    }
+
+    bool AssertResult()
+    {
+        return m_proxy.getProperty("AssertResult").onInterface(INTERFACE_NAME).get<bool>();
+    }
+
+    uint64_t ConditionTimestamp()
+    {
+        return m_proxy.getProperty("ConditionTimestamp").onInterface(INTERFACE_NAME).get<uint64_t>();
+    }
+
+    uint64_t ConditionTimestampMonotonic()
+    {
+        return m_proxy.getProperty("ConditionTimestampMonotonic").onInterface(INTERFACE_NAME).get<uint64_t>();
+    }
+
+    uint64_t AssertTimestamp()
+    {
+        return m_proxy.getProperty("AssertTimestamp").onInterface(INTERFACE_NAME).get<uint64_t>();
+    }
+
+    uint64_t AssertTimestampMonotonic()
+    {
+        return m_proxy.getProperty("AssertTimestampMonotonic").onInterface(INTERFACE_NAME).get<uint64_t>();
+    }
+
+    std::vector<sdbus::Struct<std::string, bool, bool, std::string, int32_t>> Conditions()
+    {
+        return m_proxy.getProperty("Conditions").onInterface(INTERFACE_NAME).get<std::vector<sdbus::Struct<std::string, bool, bool, std::string, int32_t>>>();
+    }
+
+    std::vector<sdbus::Struct<std::string, bool, bool, std::string, int32_t>> Asserts()
+    {
+        return m_proxy.getProperty("Asserts").onInterface(INTERFACE_NAME).get<std::vector<sdbus::Struct<std::string, bool, bool, std::string, int32_t>>>();
+    }
+
+    sdbus::Struct<std::string, std::string> LoadError()
+    {
+        return m_proxy.getProperty("LoadError").onInterface(INTERFACE_NAME).get<sdbus::Struct<std::string, std::string>>();
+    }
+
+    bool Transient()
+    {
+        return m_proxy.getProperty("Transient").onInterface(INTERFACE_NAME).get<bool>();
+    }
+
+    bool Perpetual()
+    {
+        return m_proxy.getProperty("Perpetual").onInterface(INTERFACE_NAME).get<bool>();
+    }
+
+    uint64_t StartLimitIntervalUSec()
+    {
+        return m_proxy.getProperty("StartLimitIntervalUSec").onInterface(INTERFACE_NAME).get<uint64_t>();
+    }
+
+    uint32_t StartLimitBurst()
+    {
+        return m_proxy.getProperty("StartLimitBurst").onInterface(INTERFACE_NAME).get<uint32_t>();
+    }
+
+    std::string StartLimitAction()
+    {
+        return m_proxy.getProperty("StartLimitAction").onInterface(INTERFACE_NAME).get<std::string>();
+    }
+
+    std::string FailureAction()
+    {
+        return m_proxy.getProperty("FailureAction").onInterface(INTERFACE_NAME).get<std::string>();
+    }
+
+    int32_t FailureActionExitStatus()
+    {
+        return m_proxy.getProperty("FailureActionExitStatus").onInterface(INTERFACE_NAME).get<int32_t>();
+    }
+
+    std::string SuccessAction()
+    {
+        return m_proxy.getProperty("SuccessAction").onInterface(INTERFACE_NAME).get<std::string>();
+    }
+
+    int32_t SuccessActionExitStatus()
+    {
+        return m_proxy.getProperty("SuccessActionExitStatus").onInterface(INTERFACE_NAME).get<int32_t>();
+    }
+
+    std::string RebootArgument()
+    {
+        return m_proxy.getProperty("RebootArgument").onInterface(INTERFACE_NAME).get<std::string>();
+    }
+
+    std::vector<uint8_t> InvocationID()
+    {
+        return m_proxy.getProperty("InvocationID").onInterface(INTERFACE_NAME).get<std::vector<uint8_t>>();
+    }
+
+    std::string CollectMode()
+    {
+        return m_proxy.getProperty("CollectMode").onInterface(INTERFACE_NAME).get<std::string>();
+    }
+
+    std::vector<std::string> Refs()
+    {
+        return m_proxy.getProperty("Refs").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
+    }
+
+    std::vector<sdbus::Struct<std::string, std::string>> ActivationDetails()
+    {
+        return m_proxy.getProperty("ActivationDetails").onInterface(INTERFACE_NAME).get<std::vector<sdbus::Struct<std::string, std::string>>>();
+    }
+
+private:
+    sdbus::IProxy& m_proxy;
 };
 
-}  // namespace systemd1
-}  // namespace freedesktop
-}  // namespace org
+}}} // namespaces
 
 #endif

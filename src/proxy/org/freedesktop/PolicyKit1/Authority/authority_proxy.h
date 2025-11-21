@@ -14,184 +14,113 @@ namespace org {
 namespace freedesktop {
 namespace PolicyKit1 {
 
-class Authority_proxy {
- public:
-  static constexpr const char* INTERFACE_NAME =
-      "org.freedesktop.PolicyKit1.Authority";
+class Authority_proxy
+{
+public:
+    static constexpr const char* INTERFACE_NAME = "org.freedesktop.PolicyKit1.Authority";
 
- protected:
-  Authority_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
+protected:
+    Authority_proxy(sdbus::IProxy& proxy)
+        : m_proxy(proxy)
+    {
+    }
 
-  Authority_proxy(const Authority_proxy&) = delete;
-  Authority_proxy& operator=(const Authority_proxy&) = delete;
-  Authority_proxy(Authority_proxy&&) = delete;
-  Authority_proxy& operator=(Authority_proxy&&) = delete;
+    Authority_proxy(const Authority_proxy&) = delete;
+    Authority_proxy& operator=(const Authority_proxy&) = delete;
+    Authority_proxy(Authority_proxy&&) = delete;
+    Authority_proxy& operator=(Authority_proxy&&) = delete;
 
-  ~Authority_proxy() = default;
+    ~Authority_proxy() = default;
 
-  void registerProxy() {
-    m_proxy.uponSignal("Changed").onInterface(INTERFACE_NAME).call([this]() {
-      this->onChanged();
-    });
-  }
+    void registerProxy()
+    {
+        m_proxy.uponSignal("Changed").onInterface(INTERFACE_NAME).call([this](){ this->onChanged(); });
+    }
 
-  virtual void onChanged() = 0;
+    virtual void onChanged() = 0;
 
- public:
-  std::vector<sdbus::Struct<std::string,
-                            std::string,
-                            std::string,
-                            std::string,
-                            std::string,
-                            std::string,
-                            uint32_t,
-                            uint32_t,
-                            uint32_t,
-                            std::map<std::string, std::string>>>
-  EnumerateActions(const std::string& locale) {
-    std::vector<
-        sdbus::Struct<std::string, std::string, std::string, std::string,
-                      std::string, std::string, uint32_t, uint32_t, uint32_t,
-                      std::map<std::string, std::string>>>
-        result;
-    m_proxy.callMethod("EnumerateActions")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(locale)
-        .storeResultsTo(result);
-    return result;
-  }
+public:
+    std::vector<sdbus::Struct<std::string, std::string, std::string, std::string, std::string, std::string, uint32_t, uint32_t, uint32_t, std::map<std::string, std::string>>> EnumerateActions(const std::string& locale)
+    {
+        std::vector<sdbus::Struct<std::string, std::string, std::string, std::string, std::string, std::string, uint32_t, uint32_t, uint32_t, std::map<std::string, std::string>>> result;
+        m_proxy.callMethod("EnumerateActions").onInterface(INTERFACE_NAME).withArguments(locale).storeResultsTo(result);
+        return result;
+    }
 
-  sdbus::Struct<bool, bool, std::map<std::string, std::string>>
-  CheckAuthorization(
-      const sdbus::Struct<std::string, std::map<std::string, sdbus::Variant>>&
-          subject,
-      const std::string& action_id,
-      const std::map<std::string, std::string>& details,
-      const uint32_t& flags,
-      const std::string& cancellation_id) {
-    sdbus::Struct<bool, bool, std::map<std::string, std::string>> result;
-    m_proxy.callMethod("CheckAuthorization")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(subject, action_id, details, flags, cancellation_id)
-        .storeResultsTo(result);
-    return result;
-  }
+    sdbus::Struct<bool, bool, std::map<std::string, std::string>> CheckAuthorization(const sdbus::Struct<std::string, std::map<std::string, sdbus::Variant>>& subject, const std::string& action_id, const std::map<std::string, std::string>& details, const uint32_t& flags, const std::string& cancellation_id)
+    {
+        sdbus::Struct<bool, bool, std::map<std::string, std::string>> result;
+        m_proxy.callMethod("CheckAuthorization").onInterface(INTERFACE_NAME).withArguments(subject, action_id, details, flags, cancellation_id).storeResultsTo(result);
+        return result;
+    }
 
-  void CancelCheckAuthorization(const std::string& cancellation_id) {
-    m_proxy.callMethod("CancelCheckAuthorization")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(cancellation_id);
-  }
+    void CancelCheckAuthorization(const std::string& cancellation_id)
+    {
+        m_proxy.callMethod("CancelCheckAuthorization").onInterface(INTERFACE_NAME).withArguments(cancellation_id);
+    }
 
-  void RegisterAuthenticationAgent(
-      const sdbus::Struct<std::string, std::map<std::string, sdbus::Variant>>&
-          subject,
-      const std::string& locale,
-      const std::string& object_path) {
-    m_proxy.callMethod("RegisterAuthenticationAgent")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(subject, locale, object_path);
-  }
+    void RegisterAuthenticationAgent(const sdbus::Struct<std::string, std::map<std::string, sdbus::Variant>>& subject, const std::string& locale, const std::string& object_path)
+    {
+        m_proxy.callMethod("RegisterAuthenticationAgent").onInterface(INTERFACE_NAME).withArguments(subject, locale, object_path);
+    }
 
-  void RegisterAuthenticationAgentWithOptions(
-      const sdbus::Struct<std::string, std::map<std::string, sdbus::Variant>>&
-          subject,
-      const std::string& locale,
-      const std::string& object_path,
-      const std::map<std::string, sdbus::Variant>& options) {
-    m_proxy.callMethod("RegisterAuthenticationAgentWithOptions")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(subject, locale, object_path, options);
-  }
+    void RegisterAuthenticationAgentWithOptions(const sdbus::Struct<std::string, std::map<std::string, sdbus::Variant>>& subject, const std::string& locale, const std::string& object_path, const std::map<std::string, sdbus::Variant>& options)
+    {
+        m_proxy.callMethod("RegisterAuthenticationAgentWithOptions").onInterface(INTERFACE_NAME).withArguments(subject, locale, object_path, options);
+    }
 
-  void UnregisterAuthenticationAgent(
-      const sdbus::Struct<std::string, std::map<std::string, sdbus::Variant>>&
-          subject,
-      const std::string& object_path) {
-    m_proxy.callMethod("UnregisterAuthenticationAgent")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(subject, object_path);
-  }
+    void UnregisterAuthenticationAgent(const sdbus::Struct<std::string, std::map<std::string, sdbus::Variant>>& subject, const std::string& object_path)
+    {
+        m_proxy.callMethod("UnregisterAuthenticationAgent").onInterface(INTERFACE_NAME).withArguments(subject, object_path);
+    }
 
-  void AuthenticationAgentResponse(
-      const std::string& cookie,
-      const sdbus::Struct<std::string, std::map<std::string, sdbus::Variant>>&
-          identity) {
-    m_proxy.callMethod("AuthenticationAgentResponse")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(cookie, identity);
-  }
+    void AuthenticationAgentResponse(const std::string& cookie, const sdbus::Struct<std::string, std::map<std::string, sdbus::Variant>>& identity)
+    {
+        m_proxy.callMethod("AuthenticationAgentResponse").onInterface(INTERFACE_NAME).withArguments(cookie, identity);
+    }
 
-  void AuthenticationAgentResponse2(
-      const uint32_t& uid,
-      const std::string& cookie,
-      const sdbus::Struct<std::string, std::map<std::string, sdbus::Variant>>&
-          identity) {
-    m_proxy.callMethod("AuthenticationAgentResponse2")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(uid, cookie, identity);
-  }
+    void AuthenticationAgentResponse2(const uint32_t& uid, const std::string& cookie, const sdbus::Struct<std::string, std::map<std::string, sdbus::Variant>>& identity)
+    {
+        m_proxy.callMethod("AuthenticationAgentResponse2").onInterface(INTERFACE_NAME).withArguments(uid, cookie, identity);
+    }
 
-  std::vector<sdbus::Struct<
-      std::string,
-      std::string,
-      sdbus::Struct<std::string, std::map<std::string, sdbus::Variant>>,
-      uint64_t,
-      uint64_t>>
-  EnumerateTemporaryAuthorizations(
-      const sdbus::Struct<std::string, std::map<std::string, sdbus::Variant>>&
-          subject) {
-    std::vector<sdbus::Struct<
-        std::string, std::string,
-        sdbus::Struct<std::string, std::map<std::string, sdbus::Variant>>,
-        uint64_t, uint64_t>>
-        result;
-    m_proxy.callMethod("EnumerateTemporaryAuthorizations")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(subject)
-        .storeResultsTo(result);
-    return result;
-  }
+    std::vector<sdbus::Struct<std::string, std::string, sdbus::Struct<std::string, std::map<std::string, sdbus::Variant>>, uint64_t, uint64_t>> EnumerateTemporaryAuthorizations(const sdbus::Struct<std::string, std::map<std::string, sdbus::Variant>>& subject)
+    {
+        std::vector<sdbus::Struct<std::string, std::string, sdbus::Struct<std::string, std::map<std::string, sdbus::Variant>>, uint64_t, uint64_t>> result;
+        m_proxy.callMethod("EnumerateTemporaryAuthorizations").onInterface(INTERFACE_NAME).withArguments(subject).storeResultsTo(result);
+        return result;
+    }
 
-  void RevokeTemporaryAuthorizations(
-      const sdbus::Struct<std::string, std::map<std::string, sdbus::Variant>>&
-          subject) {
-    m_proxy.callMethod("RevokeTemporaryAuthorizations")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(subject);
-  }
+    void RevokeTemporaryAuthorizations(const sdbus::Struct<std::string, std::map<std::string, sdbus::Variant>>& subject)
+    {
+        m_proxy.callMethod("RevokeTemporaryAuthorizations").onInterface(INTERFACE_NAME).withArguments(subject);
+    }
 
-  void RevokeTemporaryAuthorizationById(const std::string& id) {
-    m_proxy.callMethod("RevokeTemporaryAuthorizationById")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(id);
-  }
+    void RevokeTemporaryAuthorizationById(const std::string& id)
+    {
+        m_proxy.callMethod("RevokeTemporaryAuthorizationById").onInterface(INTERFACE_NAME).withArguments(id);
+    }
 
- public:
-  std::string BackendName() {
-    return m_proxy.getProperty("BackendName")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+public:
+    std::string BackendName()
+    {
+        return m_proxy.getProperty("BackendName").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::string BackendVersion() {
-    return m_proxy.getProperty("BackendVersion")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string BackendVersion()
+    {
+        return m_proxy.getProperty("BackendVersion").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  uint32_t BackendFeatures() {
-    return m_proxy.getProperty("BackendFeatures")
-        .onInterface(INTERFACE_NAME)
-        .get<uint32_t>();
-  }
+    uint32_t BackendFeatures()
+    {
+        return m_proxy.getProperty("BackendFeatures").onInterface(INTERFACE_NAME).get<uint32_t>();
+    }
 
- private:
-  sdbus::IProxy& m_proxy;
+private:
+    sdbus::IProxy& m_proxy;
 };
 
-}  // namespace PolicyKit1
-}  // namespace freedesktop
-}  // namespace org
+}}} // namespaces
 
 #endif

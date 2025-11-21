@@ -14,130 +14,119 @@ namespace org {
 namespace freedesktop {
 namespace login1 {
 
-class User_proxy {
- public:
-  static constexpr const char* INTERFACE_NAME = "org.freedesktop.login1.User";
+class User_proxy
+{
+public:
+    static constexpr const char* INTERFACE_NAME = "org.freedesktop.login1.User";
 
- protected:
-  User_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
+protected:
+    User_proxy(sdbus::IProxy& proxy)
+        : m_proxy(proxy)
+    {
+    }
 
-  User_proxy(const User_proxy&) = delete;
-  User_proxy& operator=(const User_proxy&) = delete;
-  User_proxy(User_proxy&&) = delete;
-  User_proxy& operator=(User_proxy&&) = delete;
+    User_proxy(const User_proxy&) = delete;
+    User_proxy& operator=(const User_proxy&) = delete;
+    User_proxy(User_proxy&&) = delete;
+    User_proxy& operator=(User_proxy&&) = delete;
 
-  ~User_proxy() = default;
+    ~User_proxy() = default;
 
-  void registerProxy() {}
+    void registerProxy()
+    {
+    }
 
- public:
-  void Terminate() {
-    m_proxy.callMethod("Terminate").onInterface(INTERFACE_NAME);
-  }
+public:
+    void Terminate()
+    {
+        m_proxy.callMethod("Terminate").onInterface(INTERFACE_NAME);
+    }
 
-  void Kill(const int32_t& signal_number) {
-    m_proxy.callMethod("Kill")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(signal_number);
-  }
+    void Kill(const int32_t& signal_number)
+    {
+        m_proxy.callMethod("Kill").onInterface(INTERFACE_NAME).withArguments(signal_number);
+    }
 
- public:
-  uint32_t UID() {
-    return m_proxy.getProperty("UID")
-        .onInterface(INTERFACE_NAME)
-        .get<uint32_t>();
-  }
+public:
+    uint32_t UID()
+    {
+        return m_proxy.getProperty("UID").onInterface(INTERFACE_NAME).get<uint32_t>();
+    }
 
-  uint32_t GID() {
-    return m_proxy.getProperty("GID")
-        .onInterface(INTERFACE_NAME)
-        .get<uint32_t>();
-  }
+    uint32_t GID()
+    {
+        return m_proxy.getProperty("GID").onInterface(INTERFACE_NAME).get<uint32_t>();
+    }
 
-  std::string Name() {
-    return m_proxy.getProperty("Name")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string Name()
+    {
+        return m_proxy.getProperty("Name").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  uint64_t Timestamp() {
-    return m_proxy.getProperty("Timestamp")
-        .onInterface(INTERFACE_NAME)
-        .get<uint64_t>();
-  }
+    uint64_t Timestamp()
+    {
+        return m_proxy.getProperty("Timestamp").onInterface(INTERFACE_NAME).get<uint64_t>();
+    }
 
-  uint64_t TimestampMonotonic() {
-    return m_proxy.getProperty("TimestampMonotonic")
-        .onInterface(INTERFACE_NAME)
-        .get<uint64_t>();
-  }
+    uint64_t TimestampMonotonic()
+    {
+        return m_proxy.getProperty("TimestampMonotonic").onInterface(INTERFACE_NAME).get<uint64_t>();
+    }
 
-  std::string RuntimePath() {
-    return m_proxy.getProperty("RuntimePath")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string RuntimePath()
+    {
+        return m_proxy.getProperty("RuntimePath").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::string Service() {
-    return m_proxy.getProperty("Service")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string Service()
+    {
+        return m_proxy.getProperty("Service").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::string Slice() {
-    return m_proxy.getProperty("Slice")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string Slice()
+    {
+        return m_proxy.getProperty("Slice").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  sdbus::Struct<std::string, sdbus::ObjectPath> Display() {
-    return m_proxy.getProperty("Display")
-        .onInterface(INTERFACE_NAME)
-        .get<sdbus::Struct<std::string, sdbus::ObjectPath>>();
-  }
+    sdbus::Struct<std::string, sdbus::ObjectPath> Display()
+    {
+        return m_proxy.getProperty("Display").onInterface(INTERFACE_NAME).get<sdbus::Struct<std::string, sdbus::ObjectPath>>();
+    }
 
-  std::string State() {
-    return m_proxy.getProperty("State")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string State()
+    {
+        return m_proxy.getProperty("State").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::vector<sdbus::Struct<std::string, sdbus::ObjectPath>> Sessions() {
-    return m_proxy.getProperty("Sessions")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<sdbus::Struct<std::string, sdbus::ObjectPath>>>();
-  }
+    std::vector<sdbus::Struct<std::string, sdbus::ObjectPath>> Sessions()
+    {
+        return m_proxy.getProperty("Sessions").onInterface(INTERFACE_NAME).get<std::vector<sdbus::Struct<std::string, sdbus::ObjectPath>>>();
+    }
 
-  bool IdleHint() {
-    return m_proxy.getProperty("IdleHint")
-        .onInterface(INTERFACE_NAME)
-        .get<bool>();
-  }
+    bool IdleHint()
+    {
+        return m_proxy.getProperty("IdleHint").onInterface(INTERFACE_NAME).get<bool>();
+    }
 
-  uint64_t IdleSinceHint() {
-    return m_proxy.getProperty("IdleSinceHint")
-        .onInterface(INTERFACE_NAME)
-        .get<uint64_t>();
-  }
+    uint64_t IdleSinceHint()
+    {
+        return m_proxy.getProperty("IdleSinceHint").onInterface(INTERFACE_NAME).get<uint64_t>();
+    }
 
-  uint64_t IdleSinceHintMonotonic() {
-    return m_proxy.getProperty("IdleSinceHintMonotonic")
-        .onInterface(INTERFACE_NAME)
-        .get<uint64_t>();
-  }
+    uint64_t IdleSinceHintMonotonic()
+    {
+        return m_proxy.getProperty("IdleSinceHintMonotonic").onInterface(INTERFACE_NAME).get<uint64_t>();
+    }
 
-  bool Linger() {
-    return m_proxy.getProperty("Linger")
-        .onInterface(INTERFACE_NAME)
-        .get<bool>();
-  }
+    bool Linger()
+    {
+        return m_proxy.getProperty("Linger").onInterface(INTERFACE_NAME).get<bool>();
+    }
 
- private:
-  sdbus::IProxy& m_proxy;
+private:
+    sdbus::IProxy& m_proxy;
 };
 
-}  // namespace login1
-}  // namespace freedesktop
-}  // namespace org
+}}} // namespaces
 
 #endif

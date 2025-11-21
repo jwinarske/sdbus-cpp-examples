@@ -1,0 +1,28 @@
+<node>
+    <interface name="org.freedesktop.RealtimeKit1">
+        <method name="MakeThreadRealtime">
+            <arg name="thread" type="t" direction="in"/>
+            <arg name="priority" type="u" direction="in"/>
+        </method>
+        <method name="MakeThreadRealtimeWithPID">
+            <arg name="process" type="t" direction="in"/>
+            <arg name="thread" type="t" direction="in"/>
+            <arg name="priority" type="u" direction="in"/>
+        </method>
+        <method name="MakeThreadHighPriority">
+            <arg name="thread" type="t" direction="in"/>
+            <arg name="priority" type="i" direction="in"/>
+        </method>
+        <method name="MakeThreadHighPriorityWithPID">
+            <arg name="process" type="t" direction="in"/>
+            <arg name="thread" type="t" direction="in"/>
+            <arg name="priority" type="i" direction="in"/>
+        </method>
+        <method name="ResetKnown"/>
+        <method name="ResetAll"/>
+        <method name="Exit"/>
+        <property name="RTTimeUSecMax" type="x" access="read"/>
+        <property name="MaxRealtimePriority" type="i" access="read"/>
+        <property name="MinNiceLevel" type="i" access="read"/>
+    </interface>
+</node>

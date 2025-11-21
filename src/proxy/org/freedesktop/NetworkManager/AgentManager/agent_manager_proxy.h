@@ -14,47 +14,48 @@ namespace org {
 namespace freedesktop {
 namespace NetworkManager {
 
-class AgentManager_proxy {
- public:
-  static constexpr const char* INTERFACE_NAME =
-      "org.freedesktop.NetworkManager.AgentManager";
+class AgentManager_proxy
+{
+public:
+    static constexpr const char* INTERFACE_NAME = "org.freedesktop.NetworkManager.AgentManager";
 
- protected:
-  AgentManager_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
+protected:
+    AgentManager_proxy(sdbus::IProxy& proxy)
+        : m_proxy(proxy)
+    {
+    }
 
-  AgentManager_proxy(const AgentManager_proxy&) = delete;
-  AgentManager_proxy& operator=(const AgentManager_proxy&) = delete;
-  AgentManager_proxy(AgentManager_proxy&&) = delete;
-  AgentManager_proxy& operator=(AgentManager_proxy&&) = delete;
+    AgentManager_proxy(const AgentManager_proxy&) = delete;
+    AgentManager_proxy& operator=(const AgentManager_proxy&) = delete;
+    AgentManager_proxy(AgentManager_proxy&&) = delete;
+    AgentManager_proxy& operator=(AgentManager_proxy&&) = delete;
 
-  ~AgentManager_proxy() = default;
+    ~AgentManager_proxy() = default;
 
-  void registerProxy() {}
+    void registerProxy()
+    {
+    }
 
- public:
-  void Register(const std::string& identifier) {
-    m_proxy.callMethod("Register")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(identifier);
-  }
+public:
+    void Register(const std::string& identifier)
+    {
+        m_proxy.callMethod("Register").onInterface(INTERFACE_NAME).withArguments(identifier);
+    }
 
-  void RegisterWithCapabilities(const std::string& identifier,
-                                const uint32_t& capabilities) {
-    m_proxy.callMethod("RegisterWithCapabilities")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(identifier, capabilities);
-  }
+    void RegisterWithCapabilities(const std::string& identifier, const uint32_t& capabilities)
+    {
+        m_proxy.callMethod("RegisterWithCapabilities").onInterface(INTERFACE_NAME).withArguments(identifier, capabilities);
+    }
 
-  void Unregister() {
-    m_proxy.callMethod("Unregister").onInterface(INTERFACE_NAME);
-  }
+    void Unregister()
+    {
+        m_proxy.callMethod("Unregister").onInterface(INTERFACE_NAME);
+    }
 
- private:
-  sdbus::IProxy& m_proxy;
+private:
+    sdbus::IProxy& m_proxy;
 };
 
-}  // namespace NetworkManager
-}  // namespace freedesktop
-}  // namespace org
+}}} // namespaces
 
 #endif

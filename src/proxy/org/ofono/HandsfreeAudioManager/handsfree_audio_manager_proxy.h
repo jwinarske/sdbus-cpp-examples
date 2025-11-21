@@ -13,70 +13,55 @@
 namespace org {
 namespace ofono {
 
-class HandsfreeAudioManager_proxy {
- public:
-  static constexpr const char* INTERFACE_NAME =
-      "org.ofono.HandsfreeAudioManager";
+class HandsfreeAudioManager_proxy
+{
+public:
+    static constexpr const char* INTERFACE_NAME = "org.ofono.HandsfreeAudioManager";
 
- protected:
-  HandsfreeAudioManager_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
+protected:
+    HandsfreeAudioManager_proxy(sdbus::IProxy& proxy)
+        : m_proxy(proxy)
+    {
+    }
 
-  HandsfreeAudioManager_proxy(const HandsfreeAudioManager_proxy&) = delete;
-  HandsfreeAudioManager_proxy& operator=(const HandsfreeAudioManager_proxy&) =
-      delete;
-  HandsfreeAudioManager_proxy(HandsfreeAudioManager_proxy&&) = delete;
-  HandsfreeAudioManager_proxy& operator=(HandsfreeAudioManager_proxy&&) =
-      delete;
+    HandsfreeAudioManager_proxy(const HandsfreeAudioManager_proxy&) = delete;
+    HandsfreeAudioManager_proxy& operator=(const HandsfreeAudioManager_proxy&) = delete;
+    HandsfreeAudioManager_proxy(HandsfreeAudioManager_proxy&&) = delete;
+    HandsfreeAudioManager_proxy& operator=(HandsfreeAudioManager_proxy&&) = delete;
 
-  ~HandsfreeAudioManager_proxy() = default;
+    ~HandsfreeAudioManager_proxy() = default;
 
-  void registerProxy() {
-    m_proxy.uponSignal("CardAdded")
-        .onInterface(INTERFACE_NAME)
-        .call([this](const sdbus::ObjectPath& path,
-                     const std::map<std::string, sdbus::Variant>& properties) {
-          this->onCardAdded(path, properties);
-        });
-    m_proxy.uponSignal("CardRemoved")
-        .onInterface(INTERFACE_NAME)
-        .call([this](const sdbus::ObjectPath& path) {
-          this->onCardRemoved(path);
-        });
-  }
+    void registerProxy()
+    {
+        m_proxy.uponSignal("CardAdded").onInterface(INTERFACE_NAME).call([this](const sdbus::ObjectPath& path, const std::map<std::string, sdbus::Variant>& properties){ this->onCardAdded(path, properties); });
+        m_proxy.uponSignal("CardRemoved").onInterface(INTERFACE_NAME).call([this](const sdbus::ObjectPath& path){ this->onCardRemoved(path); });
+    }
 
-  virtual void onCardAdded(
-      const sdbus::ObjectPath& path,
-      const std::map<std::string, sdbus::Variant>& properties) = 0;
-  virtual void onCardRemoved(const sdbus::ObjectPath& path) = 0;
+    virtual void onCardAdded(const sdbus::ObjectPath& path, const std::map<std::string, sdbus::Variant>& properties) = 0;
+    virtual void onCardRemoved(const sdbus::ObjectPath& path) = 0;
 
- public:
-  std::map<sdbus::ObjectPath, std::map<std::string, sdbus::Variant>>
-  GetCards() {
-    std::map<sdbus::ObjectPath, std::map<std::string, sdbus::Variant>> result;
-    m_proxy.callMethod("GetCards")
-        .onInterface(INTERFACE_NAME)
-        .storeResultsTo(result);
-    return result;
-  }
+public:
+    std::map<sdbus::ObjectPath, std::map<std::string, sdbus::Variant>> GetCards()
+    {
+        std::map<sdbus::ObjectPath, std::map<std::string, sdbus::Variant>> result;
+        m_proxy.callMethod("GetCards").onInterface(INTERFACE_NAME).storeResultsTo(result);
+        return result;
+    }
 
-  void Register(const sdbus::ObjectPath& path,
-                const std::vector<uint8_t>& codecs) {
-    m_proxy.callMethod("Register")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(path, codecs);
-  }
+    void Register(const sdbus::ObjectPath& path, const std::vector<uint8_t>& codecs)
+    {
+        m_proxy.callMethod("Register").onInterface(INTERFACE_NAME).withArguments(path, codecs);
+    }
 
-  void Unregister(const sdbus::ObjectPath& path) {
-    m_proxy.callMethod("Unregister")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(path);
-  }
+    void Unregister(const sdbus::ObjectPath& path)
+    {
+        m_proxy.callMethod("Unregister").onInterface(INTERFACE_NAME).withArguments(path);
+    }
 
- private:
-  sdbus::IProxy& m_proxy;
+private:
+    sdbus::IProxy& m_proxy;
 };
 
-}  // namespace ofono
-}  // namespace org
+}} // namespaces
 
 #endif

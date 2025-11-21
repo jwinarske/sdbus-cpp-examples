@@ -13,64 +13,61 @@
 namespace org {
 namespace bluez {
 
-class GattDescriptor1_proxy {
- public:
-  static constexpr const char* INTERFACE_NAME = "org.bluez.GattDescriptor1";
+class GattDescriptor1_proxy
+{
+public:
+    static constexpr const char* INTERFACE_NAME = "org.bluez.GattDescriptor1";
 
- protected:
-  GattDescriptor1_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
+protected:
+    GattDescriptor1_proxy(sdbus::IProxy& proxy)
+        : m_proxy(proxy)
+    {
+    }
 
-  GattDescriptor1_proxy(const GattDescriptor1_proxy&) = delete;
-  GattDescriptor1_proxy& operator=(const GattDescriptor1_proxy&) = delete;
-  GattDescriptor1_proxy(GattDescriptor1_proxy&&) = delete;
-  GattDescriptor1_proxy& operator=(GattDescriptor1_proxy&&) = delete;
+    GattDescriptor1_proxy(const GattDescriptor1_proxy&) = delete;
+    GattDescriptor1_proxy& operator=(const GattDescriptor1_proxy&) = delete;
+    GattDescriptor1_proxy(GattDescriptor1_proxy&&) = delete;
+    GattDescriptor1_proxy& operator=(GattDescriptor1_proxy&&) = delete;
 
-  ~GattDescriptor1_proxy() = default;
+    ~GattDescriptor1_proxy() = default;
 
-  void registerProxy() {}
+    void registerProxy()
+    {
+    }
 
- public:
-  std::vector<uint8_t> ReadValue(
-      const std::map<std::string, sdbus::Variant>& options) {
-    std::vector<uint8_t> result;
-    m_proxy.callMethod("ReadValue")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(options)
-        .storeResultsTo(result);
-    return result;
-  }
+public:
+    std::vector<uint8_t> ReadValue(const std::map<std::string, sdbus::Variant>& options)
+    {
+        std::vector<uint8_t> result;
+        m_proxy.callMethod("ReadValue").onInterface(INTERFACE_NAME).withArguments(options).storeResultsTo(result);
+        return result;
+    }
 
-  void WriteValue(const std::vector<uint8_t>& value,
-                  const std::map<std::string, sdbus::Variant>& options) {
-    m_proxy.callMethod("WriteValue")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(value, options);
-  }
+    void WriteValue(const std::vector<uint8_t>& value, const std::map<std::string, sdbus::Variant>& options)
+    {
+        m_proxy.callMethod("WriteValue").onInterface(INTERFACE_NAME).withArguments(value, options);
+    }
 
- public:
-  std::string UUID() {
-    return m_proxy.getProperty("UUID")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+public:
+    std::string UUID()
+    {
+        return m_proxy.getProperty("UUID").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  sdbus::ObjectPath Characteristic() {
-    return m_proxy.getProperty("Characteristic")
-        .onInterface(INTERFACE_NAME)
-        .get<sdbus::ObjectPath>();
-  }
+    sdbus::ObjectPath Characteristic()
+    {
+        return m_proxy.getProperty("Characteristic").onInterface(INTERFACE_NAME).get<sdbus::ObjectPath>();
+    }
 
-  std::vector<uint8_t> Value() {
-    return m_proxy.getProperty("Value")
-        .onInterface(INTERFACE_NAME)
-        .get<std::vector<uint8_t>>();
-  }
+    std::vector<uint8_t> Value()
+    {
+        return m_proxy.getProperty("Value").onInterface(INTERFACE_NAME).get<std::vector<uint8_t>>();
+    }
 
- private:
-  sdbus::IProxy& m_proxy;
+private:
+    sdbus::IProxy& m_proxy;
 };
 
-}  // namespace bluez
-}  // namespace org
+}} // namespaces
 
 #endif

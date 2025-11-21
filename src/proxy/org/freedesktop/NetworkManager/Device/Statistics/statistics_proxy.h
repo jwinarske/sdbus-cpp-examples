@@ -15,55 +15,53 @@ namespace freedesktop {
 namespace NetworkManager {
 namespace Device {
 
-class Statistics_proxy {
- public:
-  static constexpr const char* INTERFACE_NAME =
-      "org.freedesktop.NetworkManager.Device.Statistics";
+class Statistics_proxy
+{
+public:
+    static constexpr const char* INTERFACE_NAME = "org.freedesktop.NetworkManager.Device.Statistics";
 
- protected:
-  Statistics_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
+protected:
+    Statistics_proxy(sdbus::IProxy& proxy)
+        : m_proxy(proxy)
+    {
+    }
 
-  Statistics_proxy(const Statistics_proxy&) = delete;
-  Statistics_proxy& operator=(const Statistics_proxy&) = delete;
-  Statistics_proxy(Statistics_proxy&&) = delete;
-  Statistics_proxy& operator=(Statistics_proxy&&) = delete;
+    Statistics_proxy(const Statistics_proxy&) = delete;
+    Statistics_proxy& operator=(const Statistics_proxy&) = delete;
+    Statistics_proxy(Statistics_proxy&&) = delete;
+    Statistics_proxy& operator=(Statistics_proxy&&) = delete;
 
-  ~Statistics_proxy() = default;
+    ~Statistics_proxy() = default;
 
-  void registerProxy() {}
+    void registerProxy()
+    {
+    }
 
- public:
-  uint32_t RefreshRateMs() {
-    return m_proxy.getProperty("RefreshRateMs")
-        .onInterface(INTERFACE_NAME)
-        .get<uint32_t>();
-  }
+public:
+    uint32_t RefreshRateMs()
+    {
+        return m_proxy.getProperty("RefreshRateMs").onInterface(INTERFACE_NAME).get<uint32_t>();
+    }
 
-  void RefreshRateMs(const uint32_t& value) {
-    m_proxy.setProperty("RefreshRateMs")
-        .onInterface(INTERFACE_NAME)
-        .toValue(value);
-  }
+    void RefreshRateMs(const uint32_t& value)
+    {
+        m_proxy.setProperty("RefreshRateMs").onInterface(INTERFACE_NAME).toValue(value);
+    }
 
-  uint64_t TxBytes() {
-    return m_proxy.getProperty("TxBytes")
-        .onInterface(INTERFACE_NAME)
-        .get<uint64_t>();
-  }
+    uint64_t TxBytes()
+    {
+        return m_proxy.getProperty("TxBytes").onInterface(INTERFACE_NAME).get<uint64_t>();
+    }
 
-  uint64_t RxBytes() {
-    return m_proxy.getProperty("RxBytes")
-        .onInterface(INTERFACE_NAME)
-        .get<uint64_t>();
-  }
+    uint64_t RxBytes()
+    {
+        return m_proxy.getProperty("RxBytes").onInterface(INTERFACE_NAME).get<uint64_t>();
+    }
 
- private:
-  sdbus::IProxy& m_proxy;
+private:
+    sdbus::IProxy& m_proxy;
 };
 
-}  // namespace Device
-}  // namespace NetworkManager
-}  // namespace freedesktop
-}  // namespace org
+}}}} // namespaces
 
 #endif

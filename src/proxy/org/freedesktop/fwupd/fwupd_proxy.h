@@ -13,419 +13,336 @@
 namespace org {
 namespace freedesktop {
 
-class fwupd_proxy {
- public:
-  static constexpr const char* INTERFACE_NAME = "org.freedesktop.fwupd";
+class fwupd_proxy
+{
+public:
+    static constexpr const char* INTERFACE_NAME = "org.freedesktop.fwupd";
 
- protected:
-  fwupd_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
+protected:
+    fwupd_proxy(sdbus::IProxy& proxy)
+        : m_proxy(proxy)
+    {
+    }
 
-  fwupd_proxy(const fwupd_proxy&) = delete;
-  fwupd_proxy& operator=(const fwupd_proxy&) = delete;
-  fwupd_proxy(fwupd_proxy&&) = delete;
-  fwupd_proxy& operator=(fwupd_proxy&&) = delete;
+    fwupd_proxy(const fwupd_proxy&) = delete;
+    fwupd_proxy& operator=(const fwupd_proxy&) = delete;
+    fwupd_proxy(fwupd_proxy&&) = delete;
+    fwupd_proxy& operator=(fwupd_proxy&&) = delete;
 
-  ~fwupd_proxy() = default;
+    ~fwupd_proxy() = default;
 
-  void registerProxy() {
-    m_proxy.uponSignal("Changed").onInterface(INTERFACE_NAME).call([this]() {
-      this->onChanged();
-    });
-    m_proxy.uponSignal("DeviceAdded")
-        .onInterface(INTERFACE_NAME)
-        .call([this](const std::map<std::string, sdbus::Variant>& device) {
-          this->onDeviceAdded(device);
-        });
-    m_proxy.uponSignal("DeviceRemoved")
-        .onInterface(INTERFACE_NAME)
-        .call([this](const std::map<std::string, sdbus::Variant>& device) {
-          this->onDeviceRemoved(device);
-        });
-    m_proxy.uponSignal("DeviceChanged")
-        .onInterface(INTERFACE_NAME)
-        .call([this](const std::map<std::string, sdbus::Variant>& device) {
-          this->onDeviceChanged(device);
-        });
-    m_proxy.uponSignal("DeviceRequest")
-        .onInterface(INTERFACE_NAME)
-        .call([this](const std::map<std::string, sdbus::Variant>& request) {
-          this->onDeviceRequest(request);
-        });
-  }
+    void registerProxy()
+    {
+        m_proxy.uponSignal("Changed").onInterface(INTERFACE_NAME).call([this](){ this->onChanged(); });
+        m_proxy.uponSignal("DeviceAdded").onInterface(INTERFACE_NAME).call([this](const std::map<std::string, sdbus::Variant>& device){ this->onDeviceAdded(device); });
+        m_proxy.uponSignal("DeviceRemoved").onInterface(INTERFACE_NAME).call([this](const std::map<std::string, sdbus::Variant>& device){ this->onDeviceRemoved(device); });
+        m_proxy.uponSignal("DeviceChanged").onInterface(INTERFACE_NAME).call([this](const std::map<std::string, sdbus::Variant>& device){ this->onDeviceChanged(device); });
+        m_proxy.uponSignal("DeviceRequest").onInterface(INTERFACE_NAME).call([this](const std::map<std::string, sdbus::Variant>& request){ this->onDeviceRequest(request); });
+    }
 
-  virtual void onChanged() = 0;
-  virtual void onDeviceAdded(
-      const std::map<std::string, sdbus::Variant>& device) = 0;
-  virtual void onDeviceRemoved(
-      const std::map<std::string, sdbus::Variant>& device) = 0;
-  virtual void onDeviceChanged(
-      const std::map<std::string, sdbus::Variant>& device) = 0;
-  virtual void onDeviceRequest(
-      const std::map<std::string, sdbus::Variant>& request) = 0;
+    virtual void onChanged() = 0;
+    virtual void onDeviceAdded(const std::map<std::string, sdbus::Variant>& device) = 0;
+    virtual void onDeviceRemoved(const std::map<std::string, sdbus::Variant>& device) = 0;
+    virtual void onDeviceChanged(const std::map<std::string, sdbus::Variant>& device) = 0;
+    virtual void onDeviceRequest(const std::map<std::string, sdbus::Variant>& request) = 0;
 
- public:
-  std::vector<std::map<std::string, sdbus::Variant>> GetDevices() {
-    std::vector<std::map<std::string, sdbus::Variant>> result;
-    m_proxy.callMethod("GetDevices")
-        .onInterface(INTERFACE_NAME)
-        .storeResultsTo(result);
-    return result;
-  }
+public:
+    std::vector<std::map<std::string, sdbus::Variant>> GetDevices()
+    {
+        std::vector<std::map<std::string, sdbus::Variant>> result;
+        m_proxy.callMethod("GetDevices").onInterface(INTERFACE_NAME).storeResultsTo(result);
+        return result;
+    }
 
-  std::vector<std::map<std::string, sdbus::Variant>> GetPlugins() {
-    std::vector<std::map<std::string, sdbus::Variant>> result;
-    m_proxy.callMethod("GetPlugins")
-        .onInterface(INTERFACE_NAME)
-        .storeResultsTo(result);
-    return result;
-  }
+    std::vector<std::map<std::string, sdbus::Variant>> GetPlugins()
+    {
+        std::vector<std::map<std::string, sdbus::Variant>> result;
+        m_proxy.callMethod("GetPlugins").onInterface(INTERFACE_NAME).storeResultsTo(result);
+        return result;
+    }
 
-  std::vector<std::map<std::string, sdbus::Variant>> GetReleases(
-      const std::string& device_id) {
-    std::vector<std::map<std::string, sdbus::Variant>> result;
-    m_proxy.callMethod("GetReleases")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(device_id)
-        .storeResultsTo(result);
-    return result;
-  }
+    std::vector<std::map<std::string, sdbus::Variant>> GetReleases(const std::string& device_id)
+    {
+        std::vector<std::map<std::string, sdbus::Variant>> result;
+        m_proxy.callMethod("GetReleases").onInterface(INTERFACE_NAME).withArguments(device_id).storeResultsTo(result);
+        return result;
+    }
 
-  std::vector<std::map<std::string, sdbus::Variant>> GetDowngrades(
-      const std::string& device_id) {
-    std::vector<std::map<std::string, sdbus::Variant>> result;
-    m_proxy.callMethod("GetDowngrades")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(device_id)
-        .storeResultsTo(result);
-    return result;
-  }
+    std::vector<std::map<std::string, sdbus::Variant>> GetDowngrades(const std::string& device_id)
+    {
+        std::vector<std::map<std::string, sdbus::Variant>> result;
+        m_proxy.callMethod("GetDowngrades").onInterface(INTERFACE_NAME).withArguments(device_id).storeResultsTo(result);
+        return result;
+    }
 
-  std::vector<std::map<std::string, sdbus::Variant>> GetUpgrades(
-      const std::string& device_id) {
-    std::vector<std::map<std::string, sdbus::Variant>> result;
-    m_proxy.callMethod("GetUpgrades")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(device_id)
-        .storeResultsTo(result);
-    return result;
-  }
+    std::vector<std::map<std::string, sdbus::Variant>> GetUpgrades(const std::string& device_id)
+    {
+        std::vector<std::map<std::string, sdbus::Variant>> result;
+        m_proxy.callMethod("GetUpgrades").onInterface(INTERFACE_NAME).withArguments(device_id).storeResultsTo(result);
+        return result;
+    }
 
-  std::vector<std::map<std::string, sdbus::Variant>> GetDetails(
-      const sdbus::UnixFd& handle) {
-    std::vector<std::map<std::string, sdbus::Variant>> result;
-    m_proxy.callMethod("GetDetails")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(handle)
-        .storeResultsTo(result);
-    return result;
-  }
+    std::vector<std::map<std::string, sdbus::Variant>> GetDetails(const sdbus::UnixFd& handle)
+    {
+        std::vector<std::map<std::string, sdbus::Variant>> result;
+        m_proxy.callMethod("GetDetails").onInterface(INTERFACE_NAME).withArguments(handle).storeResultsTo(result);
+        return result;
+    }
 
-  std::vector<std::map<std::string, sdbus::Variant>> GetHistory() {
-    std::vector<std::map<std::string, sdbus::Variant>> result;
-    m_proxy.callMethod("GetHistory")
-        .onInterface(INTERFACE_NAME)
-        .storeResultsTo(result);
-    return result;
-  }
+    std::vector<std::map<std::string, sdbus::Variant>> GetHistory()
+    {
+        std::vector<std::map<std::string, sdbus::Variant>> result;
+        m_proxy.callMethod("GetHistory").onInterface(INTERFACE_NAME).storeResultsTo(result);
+        return result;
+    }
 
-  std::vector<std::map<std::string, sdbus::Variant>> GetHostSecurityAttrs() {
-    std::vector<std::map<std::string, sdbus::Variant>> result;
-    m_proxy.callMethod("GetHostSecurityAttrs")
-        .onInterface(INTERFACE_NAME)
-        .storeResultsTo(result);
-    return result;
-  }
+    std::vector<std::map<std::string, sdbus::Variant>> GetHostSecurityAttrs()
+    {
+        std::vector<std::map<std::string, sdbus::Variant>> result;
+        m_proxy.callMethod("GetHostSecurityAttrs").onInterface(INTERFACE_NAME).storeResultsTo(result);
+        return result;
+    }
 
-  std::vector<std::map<std::string, sdbus::Variant>> GetHostSecurityEvents(
-      const uint32_t& limit) {
-    std::vector<std::map<std::string, sdbus::Variant>> result;
-    m_proxy.callMethod("GetHostSecurityEvents")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(limit)
-        .storeResultsTo(result);
-    return result;
-  }
+    std::vector<std::map<std::string, sdbus::Variant>> GetHostSecurityEvents(const uint32_t& limit)
+    {
+        std::vector<std::map<std::string, sdbus::Variant>> result;
+        m_proxy.callMethod("GetHostSecurityEvents").onInterface(INTERFACE_NAME).withArguments(limit).storeResultsTo(result);
+        return result;
+    }
 
-  std::map<std::string, std::string> GetReportMetadata() {
-    std::map<std::string, std::string> result;
-    m_proxy.callMethod("GetReportMetadata")
-        .onInterface(INTERFACE_NAME)
-        .storeResultsTo(result);
-    return result;
-  }
+    std::map<std::string, std::string> GetReportMetadata()
+    {
+        std::map<std::string, std::string> result;
+        m_proxy.callMethod("GetReportMetadata").onInterface(INTERFACE_NAME).storeResultsTo(result);
+        return result;
+    }
 
-  void SetHints(const std::map<std::string, std::string>& hints) {
-    m_proxy.callMethod("SetHints")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(hints);
-  }
+    void SetHints(const std::map<std::string, std::string>& hints)
+    {
+        m_proxy.callMethod("SetHints").onInterface(INTERFACE_NAME).withArguments(hints);
+    }
 
-  void Install(const std::string& id,
-               const sdbus::UnixFd& handle,
-               const std::map<std::string, sdbus::Variant>& options) {
-    m_proxy.callMethod("Install")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(id, handle, options);
-  }
+    void Install(const std::string& id, const sdbus::UnixFd& handle, const std::map<std::string, sdbus::Variant>& options)
+    {
+        m_proxy.callMethod("Install").onInterface(INTERFACE_NAME).withArguments(id, handle, options);
+    }
 
-  void Verify(const std::string& id) {
-    m_proxy.callMethod("Verify").onInterface(INTERFACE_NAME).withArguments(id);
-  }
+    void Verify(const std::string& id)
+    {
+        m_proxy.callMethod("Verify").onInterface(INTERFACE_NAME).withArguments(id);
+    }
 
-  void VerifyUpdate(const std::string& id) {
-    m_proxy.callMethod("VerifyUpdate")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(id);
-  }
+    void VerifyUpdate(const std::string& id)
+    {
+        m_proxy.callMethod("VerifyUpdate").onInterface(INTERFACE_NAME).withArguments(id);
+    }
 
-  void Unlock(const std::string& id) {
-    m_proxy.callMethod("Unlock").onInterface(INTERFACE_NAME).withArguments(id);
-  }
+    void Unlock(const std::string& id)
+    {
+        m_proxy.callMethod("Unlock").onInterface(INTERFACE_NAME).withArguments(id);
+    }
 
-  void Activate(const std::string& id) {
-    m_proxy.callMethod("Activate")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(id);
-  }
+    void Activate(const std::string& id)
+    {
+        m_proxy.callMethod("Activate").onInterface(INTERFACE_NAME).withArguments(id);
+    }
 
-  std::map<std::string, sdbus::Variant> GetResults(const std::string& id) {
-    std::map<std::string, sdbus::Variant> result;
-    m_proxy.callMethod("GetResults")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(id)
-        .storeResultsTo(result);
-    return result;
-  }
+    std::map<std::string, sdbus::Variant> GetResults(const std::string& id)
+    {
+        std::map<std::string, sdbus::Variant> result;
+        m_proxy.callMethod("GetResults").onInterface(INTERFACE_NAME).withArguments(id).storeResultsTo(result);
+        return result;
+    }
 
-  std::vector<std::map<std::string, sdbus::Variant>> GetRemotes() {
-    std::vector<std::map<std::string, sdbus::Variant>> result;
-    m_proxy.callMethod("GetRemotes")
-        .onInterface(INTERFACE_NAME)
-        .storeResultsTo(result);
-    return result;
-  }
+    std::vector<std::map<std::string, sdbus::Variant>> GetRemotes()
+    {
+        std::vector<std::map<std::string, sdbus::Variant>> result;
+        m_proxy.callMethod("GetRemotes").onInterface(INTERFACE_NAME).storeResultsTo(result);
+        return result;
+    }
 
-  std::vector<std::string> GetApprovedFirmware() {
-    std::vector<std::string> result;
-    m_proxy.callMethod("GetApprovedFirmware")
-        .onInterface(INTERFACE_NAME)
-        .storeResultsTo(result);
-    return result;
-  }
+    std::vector<std::string> GetApprovedFirmware()
+    {
+        std::vector<std::string> result;
+        m_proxy.callMethod("GetApprovedFirmware").onInterface(INTERFACE_NAME).storeResultsTo(result);
+        return result;
+    }
 
-  void SetApprovedFirmware(const std::vector<std::string>& checksums) {
-    m_proxy.callMethod("SetApprovedFirmware")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(checksums);
-  }
+    void SetApprovedFirmware(const std::vector<std::string>& checksums)
+    {
+        m_proxy.callMethod("SetApprovedFirmware").onInterface(INTERFACE_NAME).withArguments(checksums);
+    }
 
-  std::vector<std::string> GetBlockedFirmware() {
-    std::vector<std::string> result;
-    m_proxy.callMethod("GetBlockedFirmware")
-        .onInterface(INTERFACE_NAME)
-        .storeResultsTo(result);
-    return result;
-  }
+    std::vector<std::string> GetBlockedFirmware()
+    {
+        std::vector<std::string> result;
+        m_proxy.callMethod("GetBlockedFirmware").onInterface(INTERFACE_NAME).storeResultsTo(result);
+        return result;
+    }
 
-  void SetBlockedFirmware(const std::vector<std::string>& checksums) {
-    m_proxy.callMethod("SetBlockedFirmware")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(checksums);
-  }
+    void SetBlockedFirmware(const std::vector<std::string>& checksums)
+    {
+        m_proxy.callMethod("SetBlockedFirmware").onInterface(INTERFACE_NAME).withArguments(checksums);
+    }
 
-  void SetFeatureFlags(const uint64_t& feature_flags) {
-    m_proxy.callMethod("SetFeatureFlags")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(feature_flags);
-  }
+    void SetFeatureFlags(const uint64_t& feature_flags)
+    {
+        m_proxy.callMethod("SetFeatureFlags").onInterface(INTERFACE_NAME).withArguments(feature_flags);
+    }
 
-  void ClearResults(const std::string& id) {
-    m_proxy.callMethod("ClearResults")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(id);
-  }
+    void ClearResults(const std::string& id)
+    {
+        m_proxy.callMethod("ClearResults").onInterface(INTERFACE_NAME).withArguments(id);
+    }
 
-  void ModifyDevice(const std::string& device_id,
-                    const std::string& key,
-                    const std::string& value) {
-    m_proxy.callMethod("ModifyDevice")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(device_id, key, value);
-  }
+    void ModifyDevice(const std::string& device_id, const std::string& key, const std::string& value)
+    {
+        m_proxy.callMethod("ModifyDevice").onInterface(INTERFACE_NAME).withArguments(device_id, key, value);
+    }
 
-  void ModifyConfig(const std::string& key, const std::string& value) {
-    m_proxy.callMethod("ModifyConfig")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(key, value);
-  }
+    void ModifyConfig(const std::string& key, const std::string& value)
+    {
+        m_proxy.callMethod("ModifyConfig").onInterface(INTERFACE_NAME).withArguments(key, value);
+    }
 
-  void UpdateMetadata(const std::string& remote_id,
-                      const sdbus::UnixFd& data,
-                      const sdbus::UnixFd& signature) {
-    m_proxy.callMethod("UpdateMetadata")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(remote_id, data, signature);
-  }
+    void UpdateMetadata(const std::string& remote_id, const sdbus::UnixFd& data, const sdbus::UnixFd& signature)
+    {
+        m_proxy.callMethod("UpdateMetadata").onInterface(INTERFACE_NAME).withArguments(remote_id, data, signature);
+    }
 
-  void ModifyRemote(const std::string& remote_id,
-                    const std::string& key,
-                    const std::string& value) {
-    m_proxy.callMethod("ModifyRemote")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(remote_id, key, value);
-  }
+    void ModifyRemote(const std::string& remote_id, const std::string& key, const std::string& value)
+    {
+        m_proxy.callMethod("ModifyRemote").onInterface(INTERFACE_NAME).withArguments(remote_id, key, value);
+    }
 
-  void FixHostSecurityAttr(const std::string& appstream_id) {
-    m_proxy.callMethod("FixHostSecurityAttr")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(appstream_id);
-  }
+    void FixHostSecurityAttr(const std::string& appstream_id)
+    {
+        m_proxy.callMethod("FixHostSecurityAttr").onInterface(INTERFACE_NAME).withArguments(appstream_id);
+    }
 
-  void UndoHostSecurityAttr(const std::string& appstream_id) {
-    m_proxy.callMethod("UndoHostSecurityAttr")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(appstream_id);
-  }
+    void UndoHostSecurityAttr(const std::string& appstream_id)
+    {
+        m_proxy.callMethod("UndoHostSecurityAttr").onInterface(INTERFACE_NAME).withArguments(appstream_id);
+    }
 
-  std::string SelfSign(const std::string& data,
-                       const std::map<std::string, sdbus::Variant>& options) {
-    std::string result;
-    m_proxy.callMethod("SelfSign")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(data, options)
-        .storeResultsTo(result);
-    return result;
-  }
+    std::string SelfSign(const std::string& data, const std::map<std::string, sdbus::Variant>& options)
+    {
+        std::string result;
+        m_proxy.callMethod("SelfSign").onInterface(INTERFACE_NAME).withArguments(data, options).storeResultsTo(result);
+        return result;
+    }
 
-  void SetBiosSettings(const std::map<std::string, std::string>& settings) {
-    m_proxy.callMethod("SetBiosSettings")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(settings);
-  }
+    void SetBiosSettings(const std::map<std::string, std::string>& settings)
+    {
+        m_proxy.callMethod("SetBiosSettings").onInterface(INTERFACE_NAME).withArguments(settings);
+    }
 
-  std::vector<std::map<std::string, sdbus::Variant>> GetBiosSettings() {
-    std::vector<std::map<std::string, sdbus::Variant>> result;
-    m_proxy.callMethod("GetBiosSettings")
-        .onInterface(INTERFACE_NAME)
-        .storeResultsTo(result);
-    return result;
-  }
+    std::vector<std::map<std::string, sdbus::Variant>> GetBiosSettings()
+    {
+        std::vector<std::map<std::string, sdbus::Variant>> result;
+        m_proxy.callMethod("GetBiosSettings").onInterface(INTERFACE_NAME).storeResultsTo(result);
+        return result;
+    }
 
-  std::string Inhibit(const std::string& reason) {
-    std::string result;
-    m_proxy.callMethod("Inhibit")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(reason)
-        .storeResultsTo(result);
-    return result;
-  }
+    std::string Inhibit(const std::string& reason)
+    {
+        std::string result;
+        m_proxy.callMethod("Inhibit").onInterface(INTERFACE_NAME).withArguments(reason).storeResultsTo(result);
+        return result;
+    }
 
-  void Uninhibit(const std::string& inhibit_id) {
-    m_proxy.callMethod("Uninhibit")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(inhibit_id);
-  }
+    void Uninhibit(const std::string& inhibit_id)
+    {
+        m_proxy.callMethod("Uninhibit").onInterface(INTERFACE_NAME).withArguments(inhibit_id);
+    }
 
-  void Quit() { m_proxy.callMethod("Quit").onInterface(INTERFACE_NAME); }
+    void Quit()
+    {
+        m_proxy.callMethod("Quit").onInterface(INTERFACE_NAME);
+    }
 
-  void EmulationLoad(const std::vector<uint8_t>& data) {
-    m_proxy.callMethod("EmulationLoad")
-        .onInterface(INTERFACE_NAME)
-        .withArguments(data);
-  }
+    void EmulationLoad(const std::vector<uint8_t>& data)
+    {
+        m_proxy.callMethod("EmulationLoad").onInterface(INTERFACE_NAME).withArguments(data);
+    }
 
-  std::vector<uint8_t> EmulationSave() {
-    std::vector<uint8_t> result;
-    m_proxy.callMethod("EmulationSave")
-        .onInterface(INTERFACE_NAME)
-        .storeResultsTo(result);
-    return result;
-  }
+    std::vector<uint8_t> EmulationSave()
+    {
+        std::vector<uint8_t> result;
+        m_proxy.callMethod("EmulationSave").onInterface(INTERFACE_NAME).storeResultsTo(result);
+        return result;
+    }
 
- public:
-  std::string DaemonVersion() {
-    return m_proxy.getProperty("DaemonVersion")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+public:
+    std::string DaemonVersion()
+    {
+        return m_proxy.getProperty("DaemonVersion").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::string HostBkc() {
-    return m_proxy.getProperty("HostBkc")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string HostBkc()
+    {
+        return m_proxy.getProperty("HostBkc").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::string HostVendor() {
-    return m_proxy.getProperty("HostVendor")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string HostVendor()
+    {
+        return m_proxy.getProperty("HostVendor").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::string HostProduct() {
-    return m_proxy.getProperty("HostProduct")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string HostProduct()
+    {
+        return m_proxy.getProperty("HostProduct").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::string HostMachineId() {
-    return m_proxy.getProperty("HostMachineId")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string HostMachineId()
+    {
+        return m_proxy.getProperty("HostMachineId").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  std::string HostSecurityId() {
-    return m_proxy.getProperty("HostSecurityId")
-        .onInterface(INTERFACE_NAME)
-        .get<std::string>();
-  }
+    std::string HostSecurityId()
+    {
+        return m_proxy.getProperty("HostSecurityId").onInterface(INTERFACE_NAME).get<std::string>();
+    }
 
-  bool Tainted() {
-    return m_proxy.getProperty("Tainted")
-        .onInterface(INTERFACE_NAME)
-        .get<bool>();
-  }
+    bool Tainted()
+    {
+        return m_proxy.getProperty("Tainted").onInterface(INTERFACE_NAME).get<bool>();
+    }
 
-  bool Interactive() {
-    return m_proxy.getProperty("Interactive")
-        .onInterface(INTERFACE_NAME)
-        .get<bool>();
-  }
+    bool Interactive()
+    {
+        return m_proxy.getProperty("Interactive").onInterface(INTERFACE_NAME).get<bool>();
+    }
 
-  uint32_t Status() {
-    return m_proxy.getProperty("Status")
-        .onInterface(INTERFACE_NAME)
-        .get<uint32_t>();
-  }
+    uint32_t Status()
+    {
+        return m_proxy.getProperty("Status").onInterface(INTERFACE_NAME).get<uint32_t>();
+    }
 
-  uint32_t Percentage() {
-    return m_proxy.getProperty("Percentage")
-        .onInterface(INTERFACE_NAME)
-        .get<uint32_t>();
-  }
+    uint32_t Percentage()
+    {
+        return m_proxy.getProperty("Percentage").onInterface(INTERFACE_NAME).get<uint32_t>();
+    }
 
-  uint32_t BatteryLevel() {
-    return m_proxy.getProperty("BatteryLevel")
-        .onInterface(INTERFACE_NAME)
-        .get<uint32_t>();
-  }
+    uint32_t BatteryLevel()
+    {
+        return m_proxy.getProperty("BatteryLevel").onInterface(INTERFACE_NAME).get<uint32_t>();
+    }
 
-  uint32_t BatteryThreshold() {
-    return m_proxy.getProperty("BatteryThreshold")
-        .onInterface(INTERFACE_NAME)
-        .get<uint32_t>();
-  }
+    uint32_t BatteryThreshold()
+    {
+        return m_proxy.getProperty("BatteryThreshold").onInterface(INTERFACE_NAME).get<uint32_t>();
+    }
 
-  bool OnlyTrusted() {
-    return m_proxy.getProperty("OnlyTrusted")
-        .onInterface(INTERFACE_NAME)
-        .get<bool>();
-  }
+    bool OnlyTrusted()
+    {
+        return m_proxy.getProperty("OnlyTrusted").onInterface(INTERFACE_NAME).get<bool>();
+    }
 
- private:
-  sdbus::IProxy& m_proxy;
+private:
+    sdbus::IProxy& m_proxy;
 };
 
-}  // namespace freedesktop
-}  // namespace org
+}} // namespaces
 
 #endif
