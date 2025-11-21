@@ -35,10 +35,14 @@ class FwupdClient final
       const std::vector<sdbus::PropertyName>& invalidatedProperties) override;
 
   void onChanged() override;
-  void onDeviceAdded(const std::map<std::string, sdbus::Variant>& device) override;
-  void onDeviceRemoved(const std::map<std::string, sdbus::Variant>& device) override;
-  void onDeviceChanged(const std::map<std::string, sdbus::Variant>& device) override;
-  void onDeviceRequest(const std::map<std::string, sdbus::Variant>& request) override;
+  void onDeviceAdded(
+      const std::map<std::string, sdbus::Variant>& device) override;
+  void onDeviceRemoved(
+      const std::map<std::string, sdbus::Variant>& device) override;
+  void onDeviceChanged(
+      const std::map<std::string, sdbus::Variant>& device) override;
+  void onDeviceRequest(
+      const std::map<std::string, sdbus::Variant>& request) override;
 };
 
 #endif  // SRC_FWUPD_FWUPD_CLIENT_H
