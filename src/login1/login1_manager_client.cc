@@ -94,13 +94,20 @@ void Login1ManagerClient::onSessionNew(const std::string& session_id,
   if (!sessions_.contains(object_path)) {
     sessions_[object_path] = std::make_unique<Login1Session>(
         getProxy().getConnection(), object_path);
+    // printProperties() is called in constructor
   }
 }
 
 void Login1ManagerClient::onSessionRemoved(
     const std::string& session_id,
     const sdbus::ObjectPath& object_path) {
-  spdlog::info("onSessionRemoved: {}: {}", session_id, object_path);
+  std::ostringstream os;
+  os << std::endl;
+  os << "========================================" << std::endl;
+  os << "SESSION REMOVED: " << object_path << std::endl;
+  os << "  Session ID: " << session_id << std::endl;
+  os << "========================================" << std::endl;
+  spdlog::info(os.str());
   if (sessions_.contains(object_path)) {
     sessions_[object_path].reset();
     sessions_.erase(object_path);
@@ -113,12 +120,19 @@ void Login1ManagerClient::onUserNew(const uint32_t& uid,
   if (!users_.contains(object_path)) {
     users_[object_path] =
         std::make_unique<Login1User>(getProxy().getConnection(), object_path);
+    // printProperties() is called in constructor
   }
 }
 
 void Login1ManagerClient::onUserRemoved(const uint32_t& uid,
                                         const sdbus::ObjectPath& object_path) {
-  spdlog::info("onUserRemoved: {}: {}", uid, object_path);
+  std::ostringstream os;
+  os << std::endl;
+  os << "========================================" << std::endl;
+  os << "USER REMOVED: " << object_path << std::endl;
+  os << "  UID: " << uid << std::endl;
+  os << "========================================" << std::endl;
+  spdlog::info(os.str());
   if (users_.contains(object_path)) {
     users_[object_path].reset();
     users_.erase(object_path);
@@ -131,12 +145,19 @@ void Login1ManagerClient::onSeatNew(const std::string& seat_id,
   if (!seats_.contains(object_path)) {
     seats_[object_path] =
         std::make_unique<Login1Seat>(getProxy().getConnection(), object_path);
+    // printProperties() is called in constructor
   }
 }
 
 void Login1ManagerClient::onSeatRemoved(const std::string& seat_id,
                                         const sdbus::ObjectPath& object_path) {
-  spdlog::info("onSeatRemoved: {}: {}", seat_id, object_path);
+  std::ostringstream os;
+  os << std::endl;
+  os << "========================================" << std::endl;
+  os << "SEAT REMOVED: " << object_path << std::endl;
+  os << "  Seat ID: " << seat_id << std::endl;
+  os << "========================================" << std::endl;
+  spdlog::info(os.str());
   if (seats_.contains(object_path)) {
     seats_[object_path].reset();
     seats_.erase(object_path);

@@ -34,10 +34,11 @@ class Login1User final
           User_proxy::INTERFACE_NAME,
           [&](std::optional<sdbus::Error> error,
               std::map<sdbus::PropertyName, sdbus::Variant> values) {
-            if (!error)
+            if (!error) {
               onPropertiesChanged(
                   sdbus::InterfaceName(User_proxy::INTERFACE_NAME), values, {});
-            else
+              printProperties();
+            } else
               spdlog::error("login1.User: {} - {}", error->getName(),
                             error->getMessage());
           });
@@ -45,6 +46,23 @@ class Login1User final
   }
 
   virtual ~Login1User() { unregisterProxy(); }
+
+  void printProperties() {
+    try {
+      auto props = this->GetAll(User_proxy::INTERFACE_NAME);
+      std::ostringstream os;
+      os << std::endl;
+      os << "========================================" << std::endl;
+      os << "USER: " << object_path_ << std::endl;
+      os << "========================================" << std::endl;
+      Utils::append_properties(props, os);
+      os << "========================================" << std::endl;
+      spdlog::info(os.str());
+    } catch (const sdbus::Error& e) {
+      spdlog::error("Failed to get user properties for {}: {} - {}",
+                    object_path_, e.getName(), e.getMessage());
+    }
+  }
 
  private:
   sdbus::ObjectPath object_path_;
@@ -55,6 +73,9 @@ class Login1User final
       const std::vector<sdbus::PropertyName>& invalidatedProperties) override {
     Utils::print_changed_properties(interfaceName, changedProperties,
                                     invalidatedProperties);
+    if (!changedProperties.empty()) {
+      printProperties();
+    }
   }
 };
 

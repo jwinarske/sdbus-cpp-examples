@@ -26,18 +26,20 @@ class Login1Session final
                 const sdbus::ObjectPath& objectPath)
       : ProxyInterfaces{connection,
                         sdbus::ServiceName("org.freedesktop.login1"),
-                        objectPath} {
+                        objectPath},
+        object_path_(objectPath) {
     registerProxy();
     {
       const auto props = this->GetAllAsync(
           Session_proxy::INTERFACE_NAME,
           [&](std::optional<sdbus::Error> error,
               std::map<sdbus::PropertyName, sdbus::Variant> values) {
-            if (!error)
+            if (!error) {
               onPropertiesChanged(
                   sdbus::InterfaceName(Session_proxy::INTERFACE_NAME), values,
                   {});
-            else
+              printProperties();
+            } else
               spdlog::error("login1.Session: {} - {}", error->getName(),
                             error->getMessage());
           });
@@ -46,13 +48,35 @@ class Login1Session final
 
   virtual ~Login1Session() { unregisterProxy(); }
 
+  void printProperties() {
+    try {
+      auto props = this->GetAll(Session_proxy::INTERFACE_NAME);
+      std::ostringstream os;
+      os << std::endl;
+      os << "========================================" << std::endl;
+      os << "SESSION: " << object_path_ << std::endl;
+      os << "========================================" << std::endl;
+      Utils::append_properties(props, os);
+      os << "========================================" << std::endl;
+      spdlog::info(os.str());
+    } catch (const sdbus::Error& e) {
+      spdlog::error("Failed to get session properties for {}: {} - {}",
+                    object_path_, e.getName(), e.getMessage());
+    }
+  }
+
  private:
+  sdbus::ObjectPath object_path_;
+
   void onPropertiesChanged(
       const sdbus::InterfaceName& interfaceName,
       const std::map<sdbus::PropertyName, sdbus::Variant>& changedProperties,
       const std::vector<sdbus::PropertyName>& invalidatedProperties) override {
     Utils::print_changed_properties(interfaceName, changedProperties,
                                     invalidatedProperties);
+    if (!changedProperties.empty()) {
+      printProperties();
+    }
   }
 
   void onPauseDevice(const uint32_t& major,
