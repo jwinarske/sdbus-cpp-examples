@@ -15,16 +15,20 @@
 #ifndef SRC_BLUEZ_UDEV_MONITOR_HPP_
 #define SRC_BLUEZ_UDEV_MONITOR_HPP_
 
-#include <libudev.h>
-#include <spdlog/spdlog.h>
-#include <sys/epoll.h>
-#include <unistd.h>
 #include <atomic>
+#include <cerrno>
+#include <cstring>
 #include <functional>
 #include <string>
 #include <thread>
 #include <utility>
 #include <vector>
+
+#include <libudev.h>
+#include <sys/epoll.h>
+#include <unistd.h>
+
+#include <spdlog/spdlog.h>
 
 class UdevMonitor {
  public:
@@ -48,7 +52,13 @@ class UdevMonitor {
 
   void stop() {
     is_running_ = false;
-    write(pipe_fds_[1], "x", 1);
+    if (pipe_fds_[1] != -1) {
+      ssize_t wrote = write(pipe_fds_[1], "x", 1);
+      if (wrote == -1) {
+        spdlog::error("Failed to write to stop pipe: {} ({})",
+                      std::strerror(errno), errno);
+      }
+    }
   }
 
  private:

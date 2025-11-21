@@ -14,118 +14,170 @@ namespace org {
 namespace freedesktop {
 namespace Flatpak {
 
-class SystemHelper_proxy
-{
-public:
-    static constexpr const char* INTERFACE_NAME = "org.freedesktop.Flatpak.SystemHelper";
+class SystemHelper_proxy {
+ public:
+  static constexpr const char* INTERFACE_NAME =
+      "org.freedesktop.Flatpak.SystemHelper";
 
-protected:
-    SystemHelper_proxy(sdbus::IProxy& proxy)
-        : m_proxy(proxy)
-    {
-    }
+ protected:
+  SystemHelper_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
 
-    SystemHelper_proxy(const SystemHelper_proxy&) = delete;
-    SystemHelper_proxy& operator=(const SystemHelper_proxy&) = delete;
-    SystemHelper_proxy(SystemHelper_proxy&&) = delete;
-    SystemHelper_proxy& operator=(SystemHelper_proxy&&) = delete;
+  SystemHelper_proxy(const SystemHelper_proxy&) = delete;
+  SystemHelper_proxy& operator=(const SystemHelper_proxy&) = delete;
+  SystemHelper_proxy(SystemHelper_proxy&&) = delete;
+  SystemHelper_proxy& operator=(SystemHelper_proxy&&) = delete;
 
-    ~SystemHelper_proxy() = default;
+  ~SystemHelper_proxy() = default;
 
-    void registerProxy()
-    {
-    }
+  void registerProxy() {}
 
-public:
-    void Deploy(const std::vector<uint8_t>& repo_path, const uint32_t& flags, const std::string& ref, const std::string& origin, const std::vector<std::string>& subpaths, const std::vector<std::string>& previous_ids, const std::string& installation)
-    {
-        m_proxy.callMethod("Deploy").onInterface(INTERFACE_NAME).withArguments(repo_path, flags, ref, origin, subpaths, previous_ids, installation);
-    }
+ public:
+  void Deploy(const std::vector<uint8_t>& repo_path,
+              const uint32_t& flags,
+              const std::string& ref,
+              const std::string& origin,
+              const std::vector<std::string>& subpaths,
+              const std::vector<std::string>& previous_ids,
+              const std::string& installation) {
+    m_proxy.callMethod("Deploy")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(repo_path, flags, ref, origin, subpaths, previous_ids,
+                       installation);
+  }
 
-    void DeployAppstream(const std::vector<uint8_t>& repo_path, const uint32_t& flags, const std::string& origin, const std::string& arch, const std::string& installation)
-    {
-        m_proxy.callMethod("DeployAppstream").onInterface(INTERFACE_NAME).withArguments(repo_path, flags, origin, arch, installation);
-    }
+  void DeployAppstream(const std::vector<uint8_t>& repo_path,
+                       const uint32_t& flags,
+                       const std::string& origin,
+                       const std::string& arch,
+                       const std::string& installation) {
+    m_proxy.callMethod("DeployAppstream")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(repo_path, flags, origin, arch, installation);
+  }
 
-    void Uninstall(const uint32_t& flags, const std::string& ref, const std::string& installation)
-    {
-        m_proxy.callMethod("Uninstall").onInterface(INTERFACE_NAME).withArguments(flags, ref, installation);
-    }
+  void Uninstall(const uint32_t& flags,
+                 const std::string& ref,
+                 const std::string& installation) {
+    m_proxy.callMethod("Uninstall")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(flags, ref, installation);
+  }
 
-    std::string InstallBundle(const std::vector<uint8_t>& bundle_path, const uint32_t& flags, const std::string& remote, const std::string& installation)
-    {
-        std::string result;
-        m_proxy.callMethod("InstallBundle").onInterface(INTERFACE_NAME).withArguments(bundle_path, flags, remote, installation).storeResultsTo(result);
-        return result;
-    }
+  std::string InstallBundle(const std::vector<uint8_t>& bundle_path,
+                            const uint32_t& flags,
+                            const std::string& remote,
+                            const std::string& installation) {
+    std::string result;
+    m_proxy.callMethod("InstallBundle")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(bundle_path, flags, remote, installation)
+        .storeResultsTo(result);
+    return result;
+  }
 
-    void ConfigureRemote(const uint32_t& flags, const std::string& remote, const std::string& config, const std::vector<uint8_t>& gpg_key, const std::string& installation)
-    {
-        m_proxy.callMethod("ConfigureRemote").onInterface(INTERFACE_NAME).withArguments(flags, remote, config, gpg_key, installation);
-    }
+  void ConfigureRemote(const uint32_t& flags,
+                       const std::string& remote,
+                       const std::string& config,
+                       const std::vector<uint8_t>& gpg_key,
+                       const std::string& installation) {
+    m_proxy.callMethod("ConfigureRemote")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(flags, remote, config, gpg_key, installation);
+  }
 
-    void Configure(const uint32_t& flags, const std::string& key, const std::string& value, const std::string& installation)
-    {
-        m_proxy.callMethod("Configure").onInterface(INTERFACE_NAME).withArguments(flags, key, value, installation);
-    }
+  void Configure(const uint32_t& flags,
+                 const std::string& key,
+                 const std::string& value,
+                 const std::string& installation) {
+    m_proxy.callMethod("Configure")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(flags, key, value, installation);
+  }
 
-    void UpdateRemote(const uint32_t& flags, const std::string& remote, const std::string& installation, const std::vector<uint8_t>& summary_path, const std::vector<uint8_t>& summary_sig_path)
-    {
-        m_proxy.callMethod("UpdateRemote").onInterface(INTERFACE_NAME).withArguments(flags, remote, installation, summary_path, summary_sig_path);
-    }
+  void UpdateRemote(const uint32_t& flags,
+                    const std::string& remote,
+                    const std::string& installation,
+                    const std::vector<uint8_t>& summary_path,
+                    const std::vector<uint8_t>& summary_sig_path) {
+    m_proxy.callMethod("UpdateRemote")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(flags, remote, installation, summary_path,
+                       summary_sig_path);
+  }
 
-    void RemoveLocalRef(const uint32_t& flags, const std::string& remote, const std::string& ref, const std::string& installation)
-    {
-        m_proxy.callMethod("RemoveLocalRef").onInterface(INTERFACE_NAME).withArguments(flags, remote, ref, installation);
-    }
+  void RemoveLocalRef(const uint32_t& flags,
+                      const std::string& remote,
+                      const std::string& ref,
+                      const std::string& installation) {
+    m_proxy.callMethod("RemoveLocalRef")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(flags, remote, ref, installation);
+  }
 
-    void PruneLocalRepo(const uint32_t& flags, const std::string& installation)
-    {
-        m_proxy.callMethod("PruneLocalRepo").onInterface(INTERFACE_NAME).withArguments(flags, installation);
-    }
+  void PruneLocalRepo(const uint32_t& flags, const std::string& installation) {
+    m_proxy.callMethod("PruneLocalRepo")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(flags, installation);
+  }
 
-    void RunTriggers(const uint32_t& flags, const std::string& installation)
-    {
-        m_proxy.callMethod("RunTriggers").onInterface(INTERFACE_NAME).withArguments(flags, installation);
-    }
+  void RunTriggers(const uint32_t& flags, const std::string& installation) {
+    m_proxy.callMethod("RunTriggers")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(flags, installation);
+  }
 
-    void EnsureRepo(const uint32_t& flags, const std::string& installation)
-    {
-        m_proxy.callMethod("EnsureRepo").onInterface(INTERFACE_NAME).withArguments(flags, installation);
-    }
+  void EnsureRepo(const uint32_t& flags, const std::string& installation) {
+    m_proxy.callMethod("EnsureRepo")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(flags, installation);
+  }
 
-    void UpdateSummary(const uint32_t& flags, const std::string& installation)
-    {
-        m_proxy.callMethod("UpdateSummary").onInterface(INTERFACE_NAME).withArguments(flags, installation);
-    }
+  void UpdateSummary(const uint32_t& flags, const std::string& installation) {
+    m_proxy.callMethod("UpdateSummary")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(flags, installation);
+  }
 
-    void GenerateOciSummary(const uint32_t& flags, const std::string& origin, const std::string& installation)
-    {
-        m_proxy.callMethod("GenerateOciSummary").onInterface(INTERFACE_NAME).withArguments(flags, origin, installation);
-    }
+  void GenerateOciSummary(const uint32_t& flags,
+                          const std::string& origin,
+                          const std::string& installation) {
+    m_proxy.callMethod("GenerateOciSummary")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(flags, origin, installation);
+  }
 
-    void CancelPull(const uint32_t& flags, const std::string& installation, const std::string& src_dir)
-    {
-        m_proxy.callMethod("CancelPull").onInterface(INTERFACE_NAME).withArguments(flags, installation, src_dir);
-    }
+  void CancelPull(const uint32_t& flags,
+                  const std::string& installation,
+                  const std::string& src_dir) {
+    m_proxy.callMethod("CancelPull")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(flags, installation, src_dir);
+  }
 
-    std::tuple<sdbus::UnixFd, std::string> GetRevokefsFd(const uint32_t& flags, const std::string& installation)
-    {
-        std::tuple<sdbus::UnixFd, std::string> result;
-        m_proxy.callMethod("GetRevokefsFd").onInterface(INTERFACE_NAME).withArguments(flags, installation).storeResultsTo(result);
-        return result;
-    }
+  std::tuple<sdbus::UnixFd, std::string> GetRevokefsFd(
+      const uint32_t& flags,
+      const std::string& installation) {
+    std::tuple<sdbus::UnixFd, std::string> result;
+    m_proxy.callMethod("GetRevokefsFd")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(flags, installation)
+        .storeResultsTo(result);
+    return result;
+  }
 
-public:
-    uint32_t version()
-    {
-        return m_proxy.getProperty("version").onInterface(INTERFACE_NAME).get<uint32_t>();
-    }
+ public:
+  uint32_t version() {
+    return m_proxy.getProperty("version")
+        .onInterface(INTERFACE_NAME)
+        .get<uint32_t>();
+  }
 
-private:
-    sdbus::IProxy& m_proxy;
+ private:
+  sdbus::IProxy& m_proxy;
 };
 
-}}} // namespaces
+}  // namespace Flatpak
+}  // namespace freedesktop
+}  // namespace org
 
 #endif

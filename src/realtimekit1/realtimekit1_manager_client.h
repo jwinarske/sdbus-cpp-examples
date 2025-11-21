@@ -20,11 +20,11 @@
 #include <sdbus-c++/sdbus-c++.h>
 #include <spdlog/spdlog.h>
 
-#include <cstdint>
-#include <string>
 #include <sys/syscall.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <cstdint>
+#include <string>
 
 class RealtimeKit1ManagerClient : public org::freedesktop::RealtimeKit1_proxy {
  public:

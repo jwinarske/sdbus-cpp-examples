@@ -22,9 +22,9 @@ extern void exerciseRealtime(RealtimeKit1ManagerClient&);
 int main() {
   try {
     auto connection = sdbus::createSystemBusConnection();
-    auto proxy = sdbus::createProxy(*connection,
-                                     sdbus::ServiceName("org.freedesktop.RealtimeKit1"),
-                                     sdbus::ObjectPath("/org/freedesktop/RealtimeKit1"));
+    auto proxy = sdbus::createProxy(
+        *connection, sdbus::ServiceName("org.freedesktop.RealtimeKit1"),
+        sdbus::ObjectPath("/org/freedesktop/RealtimeKit1"));
     RealtimeKit1ManagerClient client(*proxy);
     exerciseRealtime(client);
     spdlog::info("RealtimeKit1 example complete");

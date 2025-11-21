@@ -4,14 +4,30 @@
         <property name="SystemNTPServers" type="as" access="read"></property>
         <property name="RuntimeNTPServers" type="as" access="read"></property>
         <property name="FallbackNTPServers" type="as" access="read"></property>
-        <property name="ServerName" type="s" access="read"><annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/></property>
-        <property name="ServerAddress" type="(iay)" access="read"><annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/></property>
-        <property name="RootDistanceMaxUSec" type="t" access="read"><annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="const"/></property>
-        <property name="PollIntervalMinUSec" type="t" access="read"><annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="const"/></property>
-        <property name="PollIntervalMaxUSec" type="t" access="read"><annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="const"/></property>
-        <property name="PollIntervalUSec" type="t" access="read"><annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/></property>
+        <property name="ServerName" type="s" access="read">
+            <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
+        </property>
+        <property name="ServerAddress" type="(iay)" access="read">
+            <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
+        </property>
+        <property name="RootDistanceMaxUSec" type="t" access="read">
+            <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="const"/>
+        </property>
+        <property name="PollIntervalMinUSec" type="t" access="read">
+            <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="const"/>
+        </property>
+        <property name="PollIntervalMaxUSec" type="t" access="read">
+            <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="const"/>
+        </property>
+        <property name="PollIntervalUSec" type="t" access="read">
+            <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
+        </property>
         <property name="NTPMessage" type="(uuuuittayttttbtt)" access="read"></property>
-        <property name="Frequency" type="x" access="read"><annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/></property>
-        <method name="SetRuntimeNTPServers"><arg type="as" name="runtime_servers" direction="in"/></method>
+        <property name="Frequency" type="x" access="read">
+            <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
+        </property>
+        <method name="SetRuntimeNTPServers">
+            <arg type="as" name="runtime_servers" direction="in"/>
+        </method>
     </interface>
 </node>

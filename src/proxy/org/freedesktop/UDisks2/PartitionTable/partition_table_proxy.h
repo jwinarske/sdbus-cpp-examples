@@ -14,58 +14,74 @@ namespace org {
 namespace freedesktop {
 namespace UDisks2 {
 
-class PartitionTable_proxy
-{
-public:
-    static constexpr const char* INTERFACE_NAME = "org.freedesktop.UDisks2.PartitionTable";
+class PartitionTable_proxy {
+ public:
+  static constexpr const char* INTERFACE_NAME =
+      "org.freedesktop.UDisks2.PartitionTable";
 
-protected:
-    PartitionTable_proxy(sdbus::IProxy& proxy)
-        : m_proxy(proxy)
-    {
-    }
+ protected:
+  PartitionTable_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
 
-    PartitionTable_proxy(const PartitionTable_proxy&) = delete;
-    PartitionTable_proxy& operator=(const PartitionTable_proxy&) = delete;
-    PartitionTable_proxy(PartitionTable_proxy&&) = delete;
-    PartitionTable_proxy& operator=(PartitionTable_proxy&&) = delete;
+  PartitionTable_proxy(const PartitionTable_proxy&) = delete;
+  PartitionTable_proxy& operator=(const PartitionTable_proxy&) = delete;
+  PartitionTable_proxy(PartitionTable_proxy&&) = delete;
+  PartitionTable_proxy& operator=(PartitionTable_proxy&&) = delete;
 
-    ~PartitionTable_proxy() = default;
+  ~PartitionTable_proxy() = default;
 
-    void registerProxy()
-    {
-    }
+  void registerProxy() {}
 
-public:
-    sdbus::ObjectPath CreatePartition(const uint64_t& offset, const uint64_t& size, const std::string& type, const std::string& name, const std::map<std::string, sdbus::Variant>& options)
-    {
-        sdbus::ObjectPath result;
-        m_proxy.callMethod("CreatePartition").onInterface(INTERFACE_NAME).withArguments(offset, size, type, name, options).storeResultsTo(result);
-        return result;
-    }
+ public:
+  sdbus::ObjectPath CreatePartition(
+      const uint64_t& offset,
+      const uint64_t& size,
+      const std::string& type,
+      const std::string& name,
+      const std::map<std::string, sdbus::Variant>& options) {
+    sdbus::ObjectPath result;
+    m_proxy.callMethod("CreatePartition")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(offset, size, type, name, options)
+        .storeResultsTo(result);
+    return result;
+  }
 
-    sdbus::ObjectPath CreatePartitionAndFormat(const uint64_t& offset, const uint64_t& size, const std::string& type, const std::string& name, const std::map<std::string, sdbus::Variant>& options, const std::string& format_type, const std::map<std::string, sdbus::Variant>& format_options)
-    {
-        sdbus::ObjectPath result;
-        m_proxy.callMethod("CreatePartitionAndFormat").onInterface(INTERFACE_NAME).withArguments(offset, size, type, name, options, format_type, format_options).storeResultsTo(result);
-        return result;
-    }
+  sdbus::ObjectPath CreatePartitionAndFormat(
+      const uint64_t& offset,
+      const uint64_t& size,
+      const std::string& type,
+      const std::string& name,
+      const std::map<std::string, sdbus::Variant>& options,
+      const std::string& format_type,
+      const std::map<std::string, sdbus::Variant>& format_options) {
+    sdbus::ObjectPath result;
+    m_proxy.callMethod("CreatePartitionAndFormat")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(offset, size, type, name, options, format_type,
+                       format_options)
+        .storeResultsTo(result);
+    return result;
+  }
 
-public:
-    std::vector<sdbus::ObjectPath> Partitions()
-    {
-        return m_proxy.getProperty("Partitions").onInterface(INTERFACE_NAME).get<std::vector<sdbus::ObjectPath>>();
-    }
+ public:
+  std::vector<sdbus::ObjectPath> Partitions() {
+    return m_proxy.getProperty("Partitions")
+        .onInterface(INTERFACE_NAME)
+        .get<std::vector<sdbus::ObjectPath>>();
+  }
 
-    std::string Type()
-    {
-        return m_proxy.getProperty("Type").onInterface(INTERFACE_NAME).get<std::string>();
-    }
+  std::string Type() {
+    return m_proxy.getProperty("Type")
+        .onInterface(INTERFACE_NAME)
+        .get<std::string>();
+  }
 
-private:
-    sdbus::IProxy& m_proxy;
+ private:
+  sdbus::IProxy& m_proxy;
 };
 
-}}} // namespaces
+}  // namespace UDisks2
+}  // namespace freedesktop
+}  // namespace org
 
 #endif

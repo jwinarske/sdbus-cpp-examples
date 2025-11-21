@@ -14,68 +14,72 @@ namespace org {
 namespace freedesktop {
 namespace network1 {
 
-class Network_proxy
-{
-public:
-    static constexpr const char* INTERFACE_NAME = "org.freedesktop.network1.Network";
+class Network_proxy {
+ public:
+  static constexpr const char* INTERFACE_NAME =
+      "org.freedesktop.network1.Network";
 
-protected:
-    Network_proxy(sdbus::IProxy& proxy)
-        : m_proxy(proxy)
-    {
-    }
+ protected:
+  Network_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
 
-    Network_proxy(const Network_proxy&) = delete;
-    Network_proxy& operator=(const Network_proxy&) = delete;
-    Network_proxy(Network_proxy&&) = delete;
-    Network_proxy& operator=(Network_proxy&&) = delete;
+  Network_proxy(const Network_proxy&) = delete;
+  Network_proxy& operator=(const Network_proxy&) = delete;
+  Network_proxy(Network_proxy&&) = delete;
+  Network_proxy& operator=(Network_proxy&&) = delete;
 
-    ~Network_proxy() = default;
+  ~Network_proxy() = default;
 
-    void registerProxy()
-    {
-    }
+  void registerProxy() {}
 
-public:
-    std::string Description()
-    {
-        return m_proxy.getProperty("Description").onInterface(INTERFACE_NAME).get<std::string>();
-    }
+ public:
+  std::string Description() {
+    return m_proxy.getProperty("Description")
+        .onInterface(INTERFACE_NAME)
+        .get<std::string>();
+  }
 
-    std::string SourcePath()
-    {
-        return m_proxy.getProperty("SourcePath").onInterface(INTERFACE_NAME).get<std::string>();
-    }
+  std::string SourcePath() {
+    return m_proxy.getProperty("SourcePath")
+        .onInterface(INTERFACE_NAME)
+        .get<std::string>();
+  }
 
-    std::vector<std::string> MatchMAC()
-    {
-        return m_proxy.getProperty("MatchMAC").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
-    }
+  std::vector<std::string> MatchMAC() {
+    return m_proxy.getProperty("MatchMAC")
+        .onInterface(INTERFACE_NAME)
+        .get<std::vector<std::string>>();
+  }
 
-    std::vector<std::string> MatchPath()
-    {
-        return m_proxy.getProperty("MatchPath").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
-    }
+  std::vector<std::string> MatchPath() {
+    return m_proxy.getProperty("MatchPath")
+        .onInterface(INTERFACE_NAME)
+        .get<std::vector<std::string>>();
+  }
 
-    std::vector<std::string> MatchDriver()
-    {
-        return m_proxy.getProperty("MatchDriver").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
-    }
+  std::vector<std::string> MatchDriver() {
+    return m_proxy.getProperty("MatchDriver")
+        .onInterface(INTERFACE_NAME)
+        .get<std::vector<std::string>>();
+  }
 
-    std::vector<std::string> MatchType()
-    {
-        return m_proxy.getProperty("MatchType").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
-    }
+  std::vector<std::string> MatchType() {
+    return m_proxy.getProperty("MatchType")
+        .onInterface(INTERFACE_NAME)
+        .get<std::vector<std::string>>();
+  }
 
-    std::vector<std::string> MatchName()
-    {
-        return m_proxy.getProperty("MatchName").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
-    }
+  std::vector<std::string> MatchName() {
+    return m_proxy.getProperty("MatchName")
+        .onInterface(INTERFACE_NAME)
+        .get<std::vector<std::string>>();
+  }
 
-private:
-    sdbus::IProxy& m_proxy;
+ private:
+  sdbus::IProxy& m_proxy;
 };
 
-}}} // namespaces
+}  // namespace network1
+}  // namespace freedesktop
+}  // namespace org
 
 #endif

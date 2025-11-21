@@ -15,98 +15,116 @@ namespace freedesktop {
 namespace NetworkManager {
 namespace Device {
 
-class Wireless_proxy
-{
-public:
-    static constexpr const char* INTERFACE_NAME = "org.freedesktop.NetworkManager.Device.Wireless";
+class Wireless_proxy {
+ public:
+  static constexpr const char* INTERFACE_NAME =
+      "org.freedesktop.NetworkManager.Device.Wireless";
 
-protected:
-    Wireless_proxy(sdbus::IProxy& proxy)
-        : m_proxy(proxy)
-    {
-    }
+ protected:
+  Wireless_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
 
-    Wireless_proxy(const Wireless_proxy&) = delete;
-    Wireless_proxy& operator=(const Wireless_proxy&) = delete;
-    Wireless_proxy(Wireless_proxy&&) = delete;
-    Wireless_proxy& operator=(Wireless_proxy&&) = delete;
+  Wireless_proxy(const Wireless_proxy&) = delete;
+  Wireless_proxy& operator=(const Wireless_proxy&) = delete;
+  Wireless_proxy(Wireless_proxy&&) = delete;
+  Wireless_proxy& operator=(Wireless_proxy&&) = delete;
 
-    ~Wireless_proxy() = default;
+  ~Wireless_proxy() = default;
 
-    void registerProxy()
-    {
-        m_proxy.uponSignal("AccessPointAdded").onInterface(INTERFACE_NAME).call([this](const sdbus::ObjectPath& access_point){ this->onAccessPointAdded(access_point); });
-        m_proxy.uponSignal("AccessPointRemoved").onInterface(INTERFACE_NAME).call([this](const sdbus::ObjectPath& access_point){ this->onAccessPointRemoved(access_point); });
-    }
+  void registerProxy() {
+    m_proxy.uponSignal("AccessPointAdded")
+        .onInterface(INTERFACE_NAME)
+        .call([this](const sdbus::ObjectPath& access_point) {
+          this->onAccessPointAdded(access_point);
+        });
+    m_proxy.uponSignal("AccessPointRemoved")
+        .onInterface(INTERFACE_NAME)
+        .call([this](const sdbus::ObjectPath& access_point) {
+          this->onAccessPointRemoved(access_point);
+        });
+  }
 
-    virtual void onAccessPointAdded(const sdbus::ObjectPath& access_point) = 0;
-    virtual void onAccessPointRemoved(const sdbus::ObjectPath& access_point) = 0;
+  virtual void onAccessPointAdded(const sdbus::ObjectPath& access_point) = 0;
+  virtual void onAccessPointRemoved(const sdbus::ObjectPath& access_point) = 0;
 
-public:
-    std::vector<sdbus::ObjectPath> GetAccessPoints()
-    {
-        std::vector<sdbus::ObjectPath> result;
-        m_proxy.callMethod("GetAccessPoints").onInterface(INTERFACE_NAME).storeResultsTo(result);
-        return result;
-    }
+ public:
+  std::vector<sdbus::ObjectPath> GetAccessPoints() {
+    std::vector<sdbus::ObjectPath> result;
+    m_proxy.callMethod("GetAccessPoints")
+        .onInterface(INTERFACE_NAME)
+        .storeResultsTo(result);
+    return result;
+  }
 
-    std::vector<sdbus::ObjectPath> GetAllAccessPoints()
-    {
-        std::vector<sdbus::ObjectPath> result;
-        m_proxy.callMethod("GetAllAccessPoints").onInterface(INTERFACE_NAME).storeResultsTo(result);
-        return result;
-    }
+  std::vector<sdbus::ObjectPath> GetAllAccessPoints() {
+    std::vector<sdbus::ObjectPath> result;
+    m_proxy.callMethod("GetAllAccessPoints")
+        .onInterface(INTERFACE_NAME)
+        .storeResultsTo(result);
+    return result;
+  }
 
-    void RequestScan(const std::map<std::string, sdbus::Variant>& options)
-    {
-        m_proxy.callMethod("RequestScan").onInterface(INTERFACE_NAME).withArguments(options);
-    }
+  void RequestScan(const std::map<std::string, sdbus::Variant>& options) {
+    m_proxy.callMethod("RequestScan")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(options);
+  }
 
-public:
-    std::string HwAddress()
-    {
-        return m_proxy.getProperty("HwAddress").onInterface(INTERFACE_NAME).get<std::string>();
-    }
+ public:
+  std::string HwAddress() {
+    return m_proxy.getProperty("HwAddress")
+        .onInterface(INTERFACE_NAME)
+        .get<std::string>();
+  }
 
-    std::string PermHwAddress()
-    {
-        return m_proxy.getProperty("PermHwAddress").onInterface(INTERFACE_NAME).get<std::string>();
-    }
+  std::string PermHwAddress() {
+    return m_proxy.getProperty("PermHwAddress")
+        .onInterface(INTERFACE_NAME)
+        .get<std::string>();
+  }
 
-    uint32_t Mode()
-    {
-        return m_proxy.getProperty("Mode").onInterface(INTERFACE_NAME).get<uint32_t>();
-    }
+  uint32_t Mode() {
+    return m_proxy.getProperty("Mode")
+        .onInterface(INTERFACE_NAME)
+        .get<uint32_t>();
+  }
 
-    uint32_t Bitrate()
-    {
-        return m_proxy.getProperty("Bitrate").onInterface(INTERFACE_NAME).get<uint32_t>();
-    }
+  uint32_t Bitrate() {
+    return m_proxy.getProperty("Bitrate")
+        .onInterface(INTERFACE_NAME)
+        .get<uint32_t>();
+  }
 
-    std::vector<sdbus::ObjectPath> AccessPoints()
-    {
-        return m_proxy.getProperty("AccessPoints").onInterface(INTERFACE_NAME).get<std::vector<sdbus::ObjectPath>>();
-    }
+  std::vector<sdbus::ObjectPath> AccessPoints() {
+    return m_proxy.getProperty("AccessPoints")
+        .onInterface(INTERFACE_NAME)
+        .get<std::vector<sdbus::ObjectPath>>();
+  }
 
-    sdbus::ObjectPath ActiveAccessPoint()
-    {
-        return m_proxy.getProperty("ActiveAccessPoint").onInterface(INTERFACE_NAME).get<sdbus::ObjectPath>();
-    }
+  sdbus::ObjectPath ActiveAccessPoint() {
+    return m_proxy.getProperty("ActiveAccessPoint")
+        .onInterface(INTERFACE_NAME)
+        .get<sdbus::ObjectPath>();
+  }
 
-    uint32_t WirelessCapabilities()
-    {
-        return m_proxy.getProperty("WirelessCapabilities").onInterface(INTERFACE_NAME).get<uint32_t>();
-    }
+  uint32_t WirelessCapabilities() {
+    return m_proxy.getProperty("WirelessCapabilities")
+        .onInterface(INTERFACE_NAME)
+        .get<uint32_t>();
+  }
 
-    int64_t LastScan()
-    {
-        return m_proxy.getProperty("LastScan").onInterface(INTERFACE_NAME).get<int64_t>();
-    }
+  int64_t LastScan() {
+    return m_proxy.getProperty("LastScan")
+        .onInterface(INTERFACE_NAME)
+        .get<int64_t>();
+  }
 
-private:
-    sdbus::IProxy& m_proxy;
+ private:
+  sdbus::IProxy& m_proxy;
 };
 
-}}}} // namespaces
+}  // namespace Device
+}  // namespace NetworkManager
+}  // namespace freedesktop
+}  // namespace org
 
 #endif

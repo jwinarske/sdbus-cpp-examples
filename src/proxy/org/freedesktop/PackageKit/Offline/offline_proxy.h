@@ -14,91 +14,93 @@ namespace org {
 namespace freedesktop {
 namespace PackageKit {
 
-class Offline_proxy
-{
-public:
-    static constexpr const char* INTERFACE_NAME = "org.freedesktop.PackageKit.Offline";
+class Offline_proxy {
+ public:
+  static constexpr const char* INTERFACE_NAME =
+      "org.freedesktop.PackageKit.Offline";
 
-protected:
-    Offline_proxy(sdbus::IProxy& proxy)
-        : m_proxy(proxy)
-    {
-    }
+ protected:
+  Offline_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
 
-    Offline_proxy(const Offline_proxy&) = delete;
-    Offline_proxy& operator=(const Offline_proxy&) = delete;
-    Offline_proxy(Offline_proxy&&) = delete;
-    Offline_proxy& operator=(Offline_proxy&&) = delete;
+  Offline_proxy(const Offline_proxy&) = delete;
+  Offline_proxy& operator=(const Offline_proxy&) = delete;
+  Offline_proxy(Offline_proxy&&) = delete;
+  Offline_proxy& operator=(Offline_proxy&&) = delete;
 
-    ~Offline_proxy() = default;
+  ~Offline_proxy() = default;
 
-    void registerProxy()
-    {
-    }
+  void registerProxy() {}
 
-public:
-    void ClearResults()
-    {
-        m_proxy.callMethod("ClearResults").onInterface(INTERFACE_NAME);
-    }
+ public:
+  void ClearResults() {
+    m_proxy.callMethod("ClearResults").onInterface(INTERFACE_NAME);
+  }
 
-    void Trigger(const std::string& action)
-    {
-        m_proxy.callMethod("Trigger").onInterface(INTERFACE_NAME).withArguments(action);
-    }
+  void Trigger(const std::string& action) {
+    m_proxy.callMethod("Trigger")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(action);
+  }
 
-    void TriggerUpgrade(const std::string& action)
-    {
-        m_proxy.callMethod("TriggerUpgrade").onInterface(INTERFACE_NAME).withArguments(action);
-    }
+  void TriggerUpgrade(const std::string& action) {
+    m_proxy.callMethod("TriggerUpgrade")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(action);
+  }
 
-    void Cancel()
-    {
-        m_proxy.callMethod("Cancel").onInterface(INTERFACE_NAME);
-    }
+  void Cancel() { m_proxy.callMethod("Cancel").onInterface(INTERFACE_NAME); }
 
-    std::vector<std::string> GetPrepared()
-    {
-        std::vector<std::string> result;
-        m_proxy.callMethod("GetPrepared").onInterface(INTERFACE_NAME).storeResultsTo(result);
-        return result;
-    }
+  std::vector<std::string> GetPrepared() {
+    std::vector<std::string> result;
+    m_proxy.callMethod("GetPrepared")
+        .onInterface(INTERFACE_NAME)
+        .storeResultsTo(result);
+    return result;
+  }
 
-public:
-    bool UpdatePrepared()
-    {
-        return m_proxy.getProperty("UpdatePrepared").onInterface(INTERFACE_NAME).get<bool>();
-    }
+ public:
+  bool UpdatePrepared() {
+    return m_proxy.getProperty("UpdatePrepared")
+        .onInterface(INTERFACE_NAME)
+        .get<bool>();
+  }
 
-    bool UpdateTriggered()
-    {
-        return m_proxy.getProperty("UpdateTriggered").onInterface(INTERFACE_NAME).get<bool>();
-    }
+  bool UpdateTriggered() {
+    return m_proxy.getProperty("UpdateTriggered")
+        .onInterface(INTERFACE_NAME)
+        .get<bool>();
+  }
 
-    bool UpgradePrepared()
-    {
-        return m_proxy.getProperty("UpgradePrepared").onInterface(INTERFACE_NAME).get<bool>();
-    }
+  bool UpgradePrepared() {
+    return m_proxy.getProperty("UpgradePrepared")
+        .onInterface(INTERFACE_NAME)
+        .get<bool>();
+  }
 
-    bool UpgradeTriggered()
-    {
-        return m_proxy.getProperty("UpgradeTriggered").onInterface(INTERFACE_NAME).get<bool>();
-    }
+  bool UpgradeTriggered() {
+    return m_proxy.getProperty("UpgradeTriggered")
+        .onInterface(INTERFACE_NAME)
+        .get<bool>();
+  }
 
-    std::map<std::string, sdbus::Variant> PreparedUpgrade()
-    {
-        return m_proxy.getProperty("PreparedUpgrade").onInterface(INTERFACE_NAME).get<std::map<std::string, sdbus::Variant>>();
-    }
+  std::map<std::string, sdbus::Variant> PreparedUpgrade() {
+    return m_proxy.getProperty("PreparedUpgrade")
+        .onInterface(INTERFACE_NAME)
+        .get<std::map<std::string, sdbus::Variant>>();
+  }
 
-    std::string TriggerAction()
-    {
-        return m_proxy.getProperty("TriggerAction").onInterface(INTERFACE_NAME).get<std::string>();
-    }
+  std::string TriggerAction() {
+    return m_proxy.getProperty("TriggerAction")
+        .onInterface(INTERFACE_NAME)
+        .get<std::string>();
+  }
 
-private:
-    sdbus::IProxy& m_proxy;
+ private:
+  sdbus::IProxy& m_proxy;
 };
 
-}}} // namespaces
+}  // namespace PackageKit
+}  // namespace freedesktop
+}  // namespace org
 
 #endif

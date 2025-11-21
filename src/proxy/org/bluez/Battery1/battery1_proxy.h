@@ -13,38 +13,34 @@
 namespace org {
 namespace bluez {
 
-class Battery1_proxy
-{
-public:
-    static constexpr const char* INTERFACE_NAME = "org.bluez.Battery1";
+class Battery1_proxy {
+ public:
+  static constexpr const char* INTERFACE_NAME = "org.bluez.Battery1";
 
-protected:
-    Battery1_proxy(sdbus::IProxy& proxy)
-        : m_proxy(proxy)
-    {
-    }
+ protected:
+  Battery1_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
 
-    Battery1_proxy(const Battery1_proxy&) = delete;
-    Battery1_proxy& operator=(const Battery1_proxy&) = delete;
-    Battery1_proxy(Battery1_proxy&&) = delete;
-    Battery1_proxy& operator=(Battery1_proxy&&) = delete;
+  Battery1_proxy(const Battery1_proxy&) = delete;
+  Battery1_proxy& operator=(const Battery1_proxy&) = delete;
+  Battery1_proxy(Battery1_proxy&&) = delete;
+  Battery1_proxy& operator=(Battery1_proxy&&) = delete;
 
-    ~Battery1_proxy() = default;
+  ~Battery1_proxy() = default;
 
-    void registerProxy()
-    {
-    }
+  void registerProxy() {}
 
-public:
-    uint8_t Percentage()
-    {
-        return m_proxy.getProperty("Percentage").onInterface(INTERFACE_NAME).get<uint8_t>();
-    }
+ public:
+  uint8_t Percentage() {
+    return m_proxy.getProperty("Percentage")
+        .onInterface(INTERFACE_NAME)
+        .get<uint8_t>();
+  }
 
-private:
-    sdbus::IProxy& m_proxy;
+ private:
+  sdbus::IProxy& m_proxy;
 };
 
-}} // namespaces
+}  // namespace bluez
+}  // namespace org
 
 #endif

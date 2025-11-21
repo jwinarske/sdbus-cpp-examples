@@ -13,53 +13,53 @@
 namespace net {
 namespace connman {
 
-class Technology_proxy
-{
-public:
-    static constexpr const char* INTERFACE_NAME = "net.connman.Technology";
+class Technology_proxy {
+ public:
+  static constexpr const char* INTERFACE_NAME = "net.connman.Technology";
 
-protected:
-    Technology_proxy(sdbus::IProxy& proxy)
-        : m_proxy(proxy)
-    {
-    }
+ protected:
+  Technology_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
 
-    Technology_proxy(const Technology_proxy&) = delete;
-    Technology_proxy& operator=(const Technology_proxy&) = delete;
-    Technology_proxy(Technology_proxy&&) = delete;
-    Technology_proxy& operator=(Technology_proxy&&) = delete;
+  Technology_proxy(const Technology_proxy&) = delete;
+  Technology_proxy& operator=(const Technology_proxy&) = delete;
+  Technology_proxy(Technology_proxy&&) = delete;
+  Technology_proxy& operator=(Technology_proxy&&) = delete;
 
-    ~Technology_proxy() = default;
+  ~Technology_proxy() = default;
 
-    void registerProxy()
-    {
-        m_proxy.uponSignal("PropertyChanged").onInterface(INTERFACE_NAME).call([this](const std::string& name, const sdbus::Variant& value){ this->onPropertyChanged(name, value); });
-    }
+  void registerProxy() {
+    m_proxy.uponSignal("PropertyChanged")
+        .onInterface(INTERFACE_NAME)
+        .call([this](const std::string& name, const sdbus::Variant& value) {
+          this->onPropertyChanged(name, value);
+        });
+  }
 
-    virtual void onPropertyChanged(const std::string& name, const sdbus::Variant& value) = 0;
+  virtual void onPropertyChanged(const std::string& name,
+                                 const sdbus::Variant& value) = 0;
 
-public:
-    std::map<std::string, sdbus::Variant> GetProperties()
-    {
-        std::map<std::string, sdbus::Variant> result;
-        m_proxy.callMethod("GetProperties").onInterface(INTERFACE_NAME).storeResultsTo(result);
-        return result;
-    }
+ public:
+  std::map<std::string, sdbus::Variant> GetProperties() {
+    std::map<std::string, sdbus::Variant> result;
+    m_proxy.callMethod("GetProperties")
+        .onInterface(INTERFACE_NAME)
+        .storeResultsTo(result);
+    return result;
+  }
 
-    void SetProperty(const std::string& name, const sdbus::Variant& value)
-    {
-        m_proxy.callMethod("SetProperty").onInterface(INTERFACE_NAME).withArguments(name, value);
-    }
+  void SetProperty(const std::string& name, const sdbus::Variant& value) {
+    m_proxy.callMethod("SetProperty")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(name, value);
+  }
 
-    void Scan()
-    {
-        m_proxy.callMethod("Scan").onInterface(INTERFACE_NAME);
-    }
+  void Scan() { m_proxy.callMethod("Scan").onInterface(INTERFACE_NAME); }
 
-private:
-    sdbus::IProxy& m_proxy;
+ private:
+  sdbus::IProxy& m_proxy;
 };
 
-}} // namespaces
+}  // namespace connman
+}  // namespace net
 
 #endif

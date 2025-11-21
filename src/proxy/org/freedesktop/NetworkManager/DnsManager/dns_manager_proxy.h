@@ -14,48 +14,48 @@ namespace org {
 namespace freedesktop {
 namespace NetworkManager {
 
-class DnsManager_proxy
-{
-public:
-    static constexpr const char* INTERFACE_NAME = "org.freedesktop.NetworkManager.DnsManager";
+class DnsManager_proxy {
+ public:
+  static constexpr const char* INTERFACE_NAME =
+      "org.freedesktop.NetworkManager.DnsManager";
 
-protected:
-    DnsManager_proxy(sdbus::IProxy& proxy)
-        : m_proxy(proxy)
-    {
-    }
+ protected:
+  DnsManager_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
 
-    DnsManager_proxy(const DnsManager_proxy&) = delete;
-    DnsManager_proxy& operator=(const DnsManager_proxy&) = delete;
-    DnsManager_proxy(DnsManager_proxy&&) = delete;
-    DnsManager_proxy& operator=(DnsManager_proxy&&) = delete;
+  DnsManager_proxy(const DnsManager_proxy&) = delete;
+  DnsManager_proxy& operator=(const DnsManager_proxy&) = delete;
+  DnsManager_proxy(DnsManager_proxy&&) = delete;
+  DnsManager_proxy& operator=(DnsManager_proxy&&) = delete;
 
-    ~DnsManager_proxy() = default;
+  ~DnsManager_proxy() = default;
 
-    void registerProxy()
-    {
-    }
+  void registerProxy() {}
 
-public:
-    std::string Mode()
-    {
-        return m_proxy.getProperty("Mode").onInterface(INTERFACE_NAME).get<std::string>();
-    }
+ public:
+  std::string Mode() {
+    return m_proxy.getProperty("Mode")
+        .onInterface(INTERFACE_NAME)
+        .get<std::string>();
+  }
 
-    std::string RcManager()
-    {
-        return m_proxy.getProperty("RcManager").onInterface(INTERFACE_NAME).get<std::string>();
-    }
+  std::string RcManager() {
+    return m_proxy.getProperty("RcManager")
+        .onInterface(INTERFACE_NAME)
+        .get<std::string>();
+  }
 
-    std::vector<std::map<std::string, sdbus::Variant>> Configuration()
-    {
-        return m_proxy.getProperty("Configuration").onInterface(INTERFACE_NAME).get<std::vector<std::map<std::string, sdbus::Variant>>>();
-    }
+  std::vector<std::map<std::string, sdbus::Variant>> Configuration() {
+    return m_proxy.getProperty("Configuration")
+        .onInterface(INTERFACE_NAME)
+        .get<std::vector<std::map<std::string, sdbus::Variant>>>();
+  }
 
-private:
-    sdbus::IProxy& m_proxy;
+ private:
+  sdbus::IProxy& m_proxy;
 };
 
-}}} // namespaces
+}  // namespace NetworkManager
+}  // namespace freedesktop
+}  // namespace org
 
 #endif
