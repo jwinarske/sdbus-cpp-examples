@@ -58,7 +58,7 @@ ${XML2CPP} --verbose --proxy=${PROXY}/org/freedesktop/GeoClue2/Client/Location/l
 mkdir -p ${PROXY}/org/freedesktop/resolve1/{Manager,Link} |true
 
 ${XML2CPP} --verbose --proxy=${PROXY}/org/freedesktop/resolve1/Manager/manager_proxy.h interfaces/org/freedesktop/resolve1/Manager/Manager.xml
-${XML2CPP} --verbose --proxy=${PROXY}/org/freedesktop/resolve1/Manager/link_proxy.h interfaces/org/freedesktop/resolve1/Link/Link.xml
+${XML2CPP} --verbose --proxy=${PROXY}/org/freedesktop/resolve1/Link/link_proxy.h interfaces/org/freedesktop/resolve1/Link/Link.xml
 
 mkdir -p ${PROXY}/org/freedesktop/fwupd |true
 
