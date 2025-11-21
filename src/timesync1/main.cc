@@ -22,9 +22,9 @@ extern void exerciseTimesync(Timesync1ManagerClient&);
 int main() {
   try {
     auto connection = sdbus::createSystemBusConnection();
-    auto proxy = sdbus::createProxy(*connection,
-                                     sdbus::ServiceName("org.freedesktop.timesync1"),
-                                     sdbus::ObjectPath("/org/freedesktop/timesync1/Manager"));
+    auto proxy = sdbus::createProxy(
+        *connection, sdbus::ServiceName("org.freedesktop.timesync1"),
+        sdbus::ObjectPath("/org/freedesktop/timesync1/Manager"));
     Timesync1ManagerClient client(*proxy);
     exerciseTimesync(client);
     spdlog::info("timesync1 Manager example complete");

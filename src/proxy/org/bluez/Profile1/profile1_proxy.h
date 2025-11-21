@@ -13,53 +13,47 @@
 namespace org {
 namespace bluez {
 
-class Profile1_proxy
-{
-public:
-    static constexpr const char* INTERFACE_NAME = "org.bluez.Profile1";
+class Profile1_proxy {
+ public:
+  static constexpr const char* INTERFACE_NAME = "org.bluez.Profile1";
 
-protected:
-    Profile1_proxy(sdbus::IProxy& proxy)
-        : m_proxy(proxy)
-    {
-    }
+ protected:
+  Profile1_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
 
-    Profile1_proxy(const Profile1_proxy&) = delete;
-    Profile1_proxy& operator=(const Profile1_proxy&) = delete;
-    Profile1_proxy(Profile1_proxy&&) = delete;
-    Profile1_proxy& operator=(Profile1_proxy&&) = delete;
+  Profile1_proxy(const Profile1_proxy&) = delete;
+  Profile1_proxy& operator=(const Profile1_proxy&) = delete;
+  Profile1_proxy(Profile1_proxy&&) = delete;
+  Profile1_proxy& operator=(Profile1_proxy&&) = delete;
 
-    ~Profile1_proxy() = default;
+  ~Profile1_proxy() = default;
 
-    void registerProxy()
-    {
-    }
+  void registerProxy() {}
 
-public:
-    void NewConnection(const sdbus::ObjectPath& device, const sdbus::UnixFd& fd, const std::map<std::string, sdbus::Variant>& fd_properties)
-    {
-        m_proxy.callMethod("NewConnection").onInterface(INTERFACE_NAME).withArguments(device, fd, fd_properties);
-    }
+ public:
+  void NewConnection(
+      const sdbus::ObjectPath& device,
+      const sdbus::UnixFd& fd,
+      const std::map<std::string, sdbus::Variant>& fd_properties) {
+    m_proxy.callMethod("NewConnection")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(device, fd, fd_properties);
+  }
 
-    void Release()
-    {
-        m_proxy.callMethod("Release").onInterface(INTERFACE_NAME);
-    }
+  void Release() { m_proxy.callMethod("Release").onInterface(INTERFACE_NAME); }
 
-    void Cancel()
-    {
-        m_proxy.callMethod("Cancel").onInterface(INTERFACE_NAME);
-    }
+  void Cancel() { m_proxy.callMethod("Cancel").onInterface(INTERFACE_NAME); }
 
-    void RequestDisconnection(const sdbus::ObjectPath& device)
-    {
-        m_proxy.callMethod("RequestDisconnection").onInterface(INTERFACE_NAME).withArguments(device);
-    }
+  void RequestDisconnection(const sdbus::ObjectPath& device) {
+    m_proxy.callMethod("RequestDisconnection")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(device);
+  }
 
-private:
-    sdbus::IProxy& m_proxy;
+ private:
+  sdbus::IProxy& m_proxy;
 };
 
-}} // namespaces
+}  // namespace bluez
+}  // namespace org
 
 #endif

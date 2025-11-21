@@ -60,7 +60,7 @@ class BlockDeviceWatcher
     checkAndReportIfReady();
   }
 
-  ~BlockDeviceWatcher() override { unregisterProxy(); }
+  ~BlockDeviceWatcher() { unregisterProxy(); }
 
  private:
   static constexpr char kInterfaceName[] = "org.freedesktop.UDisks2";
@@ -171,7 +171,7 @@ class RemovableDeviceMonitor final
     spdlog::info("Initial scan complete. Monitoring for new devices...");
   }
 
-  ~RemovableDeviceMonitor() override { unregisterProxy(); }
+  ~RemovableDeviceMonitor() { unregisterProxy(); }
 
  private:
   static constexpr auto kInterfaceName = "org.freedesktop.UDisks2";

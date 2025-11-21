@@ -15,131 +15,154 @@ namespace freedesktop {
 namespace UDisks2 {
 namespace NVMe {
 
-class Controller_proxy
-{
-public:
-    static constexpr const char* INTERFACE_NAME = "org.freedesktop.UDisks2.NVMe.Controller";
+class Controller_proxy {
+ public:
+  static constexpr const char* INTERFACE_NAME =
+      "org.freedesktop.UDisks2.NVMe.Controller";
 
-protected:
-    Controller_proxy(sdbus::IProxy& proxy)
-        : m_proxy(proxy)
-    {
-    }
+ protected:
+  Controller_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
 
-    Controller_proxy(const Controller_proxy&) = delete;
-    Controller_proxy& operator=(const Controller_proxy&) = delete;
-    Controller_proxy(Controller_proxy&&) = delete;
-    Controller_proxy& operator=(Controller_proxy&&) = delete;
+  Controller_proxy(const Controller_proxy&) = delete;
+  Controller_proxy& operator=(const Controller_proxy&) = delete;
+  Controller_proxy(Controller_proxy&&) = delete;
+  Controller_proxy& operator=(Controller_proxy&&) = delete;
 
-    ~Controller_proxy() = default;
+  ~Controller_proxy() = default;
 
-    void registerProxy()
-    {
-    }
+  void registerProxy() {}
 
-public:
-    void SmartUpdate(const std::map<std::string, sdbus::Variant>& options)
-    {
-        m_proxy.callMethod("SmartUpdate").onInterface(INTERFACE_NAME).withArguments(options);
-    }
+ public:
+  void SmartUpdate(const std::map<std::string, sdbus::Variant>& options) {
+    m_proxy.callMethod("SmartUpdate")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(options);
+  }
 
-    std::map<std::string, sdbus::Variant> SmartGetAttributes(const std::map<std::string, sdbus::Variant>& options)
-    {
-        std::map<std::string, sdbus::Variant> result;
-        m_proxy.callMethod("SmartGetAttributes").onInterface(INTERFACE_NAME).withArguments(options).storeResultsTo(result);
-        return result;
-    }
+  std::map<std::string, sdbus::Variant> SmartGetAttributes(
+      const std::map<std::string, sdbus::Variant>& options) {
+    std::map<std::string, sdbus::Variant> result;
+    m_proxy.callMethod("SmartGetAttributes")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(options)
+        .storeResultsTo(result);
+    return result;
+  }
 
-    void SmartSelftestStart(const std::string& type, const std::map<std::string, sdbus::Variant>& options)
-    {
-        m_proxy.callMethod("SmartSelftestStart").onInterface(INTERFACE_NAME).withArguments(type, options);
-    }
+  void SmartSelftestStart(
+      const std::string& type,
+      const std::map<std::string, sdbus::Variant>& options) {
+    m_proxy.callMethod("SmartSelftestStart")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(type, options);
+  }
 
-    void SmartSelftestAbort(const std::map<std::string, sdbus::Variant>& options)
-    {
-        m_proxy.callMethod("SmartSelftestAbort").onInterface(INTERFACE_NAME).withArguments(options);
-    }
+  void SmartSelftestAbort(
+      const std::map<std::string, sdbus::Variant>& options) {
+    m_proxy.callMethod("SmartSelftestAbort")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(options);
+  }
 
-    void SanitizeStart(const std::string& action, const std::map<std::string, sdbus::Variant>& options)
-    {
-        m_proxy.callMethod("SanitizeStart").onInterface(INTERFACE_NAME).withArguments(action, options);
-    }
+  void SanitizeStart(const std::string& action,
+                     const std::map<std::string, sdbus::Variant>& options) {
+    m_proxy.callMethod("SanitizeStart")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(action, options);
+  }
 
-public:
-    std::string State()
-    {
-        return m_proxy.getProperty("State").onInterface(INTERFACE_NAME).get<std::string>();
-    }
+ public:
+  std::string State() {
+    return m_proxy.getProperty("State")
+        .onInterface(INTERFACE_NAME)
+        .get<std::string>();
+  }
 
-    uint16_t ControllerID()
-    {
-        return m_proxy.getProperty("ControllerID").onInterface(INTERFACE_NAME).get<uint16_t>();
-    }
+  uint16_t ControllerID() {
+    return m_proxy.getProperty("ControllerID")
+        .onInterface(INTERFACE_NAME)
+        .get<uint16_t>();
+  }
 
-    std::vector<uint8_t> SubsystemNQN()
-    {
-        return m_proxy.getProperty("SubsystemNQN").onInterface(INTERFACE_NAME).get<std::vector<uint8_t>>();
-    }
+  std::vector<uint8_t> SubsystemNQN() {
+    return m_proxy.getProperty("SubsystemNQN")
+        .onInterface(INTERFACE_NAME)
+        .get<std::vector<uint8_t>>();
+  }
 
-    std::string FGUID()
-    {
-        return m_proxy.getProperty("FGUID").onInterface(INTERFACE_NAME).get<std::string>();
-    }
+  std::string FGUID() {
+    return m_proxy.getProperty("FGUID")
+        .onInterface(INTERFACE_NAME)
+        .get<std::string>();
+  }
 
-    std::string NVMeRevision()
-    {
-        return m_proxy.getProperty("NVMeRevision").onInterface(INTERFACE_NAME).get<std::string>();
-    }
+  std::string NVMeRevision() {
+    return m_proxy.getProperty("NVMeRevision")
+        .onInterface(INTERFACE_NAME)
+        .get<std::string>();
+  }
 
-    uint64_t UnallocatedCapacity()
-    {
-        return m_proxy.getProperty("UnallocatedCapacity").onInterface(INTERFACE_NAME).get<uint64_t>();
-    }
+  uint64_t UnallocatedCapacity() {
+    return m_proxy.getProperty("UnallocatedCapacity")
+        .onInterface(INTERFACE_NAME)
+        .get<uint64_t>();
+  }
 
-    uint64_t SmartUpdated()
-    {
-        return m_proxy.getProperty("SmartUpdated").onInterface(INTERFACE_NAME).get<uint64_t>();
-    }
+  uint64_t SmartUpdated() {
+    return m_proxy.getProperty("SmartUpdated")
+        .onInterface(INTERFACE_NAME)
+        .get<uint64_t>();
+  }
 
-    std::vector<std::string> SmartCriticalWarning()
-    {
-        return m_proxy.getProperty("SmartCriticalWarning").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
-    }
+  std::vector<std::string> SmartCriticalWarning() {
+    return m_proxy.getProperty("SmartCriticalWarning")
+        .onInterface(INTERFACE_NAME)
+        .get<std::vector<std::string>>();
+  }
 
-    uint64_t SmartPowerOnHours()
-    {
-        return m_proxy.getProperty("SmartPowerOnHours").onInterface(INTERFACE_NAME).get<uint64_t>();
-    }
+  uint64_t SmartPowerOnHours() {
+    return m_proxy.getProperty("SmartPowerOnHours")
+        .onInterface(INTERFACE_NAME)
+        .get<uint64_t>();
+  }
 
-    uint16_t SmartTemperature()
-    {
-        return m_proxy.getProperty("SmartTemperature").onInterface(INTERFACE_NAME).get<uint16_t>();
-    }
+  uint16_t SmartTemperature() {
+    return m_proxy.getProperty("SmartTemperature")
+        .onInterface(INTERFACE_NAME)
+        .get<uint16_t>();
+  }
 
-    std::string SmartSelftestStatus()
-    {
-        return m_proxy.getProperty("SmartSelftestStatus").onInterface(INTERFACE_NAME).get<std::string>();
-    }
+  std::string SmartSelftestStatus() {
+    return m_proxy.getProperty("SmartSelftestStatus")
+        .onInterface(INTERFACE_NAME)
+        .get<std::string>();
+  }
 
-    int32_t SmartSelftestPercentRemaining()
-    {
-        return m_proxy.getProperty("SmartSelftestPercentRemaining").onInterface(INTERFACE_NAME).get<int32_t>();
-    }
+  int32_t SmartSelftestPercentRemaining() {
+    return m_proxy.getProperty("SmartSelftestPercentRemaining")
+        .onInterface(INTERFACE_NAME)
+        .get<int32_t>();
+  }
 
-    std::string SanitizeStatus()
-    {
-        return m_proxy.getProperty("SanitizeStatus").onInterface(INTERFACE_NAME).get<std::string>();
-    }
+  std::string SanitizeStatus() {
+    return m_proxy.getProperty("SanitizeStatus")
+        .onInterface(INTERFACE_NAME)
+        .get<std::string>();
+  }
 
-    int32_t SanitizePercentRemaining()
-    {
-        return m_proxy.getProperty("SanitizePercentRemaining").onInterface(INTERFACE_NAME).get<int32_t>();
-    }
+  int32_t SanitizePercentRemaining() {
+    return m_proxy.getProperty("SanitizePercentRemaining")
+        .onInterface(INTERFACE_NAME)
+        .get<int32_t>();
+  }
 
-private:
-    sdbus::IProxy& m_proxy;
+ private:
+  sdbus::IProxy& m_proxy;
 };
 
-}}}} // namespaces
+}  // namespace NVMe
+}  // namespace UDisks2
+}  // namespace freedesktop
+}  // namespace org
 
 #endif

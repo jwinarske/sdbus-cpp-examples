@@ -13,69 +13,76 @@
 namespace org {
 namespace bluez {
 
-class Media1_proxy
-{
-public:
-    static constexpr const char* INTERFACE_NAME = "org.bluez.Media1";
+class Media1_proxy {
+ public:
+  static constexpr const char* INTERFACE_NAME = "org.bluez.Media1";
 
-protected:
-    Media1_proxy(sdbus::IProxy& proxy)
-        : m_proxy(proxy)
-    {
-    }
+ protected:
+  Media1_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
 
-    Media1_proxy(const Media1_proxy&) = delete;
-    Media1_proxy& operator=(const Media1_proxy&) = delete;
-    Media1_proxy(Media1_proxy&&) = delete;
-    Media1_proxy& operator=(Media1_proxy&&) = delete;
+  Media1_proxy(const Media1_proxy&) = delete;
+  Media1_proxy& operator=(const Media1_proxy&) = delete;
+  Media1_proxy(Media1_proxy&&) = delete;
+  Media1_proxy& operator=(Media1_proxy&&) = delete;
 
-    ~Media1_proxy() = default;
+  ~Media1_proxy() = default;
 
-    void registerProxy()
-    {
-    }
+  void registerProxy() {}
 
-public:
-    void RegisterEndpoint(const sdbus::ObjectPath& endpoint, const std::map<std::string, sdbus::Variant>& properties)
-    {
-        m_proxy.callMethod("RegisterEndpoint").onInterface(INTERFACE_NAME).withArguments(endpoint, properties);
-    }
+ public:
+  void RegisterEndpoint(
+      const sdbus::ObjectPath& endpoint,
+      const std::map<std::string, sdbus::Variant>& properties) {
+    m_proxy.callMethod("RegisterEndpoint")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(endpoint, properties);
+  }
 
-    void UnregisterEndpoint(const sdbus::ObjectPath& endpoint)
-    {
-        m_proxy.callMethod("UnregisterEndpoint").onInterface(INTERFACE_NAME).withArguments(endpoint);
-    }
+  void UnregisterEndpoint(const sdbus::ObjectPath& endpoint) {
+    m_proxy.callMethod("UnregisterEndpoint")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(endpoint);
+  }
 
-    void RegisterPlayer(const sdbus::ObjectPath& player, const std::map<std::string, sdbus::Variant>& properties)
-    {
-        m_proxy.callMethod("RegisterPlayer").onInterface(INTERFACE_NAME).withArguments(player, properties);
-    }
+  void RegisterPlayer(const sdbus::ObjectPath& player,
+                      const std::map<std::string, sdbus::Variant>& properties) {
+    m_proxy.callMethod("RegisterPlayer")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(player, properties);
+  }
 
-    void UnregisterPlayer(const sdbus::ObjectPath& player)
-    {
-        m_proxy.callMethod("UnregisterPlayer").onInterface(INTERFACE_NAME).withArguments(player);
-    }
+  void UnregisterPlayer(const sdbus::ObjectPath& player) {
+    m_proxy.callMethod("UnregisterPlayer")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(player);
+  }
 
-    void RegisterApplication(const sdbus::ObjectPath& application, const std::map<std::string, sdbus::Variant>& options)
-    {
-        m_proxy.callMethod("RegisterApplication").onInterface(INTERFACE_NAME).withArguments(application, options);
-    }
+  void RegisterApplication(
+      const sdbus::ObjectPath& application,
+      const std::map<std::string, sdbus::Variant>& options) {
+    m_proxy.callMethod("RegisterApplication")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(application, options);
+  }
 
-    void UnregisterApplication(const sdbus::ObjectPath& application)
-    {
-        m_proxy.callMethod("UnregisterApplication").onInterface(INTERFACE_NAME).withArguments(application);
-    }
+  void UnregisterApplication(const sdbus::ObjectPath& application) {
+    m_proxy.callMethod("UnregisterApplication")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(application);
+  }
 
-public:
-    std::vector<std::string> SupportedUUIDs()
-    {
-        return m_proxy.getProperty("SupportedUUIDs").onInterface(INTERFACE_NAME).get<std::vector<std::string>>();
-    }
+ public:
+  std::vector<std::string> SupportedUUIDs() {
+    return m_proxy.getProperty("SupportedUUIDs")
+        .onInterface(INTERFACE_NAME)
+        .get<std::vector<std::string>>();
+  }
 
-private:
-    sdbus::IProxy& m_proxy;
+ private:
+  sdbus::IProxy& m_proxy;
 };
 
-}} // namespaces
+}  // namespace bluez
+}  // namespace org
 
 #endif

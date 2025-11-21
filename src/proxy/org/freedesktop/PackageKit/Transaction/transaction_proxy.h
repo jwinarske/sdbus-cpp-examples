@@ -14,306 +14,536 @@ namespace org {
 namespace freedesktop {
 namespace PackageKit {
 
-class Transaction_proxy
-{
-public:
-    static constexpr const char* INTERFACE_NAME = "org.freedesktop.PackageKit.Transaction";
+class Transaction_proxy {
+ public:
+  static constexpr const char* INTERFACE_NAME =
+      "org.freedesktop.PackageKit.Transaction";
 
-protected:
-    Transaction_proxy(sdbus::IProxy& proxy)
-        : m_proxy(proxy)
-    {
-    }
+ protected:
+  Transaction_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
 
-    Transaction_proxy(const Transaction_proxy&) = delete;
-    Transaction_proxy& operator=(const Transaction_proxy&) = delete;
-    Transaction_proxy(Transaction_proxy&&) = delete;
-    Transaction_proxy& operator=(Transaction_proxy&&) = delete;
+  Transaction_proxy(const Transaction_proxy&) = delete;
+  Transaction_proxy& operator=(const Transaction_proxy&) = delete;
+  Transaction_proxy(Transaction_proxy&&) = delete;
+  Transaction_proxy& operator=(Transaction_proxy&&) = delete;
 
-    ~Transaction_proxy() = default;
+  ~Transaction_proxy() = default;
 
-    void registerProxy()
-    {
-        m_proxy.uponSignal("Category").onInterface(INTERFACE_NAME).call([this](const std::string& parent_id, const std::string& cat_id, const std::string& name, const std::string& summary, const std::string& icon){ this->onCategory(parent_id, cat_id, name, summary, icon); });
-        m_proxy.uponSignal("Details").onInterface(INTERFACE_NAME).call([this](const std::map<std::string, sdbus::Variant>& data){ this->onDetails(data); });
-        m_proxy.uponSignal("ErrorCode").onInterface(INTERFACE_NAME).call([this](const uint32_t& code, const std::string& details){ this->onErrorCode(code, details); });
-        m_proxy.uponSignal("Files").onInterface(INTERFACE_NAME).call([this](const std::string& package_id, const std::vector<std::string>& file_list){ this->onFiles(package_id, file_list); });
-        m_proxy.uponSignal("Finished").onInterface(INTERFACE_NAME).call([this](const uint32_t& exit, const uint32_t& runtime){ this->onFinished(exit, runtime); });
-        m_proxy.uponSignal("Package").onInterface(INTERFACE_NAME).call([this](const uint32_t& info, const std::string& package_id, const std::string& summary){ this->onPackage(info, package_id, summary); });
-        m_proxy.uponSignal("Packages").onInterface(INTERFACE_NAME).call([this](const std::vector<sdbus::Struct<uint32_t, std::string, std::string>>& packages){ this->onPackages(packages); });
-        m_proxy.uponSignal("RepoDetail").onInterface(INTERFACE_NAME).call([this](const std::string& repo_id, const std::string& description, const bool& enabled){ this->onRepoDetail(repo_id, description, enabled); });
-        m_proxy.uponSignal("RepoSignatureRequired").onInterface(INTERFACE_NAME).call([this](const std::string& package_id, const std::string& repository_name, const std::string& key_url, const std::string& key_userid, const std::string& key_id, const std::string& key_fingerprint, const std::string& key_timestamp, const uint32_t& type){ this->onRepoSignatureRequired(package_id, repository_name, key_url, key_userid, key_id, key_fingerprint, key_timestamp, type); });
-        m_proxy.uponSignal("EulaRequired").onInterface(INTERFACE_NAME).call([this](const std::string& eula_id, const std::string& package_id, const std::string& vendor_name, const std::string& license_agreement){ this->onEulaRequired(eula_id, package_id, vendor_name, license_agreement); });
-        m_proxy.uponSignal("MediaChangeRequired").onInterface(INTERFACE_NAME).call([this](const uint32_t& media_type, const std::string& media_id, const std::string& media_text){ this->onMediaChangeRequired(media_type, media_id, media_text); });
-        m_proxy.uponSignal("RequireRestart").onInterface(INTERFACE_NAME).call([this](const uint32_t& type, const std::string& package_id){ this->onRequireRestart(type, package_id); });
-        m_proxy.uponSignal("Transaction").onInterface(INTERFACE_NAME).call([this](const sdbus::ObjectPath& object_path, const std::string& timespec, const bool& succeeded, const uint32_t& role, const uint32_t& duration, const std::string& data, const uint32_t& uid, const std::string& cmdline){ this->onTransaction(object_path, timespec, succeeded, role, duration, data, uid, cmdline); });
-        m_proxy.uponSignal("UpdateDetail").onInterface(INTERFACE_NAME).call([this](const std::string& package_id, const std::vector<std::string>& updates, const std::vector<std::string>& obsoletes, const std::vector<std::string>& vendor_urls, const std::vector<std::string>& bugzilla_urls, const std::vector<std::string>& cve_urls, const uint32_t& restart, const std::string& update_text, const std::string& changelog, const uint32_t& state, const std::string& issued, const std::string& updated){ this->onUpdateDetail(package_id, updates, obsoletes, vendor_urls, bugzilla_urls, cve_urls, restart, update_text, changelog, state, issued, updated); });
-        m_proxy.uponSignal("UpdateDetails").onInterface(INTERFACE_NAME).call([this](const std::vector<sdbus::Struct<std::string, std::vector<std::string>, std::vector<std::string>, std::vector<std::string>, std::vector<std::string>, std::vector<std::string>, uint32_t, std::string, std::string, uint32_t, std::string, std::string>>& details){ this->onUpdateDetails(details); });
-        m_proxy.uponSignal("DistroUpgrade").onInterface(INTERFACE_NAME).call([this](const uint32_t& type, const std::string& name, const std::string& summary){ this->onDistroUpgrade(type, name, summary); });
-        m_proxy.uponSignal("ItemProgress").onInterface(INTERFACE_NAME).call([this](const std::string& id, const uint32_t& status, const uint32_t& percentage){ this->onItemProgress(id, status, percentage); });
-        m_proxy.uponSignal("Destroy").onInterface(INTERFACE_NAME).call([this](){ this->onDestroy(); });
-    }
+  void registerProxy() {
+    m_proxy.uponSignal("Category")
+        .onInterface(INTERFACE_NAME)
+        .call([this](const std::string& parent_id, const std::string& cat_id,
+                     const std::string& name, const std::string& summary,
+                     const std::string& icon) {
+          this->onCategory(parent_id, cat_id, name, summary, icon);
+        });
+    m_proxy.uponSignal("Details")
+        .onInterface(INTERFACE_NAME)
+        .call([this](const std::map<std::string, sdbus::Variant>& data) {
+          this->onDetails(data);
+        });
+    m_proxy.uponSignal("ErrorCode")
+        .onInterface(INTERFACE_NAME)
+        .call([this](const uint32_t& code, const std::string& details) {
+          this->onErrorCode(code, details);
+        });
+    m_proxy.uponSignal("Files")
+        .onInterface(INTERFACE_NAME)
+        .call([this](const std::string& package_id,
+                     const std::vector<std::string>& file_list) {
+          this->onFiles(package_id, file_list);
+        });
+    m_proxy.uponSignal("Finished")
+        .onInterface(INTERFACE_NAME)
+        .call([this](const uint32_t& exit, const uint32_t& runtime) {
+          this->onFinished(exit, runtime);
+        });
+    m_proxy.uponSignal("Package")
+        .onInterface(INTERFACE_NAME)
+        .call([this](const uint32_t& info, const std::string& package_id,
+                     const std::string& summary) {
+          this->onPackage(info, package_id, summary);
+        });
+    m_proxy.uponSignal("Packages")
+        .onInterface(INTERFACE_NAME)
+        .call([this](const std::vector<sdbus::Struct<uint32_t, std::string,
+                                                     std::string>>& packages) {
+          this->onPackages(packages);
+        });
+    m_proxy.uponSignal("RepoDetail")
+        .onInterface(INTERFACE_NAME)
+        .call([this](const std::string& repo_id, const std::string& description,
+                     const bool& enabled) {
+          this->onRepoDetail(repo_id, description, enabled);
+        });
+    m_proxy.uponSignal("RepoSignatureRequired")
+        .onInterface(INTERFACE_NAME)
+        .call([this](const std::string& package_id,
+                     const std::string& repository_name,
+                     const std::string& key_url, const std::string& key_userid,
+                     const std::string& key_id,
+                     const std::string& key_fingerprint,
+                     const std::string& key_timestamp, const uint32_t& type) {
+          this->onRepoSignatureRequired(package_id, repository_name, key_url,
+                                        key_userid, key_id, key_fingerprint,
+                                        key_timestamp, type);
+        });
+    m_proxy.uponSignal("EulaRequired")
+        .onInterface(INTERFACE_NAME)
+        .call([this](const std::string& eula_id, const std::string& package_id,
+                     const std::string& vendor_name,
+                     const std::string& license_agreement) {
+          this->onEulaRequired(eula_id, package_id, vendor_name,
+                               license_agreement);
+        });
+    m_proxy.uponSignal("MediaChangeRequired")
+        .onInterface(INTERFACE_NAME)
+        .call([this](const uint32_t& media_type, const std::string& media_id,
+                     const std::string& media_text) {
+          this->onMediaChangeRequired(media_type, media_id, media_text);
+        });
+    m_proxy.uponSignal("RequireRestart")
+        .onInterface(INTERFACE_NAME)
+        .call([this](const uint32_t& type, const std::string& package_id) {
+          this->onRequireRestart(type, package_id);
+        });
+    m_proxy.uponSignal("Transaction")
+        .onInterface(INTERFACE_NAME)
+        .call([this](const sdbus::ObjectPath& object_path,
+                     const std::string& timespec, const bool& succeeded,
+                     const uint32_t& role, const uint32_t& duration,
+                     const std::string& data, const uint32_t& uid,
+                     const std::string& cmdline) {
+          this->onTransaction(object_path, timespec, succeeded, role, duration,
+                              data, uid, cmdline);
+        });
+    m_proxy.uponSignal("UpdateDetail")
+        .onInterface(INTERFACE_NAME)
+        .call([this](const std::string& package_id,
+                     const std::vector<std::string>& updates,
+                     const std::vector<std::string>& obsoletes,
+                     const std::vector<std::string>& vendor_urls,
+                     const std::vector<std::string>& bugzilla_urls,
+                     const std::vector<std::string>& cve_urls,
+                     const uint32_t& restart, const std::string& update_text,
+                     const std::string& changelog, const uint32_t& state,
+                     const std::string& issued, const std::string& updated) {
+          this->onUpdateDetail(package_id, updates, obsoletes, vendor_urls,
+                               bugzilla_urls, cve_urls, restart, update_text,
+                               changelog, state, issued, updated);
+        });
+    m_proxy.uponSignal("UpdateDetails")
+        .onInterface(INTERFACE_NAME)
+        .call([this](const std::vector<sdbus::Struct<
+                         std::string, std::vector<std::string>,
+                         std::vector<std::string>, std::vector<std::string>,
+                         std::vector<std::string>, std::vector<std::string>,
+                         uint32_t, std::string, std::string, uint32_t,
+                         std::string, std::string>>& details) {
+          this->onUpdateDetails(details);
+        });
+    m_proxy.uponSignal("DistroUpgrade")
+        .onInterface(INTERFACE_NAME)
+        .call([this](const uint32_t& type, const std::string& name,
+                     const std::string& summary) {
+          this->onDistroUpgrade(type, name, summary);
+        });
+    m_proxy.uponSignal("ItemProgress")
+        .onInterface(INTERFACE_NAME)
+        .call([this](const std::string& id, const uint32_t& status,
+                     const uint32_t& percentage) {
+          this->onItemProgress(id, status, percentage);
+        });
+    m_proxy.uponSignal("Destroy").onInterface(INTERFACE_NAME).call([this]() {
+      this->onDestroy();
+    });
+  }
 
-    virtual void onCategory(const std::string& parent_id, const std::string& cat_id, const std::string& name, const std::string& summary, const std::string& icon) = 0;
-    virtual void onDetails(const std::map<std::string, sdbus::Variant>& data) = 0;
-    virtual void onErrorCode(const uint32_t& code, const std::string& details) = 0;
-    virtual void onFiles(const std::string& package_id, const std::vector<std::string>& file_list) = 0;
-    virtual void onFinished(const uint32_t& exit, const uint32_t& runtime) = 0;
-    virtual void onPackage(const uint32_t& info, const std::string& package_id, const std::string& summary) = 0;
-    virtual void onPackages(const std::vector<sdbus::Struct<uint32_t, std::string, std::string>>& packages) = 0;
-    virtual void onRepoDetail(const std::string& repo_id, const std::string& description, const bool& enabled) = 0;
-    virtual void onRepoSignatureRequired(const std::string& package_id, const std::string& repository_name, const std::string& key_url, const std::string& key_userid, const std::string& key_id, const std::string& key_fingerprint, const std::string& key_timestamp, const uint32_t& type) = 0;
-    virtual void onEulaRequired(const std::string& eula_id, const std::string& package_id, const std::string& vendor_name, const std::string& license_agreement) = 0;
-    virtual void onMediaChangeRequired(const uint32_t& media_type, const std::string& media_id, const std::string& media_text) = 0;
-    virtual void onRequireRestart(const uint32_t& type, const std::string& package_id) = 0;
-    virtual void onTransaction(const sdbus::ObjectPath& object_path, const std::string& timespec, const bool& succeeded, const uint32_t& role, const uint32_t& duration, const std::string& data, const uint32_t& uid, const std::string& cmdline) = 0;
-    virtual void onUpdateDetail(const std::string& package_id, const std::vector<std::string>& updates, const std::vector<std::string>& obsoletes, const std::vector<std::string>& vendor_urls, const std::vector<std::string>& bugzilla_urls, const std::vector<std::string>& cve_urls, const uint32_t& restart, const std::string& update_text, const std::string& changelog, const uint32_t& state, const std::string& issued, const std::string& updated) = 0;
-    virtual void onUpdateDetails(const std::vector<sdbus::Struct<std::string, std::vector<std::string>, std::vector<std::string>, std::vector<std::string>, std::vector<std::string>, std::vector<std::string>, uint32_t, std::string, std::string, uint32_t, std::string, std::string>>& details) = 0;
-    virtual void onDistroUpgrade(const uint32_t& type, const std::string& name, const std::string& summary) = 0;
-    virtual void onItemProgress(const std::string& id, const uint32_t& status, const uint32_t& percentage) = 0;
-    virtual void onDestroy() = 0;
+  virtual void onCategory(const std::string& parent_id,
+                          const std::string& cat_id,
+                          const std::string& name,
+                          const std::string& summary,
+                          const std::string& icon) = 0;
+  virtual void onDetails(const std::map<std::string, sdbus::Variant>& data) = 0;
+  virtual void onErrorCode(const uint32_t& code,
+                           const std::string& details) = 0;
+  virtual void onFiles(const std::string& package_id,
+                       const std::vector<std::string>& file_list) = 0;
+  virtual void onFinished(const uint32_t& exit, const uint32_t& runtime) = 0;
+  virtual void onPackage(const uint32_t& info,
+                         const std::string& package_id,
+                         const std::string& summary) = 0;
+  virtual void onPackages(
+      const std::vector<sdbus::Struct<uint32_t, std::string, std::string>>&
+          packages) = 0;
+  virtual void onRepoDetail(const std::string& repo_id,
+                            const std::string& description,
+                            const bool& enabled) = 0;
+  virtual void onRepoSignatureRequired(const std::string& package_id,
+                                       const std::string& repository_name,
+                                       const std::string& key_url,
+                                       const std::string& key_userid,
+                                       const std::string& key_id,
+                                       const std::string& key_fingerprint,
+                                       const std::string& key_timestamp,
+                                       const uint32_t& type) = 0;
+  virtual void onEulaRequired(const std::string& eula_id,
+                              const std::string& package_id,
+                              const std::string& vendor_name,
+                              const std::string& license_agreement) = 0;
+  virtual void onMediaChangeRequired(const uint32_t& media_type,
+                                     const std::string& media_id,
+                                     const std::string& media_text) = 0;
+  virtual void onRequireRestart(const uint32_t& type,
+                                const std::string& package_id) = 0;
+  virtual void onTransaction(const sdbus::ObjectPath& object_path,
+                             const std::string& timespec,
+                             const bool& succeeded,
+                             const uint32_t& role,
+                             const uint32_t& duration,
+                             const std::string& data,
+                             const uint32_t& uid,
+                             const std::string& cmdline) = 0;
+  virtual void onUpdateDetail(const std::string& package_id,
+                              const std::vector<std::string>& updates,
+                              const std::vector<std::string>& obsoletes,
+                              const std::vector<std::string>& vendor_urls,
+                              const std::vector<std::string>& bugzilla_urls,
+                              const std::vector<std::string>& cve_urls,
+                              const uint32_t& restart,
+                              const std::string& update_text,
+                              const std::string& changelog,
+                              const uint32_t& state,
+                              const std::string& issued,
+                              const std::string& updated) = 0;
+  virtual void onUpdateDetails(
+      const std::vector<sdbus::Struct<std::string,
+                                      std::vector<std::string>,
+                                      std::vector<std::string>,
+                                      std::vector<std::string>,
+                                      std::vector<std::string>,
+                                      std::vector<std::string>,
+                                      uint32_t,
+                                      std::string,
+                                      std::string,
+                                      uint32_t,
+                                      std::string,
+                                      std::string>>& details) = 0;
+  virtual void onDistroUpgrade(const uint32_t& type,
+                               const std::string& name,
+                               const std::string& summary) = 0;
+  virtual void onItemProgress(const std::string& id,
+                              const uint32_t& status,
+                              const uint32_t& percentage) = 0;
+  virtual void onDestroy() = 0;
 
-public:
-    void SetHints(const std::vector<std::string>& hints)
-    {
-        m_proxy.callMethod("SetHints").onInterface(INTERFACE_NAME).withArguments(hints);
-    }
+ public:
+  void SetHints(const std::vector<std::string>& hints) {
+    m_proxy.callMethod("SetHints")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(hints);
+  }
 
-    void AcceptEula(const std::string& eula_id)
-    {
-        m_proxy.callMethod("AcceptEula").onInterface(INTERFACE_NAME).withArguments(eula_id);
-    }
+  void AcceptEula(const std::string& eula_id) {
+    m_proxy.callMethod("AcceptEula")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(eula_id);
+  }
 
-    void Cancel()
-    {
-        m_proxy.callMethod("Cancel").onInterface(INTERFACE_NAME);
-    }
+  void Cancel() { m_proxy.callMethod("Cancel").onInterface(INTERFACE_NAME); }
 
-    void DownloadPackages(const bool& store_in_cache, const std::vector<std::string>& package_ids)
-    {
-        m_proxy.callMethod("DownloadPackages").onInterface(INTERFACE_NAME).withArguments(store_in_cache, package_ids);
-    }
+  void DownloadPackages(const bool& store_in_cache,
+                        const std::vector<std::string>& package_ids) {
+    m_proxy.callMethod("DownloadPackages")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(store_in_cache, package_ids);
+  }
 
-    void GetCategories()
-    {
-        m_proxy.callMethod("GetCategories").onInterface(INTERFACE_NAME);
-    }
+  void GetCategories() {
+    m_proxy.callMethod("GetCategories").onInterface(INTERFACE_NAME);
+  }
 
-    void DependsOn(const uint64_t& filter, const std::vector<std::string>& package_ids, const bool& recursive)
-    {
-        m_proxy.callMethod("DependsOn").onInterface(INTERFACE_NAME).withArguments(filter, package_ids, recursive);
-    }
+  void DependsOn(const uint64_t& filter,
+                 const std::vector<std::string>& package_ids,
+                 const bool& recursive) {
+    m_proxy.callMethod("DependsOn")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(filter, package_ids, recursive);
+  }
 
-    void GetDetails(const std::vector<std::string>& package_ids)
-    {
-        m_proxy.callMethod("GetDetails").onInterface(INTERFACE_NAME).withArguments(package_ids);
-    }
+  void GetDetails(const std::vector<std::string>& package_ids) {
+    m_proxy.callMethod("GetDetails")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(package_ids);
+  }
 
-    void GetDetailsLocal(const std::vector<std::string>& files)
-    {
-        m_proxy.callMethod("GetDetailsLocal").onInterface(INTERFACE_NAME).withArguments(files);
-    }
+  void GetDetailsLocal(const std::vector<std::string>& files) {
+    m_proxy.callMethod("GetDetailsLocal")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(files);
+  }
 
-    void GetFilesLocal(const std::vector<std::string>& files)
-    {
-        m_proxy.callMethod("GetFilesLocal").onInterface(INTERFACE_NAME).withArguments(files);
-    }
+  void GetFilesLocal(const std::vector<std::string>& files) {
+    m_proxy.callMethod("GetFilesLocal")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(files);
+  }
 
-    void GetFiles(const std::vector<std::string>& package_ids)
-    {
-        m_proxy.callMethod("GetFiles").onInterface(INTERFACE_NAME).withArguments(package_ids);
-    }
+  void GetFiles(const std::vector<std::string>& package_ids) {
+    m_proxy.callMethod("GetFiles")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(package_ids);
+  }
 
-    void GetOldTransactions(const uint32_t& number)
-    {
-        m_proxy.callMethod("GetOldTransactions").onInterface(INTERFACE_NAME).withArguments(number);
-    }
+  void GetOldTransactions(const uint32_t& number) {
+    m_proxy.callMethod("GetOldTransactions")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(number);
+  }
 
-    void GetPackages(const uint64_t& filter)
-    {
-        m_proxy.callMethod("GetPackages").onInterface(INTERFACE_NAME).withArguments(filter);
-    }
+  void GetPackages(const uint64_t& filter) {
+    m_proxy.callMethod("GetPackages")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(filter);
+  }
 
-    void GetRepoList(const uint64_t& filter)
-    {
-        m_proxy.callMethod("GetRepoList").onInterface(INTERFACE_NAME).withArguments(filter);
-    }
+  void GetRepoList(const uint64_t& filter) {
+    m_proxy.callMethod("GetRepoList")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(filter);
+  }
 
-    void RequiredBy(const uint64_t& filter, const std::vector<std::string>& package_ids, const bool& recursive)
-    {
-        m_proxy.callMethod("RequiredBy").onInterface(INTERFACE_NAME).withArguments(filter, package_ids, recursive);
-    }
+  void RequiredBy(const uint64_t& filter,
+                  const std::vector<std::string>& package_ids,
+                  const bool& recursive) {
+    m_proxy.callMethod("RequiredBy")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(filter, package_ids, recursive);
+  }
 
-    void GetUpdateDetail(const std::vector<std::string>& package_ids)
-    {
-        m_proxy.callMethod("GetUpdateDetail").onInterface(INTERFACE_NAME).withArguments(package_ids);
-    }
+  void GetUpdateDetail(const std::vector<std::string>& package_ids) {
+    m_proxy.callMethod("GetUpdateDetail")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(package_ids);
+  }
 
-    void GetUpdates(const uint64_t& filter)
-    {
-        m_proxy.callMethod("GetUpdates").onInterface(INTERFACE_NAME).withArguments(filter);
-    }
+  void GetUpdates(const uint64_t& filter) {
+    m_proxy.callMethod("GetUpdates")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(filter);
+  }
 
-    void GetDistroUpgrades()
-    {
-        m_proxy.callMethod("GetDistroUpgrades").onInterface(INTERFACE_NAME);
-    }
+  void GetDistroUpgrades() {
+    m_proxy.callMethod("GetDistroUpgrades").onInterface(INTERFACE_NAME);
+  }
 
-    void InstallFiles(const uint64_t& transaction_flags, const std::vector<std::string>& full_paths)
-    {
-        m_proxy.callMethod("InstallFiles").onInterface(INTERFACE_NAME).withArguments(transaction_flags, full_paths);
-    }
+  void InstallFiles(const uint64_t& transaction_flags,
+                    const std::vector<std::string>& full_paths) {
+    m_proxy.callMethod("InstallFiles")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(transaction_flags, full_paths);
+  }
 
-    void InstallPackages(const uint64_t& transaction_flags, const std::vector<std::string>& package_ids)
-    {
-        m_proxy.callMethod("InstallPackages").onInterface(INTERFACE_NAME).withArguments(transaction_flags, package_ids);
-    }
+  void InstallPackages(const uint64_t& transaction_flags,
+                       const std::vector<std::string>& package_ids) {
+    m_proxy.callMethod("InstallPackages")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(transaction_flags, package_ids);
+  }
 
-    void InstallSignature(const uint32_t& sig_type, const std::string& key_id, const std::string& package_id)
-    {
-        m_proxy.callMethod("InstallSignature").onInterface(INTERFACE_NAME).withArguments(sig_type, key_id, package_id);
-    }
+  void InstallSignature(const uint32_t& sig_type,
+                        const std::string& key_id,
+                        const std::string& package_id) {
+    m_proxy.callMethod("InstallSignature")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(sig_type, key_id, package_id);
+  }
 
-    void RefreshCache(const bool& force)
-    {
-        m_proxy.callMethod("RefreshCache").onInterface(INTERFACE_NAME).withArguments(force);
-    }
+  void RefreshCache(const bool& force) {
+    m_proxy.callMethod("RefreshCache")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(force);
+  }
 
-    void RemovePackages(const uint64_t& transaction_flags, const std::vector<std::string>& package_ids, const bool& allow_deps, const bool& autoremove)
-    {
-        m_proxy.callMethod("RemovePackages").onInterface(INTERFACE_NAME).withArguments(transaction_flags, package_ids, allow_deps, autoremove);
-    }
+  void RemovePackages(const uint64_t& transaction_flags,
+                      const std::vector<std::string>& package_ids,
+                      const bool& allow_deps,
+                      const bool& autoremove) {
+    m_proxy.callMethod("RemovePackages")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(transaction_flags, package_ids, allow_deps, autoremove);
+  }
 
-    void RepoEnable(const std::string& repo_id, const bool& enabled)
-    {
-        m_proxy.callMethod("RepoEnable").onInterface(INTERFACE_NAME).withArguments(repo_id, enabled);
-    }
+  void RepoEnable(const std::string& repo_id, const bool& enabled) {
+    m_proxy.callMethod("RepoEnable")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(repo_id, enabled);
+  }
 
-    void RepoSetData(const std::string& repo_id, const std::string& parameter, const std::string& value)
-    {
-        m_proxy.callMethod("RepoSetData").onInterface(INTERFACE_NAME).withArguments(repo_id, parameter, value);
-    }
+  void RepoSetData(const std::string& repo_id,
+                   const std::string& parameter,
+                   const std::string& value) {
+    m_proxy.callMethod("RepoSetData")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(repo_id, parameter, value);
+  }
 
-    void RepoRemove(const uint64_t& transaction_flags, const std::string& repo_id, const bool& autoremove)
-    {
-        m_proxy.callMethod("RepoRemove").onInterface(INTERFACE_NAME).withArguments(transaction_flags, repo_id, autoremove);
-    }
+  void RepoRemove(const uint64_t& transaction_flags,
+                  const std::string& repo_id,
+                  const bool& autoremove) {
+    m_proxy.callMethod("RepoRemove")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(transaction_flags, repo_id, autoremove);
+  }
 
-    void Resolve(const uint64_t& filter, const std::vector<std::string>& packages)
-    {
-        m_proxy.callMethod("Resolve").onInterface(INTERFACE_NAME).withArguments(filter, packages);
-    }
+  void Resolve(const uint64_t& filter,
+               const std::vector<std::string>& packages) {
+    m_proxy.callMethod("Resolve")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(filter, packages);
+  }
 
-    void SearchDetails(const uint64_t& filter, const std::vector<std::string>& values)
-    {
-        m_proxy.callMethod("SearchDetails").onInterface(INTERFACE_NAME).withArguments(filter, values);
-    }
+  void SearchDetails(const uint64_t& filter,
+                     const std::vector<std::string>& values) {
+    m_proxy.callMethod("SearchDetails")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(filter, values);
+  }
 
-    void SearchFiles(const uint64_t& filter, const std::vector<std::string>& values)
-    {
-        m_proxy.callMethod("SearchFiles").onInterface(INTERFACE_NAME).withArguments(filter, values);
-    }
+  void SearchFiles(const uint64_t& filter,
+                   const std::vector<std::string>& values) {
+    m_proxy.callMethod("SearchFiles")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(filter, values);
+  }
 
-    void SearchGroups(const uint64_t& filter, const std::vector<std::string>& values)
-    {
-        m_proxy.callMethod("SearchGroups").onInterface(INTERFACE_NAME).withArguments(filter, values);
-    }
+  void SearchGroups(const uint64_t& filter,
+                    const std::vector<std::string>& values) {
+    m_proxy.callMethod("SearchGroups")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(filter, values);
+  }
 
-    void SearchNames(const uint64_t& filter, const std::vector<std::string>& values)
-    {
-        m_proxy.callMethod("SearchNames").onInterface(INTERFACE_NAME).withArguments(filter, values);
-    }
+  void SearchNames(const uint64_t& filter,
+                   const std::vector<std::string>& values) {
+    m_proxy.callMethod("SearchNames")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(filter, values);
+  }
 
-    void UpdatePackages(const uint64_t& transaction_flags, const std::vector<std::string>& package_ids)
-    {
-        m_proxy.callMethod("UpdatePackages").onInterface(INTERFACE_NAME).withArguments(transaction_flags, package_ids);
-    }
+  void UpdatePackages(const uint64_t& transaction_flags,
+                      const std::vector<std::string>& package_ids) {
+    m_proxy.callMethod("UpdatePackages")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(transaction_flags, package_ids);
+  }
 
-    void WhatProvides(const uint64_t& filter, const std::vector<std::string>& values)
-    {
-        m_proxy.callMethod("WhatProvides").onInterface(INTERFACE_NAME).withArguments(filter, values);
-    }
+  void WhatProvides(const uint64_t& filter,
+                    const std::vector<std::string>& values) {
+    m_proxy.callMethod("WhatProvides")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(filter, values);
+  }
 
-    void UpgradeSystem(const uint64_t& transaction_flags, const std::string& distro_id, const uint32_t& upgrade_kind)
-    {
-        m_proxy.callMethod("UpgradeSystem").onInterface(INTERFACE_NAME).withArguments(transaction_flags, distro_id, upgrade_kind);
-    }
+  void UpgradeSystem(const uint64_t& transaction_flags,
+                     const std::string& distro_id,
+                     const uint32_t& upgrade_kind) {
+    m_proxy.callMethod("UpgradeSystem")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(transaction_flags, distro_id, upgrade_kind);
+  }
 
-    void RepairSystem(const uint64_t& transaction_flags)
-    {
-        m_proxy.callMethod("RepairSystem").onInterface(INTERFACE_NAME).withArguments(transaction_flags);
-    }
+  void RepairSystem(const uint64_t& transaction_flags) {
+    m_proxy.callMethod("RepairSystem")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(transaction_flags);
+  }
 
-public:
-    uint32_t Role()
-    {
-        return m_proxy.getProperty("Role").onInterface(INTERFACE_NAME).get<uint32_t>();
-    }
+ public:
+  uint32_t Role() {
+    return m_proxy.getProperty("Role")
+        .onInterface(INTERFACE_NAME)
+        .get<uint32_t>();
+  }
 
-    uint32_t Status()
-    {
-        return m_proxy.getProperty("Status").onInterface(INTERFACE_NAME).get<uint32_t>();
-    }
+  uint32_t Status() {
+    return m_proxy.getProperty("Status")
+        .onInterface(INTERFACE_NAME)
+        .get<uint32_t>();
+  }
 
-    std::string LastPackage()
-    {
-        return m_proxy.getProperty("LastPackage").onInterface(INTERFACE_NAME).get<std::string>();
-    }
+  std::string LastPackage() {
+    return m_proxy.getProperty("LastPackage")
+        .onInterface(INTERFACE_NAME)
+        .get<std::string>();
+  }
 
-    uint32_t Uid()
-    {
-        return m_proxy.getProperty("Uid").onInterface(INTERFACE_NAME).get<uint32_t>();
-    }
+  uint32_t Uid() {
+    return m_proxy.getProperty("Uid")
+        .onInterface(INTERFACE_NAME)
+        .get<uint32_t>();
+  }
 
-    std::string Sender()
-    {
-        return m_proxy.getProperty("Sender").onInterface(INTERFACE_NAME).get<std::string>();
-    }
+  std::string Sender() {
+    return m_proxy.getProperty("Sender")
+        .onInterface(INTERFACE_NAME)
+        .get<std::string>();
+  }
 
-    uint32_t Percentage()
-    {
-        return m_proxy.getProperty("Percentage").onInterface(INTERFACE_NAME).get<uint32_t>();
-    }
+  uint32_t Percentage() {
+    return m_proxy.getProperty("Percentage")
+        .onInterface(INTERFACE_NAME)
+        .get<uint32_t>();
+  }
 
-    bool AllowCancel()
-    {
-        return m_proxy.getProperty("AllowCancel").onInterface(INTERFACE_NAME).get<bool>();
-    }
+  bool AllowCancel() {
+    return m_proxy.getProperty("AllowCancel")
+        .onInterface(INTERFACE_NAME)
+        .get<bool>();
+  }
 
-    bool CallerActive()
-    {
-        return m_proxy.getProperty("CallerActive").onInterface(INTERFACE_NAME).get<bool>();
-    }
+  bool CallerActive() {
+    return m_proxy.getProperty("CallerActive")
+        .onInterface(INTERFACE_NAME)
+        .get<bool>();
+  }
 
-    uint32_t ElapsedTime()
-    {
-        return m_proxy.getProperty("ElapsedTime").onInterface(INTERFACE_NAME).get<uint32_t>();
-    }
+  uint32_t ElapsedTime() {
+    return m_proxy.getProperty("ElapsedTime")
+        .onInterface(INTERFACE_NAME)
+        .get<uint32_t>();
+  }
 
-    uint32_t RemainingTime()
-    {
-        return m_proxy.getProperty("RemainingTime").onInterface(INTERFACE_NAME).get<uint32_t>();
-    }
+  uint32_t RemainingTime() {
+    return m_proxy.getProperty("RemainingTime")
+        .onInterface(INTERFACE_NAME)
+        .get<uint32_t>();
+  }
 
-    uint32_t Speed()
-    {
-        return m_proxy.getProperty("Speed").onInterface(INTERFACE_NAME).get<uint32_t>();
-    }
+  uint32_t Speed() {
+    return m_proxy.getProperty("Speed")
+        .onInterface(INTERFACE_NAME)
+        .get<uint32_t>();
+  }
 
-    uint64_t DownloadSizeRemaining()
-    {
-        return m_proxy.getProperty("DownloadSizeRemaining").onInterface(INTERFACE_NAME).get<uint64_t>();
-    }
+  uint64_t DownloadSizeRemaining() {
+    return m_proxy.getProperty("DownloadSizeRemaining")
+        .onInterface(INTERFACE_NAME)
+        .get<uint64_t>();
+  }
 
-    uint64_t TransactionFlags()
-    {
-        return m_proxy.getProperty("TransactionFlags").onInterface(INTERFACE_NAME).get<uint64_t>();
-    }
+  uint64_t TransactionFlags() {
+    return m_proxy.getProperty("TransactionFlags")
+        .onInterface(INTERFACE_NAME)
+        .get<uint64_t>();
+  }
 
-private:
-    sdbus::IProxy& m_proxy;
+ private:
+  sdbus::IProxy& m_proxy;
 };
 
-}}} // namespaces
+}  // namespace PackageKit
+}  // namespace freedesktop
+}  // namespace org
 
 #endif

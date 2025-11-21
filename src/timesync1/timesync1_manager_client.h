@@ -49,8 +49,7 @@ class Timesync1ManagerClient
                  addr.get<1>().size());
   }
   void setRuntimeServersExample() {
-    std::vector<std::string> servers{"time1.google.com",
-                                      "time.cloudflare.com"};
+    std::vector<std::string> servers{"time1.google.com", "time.cloudflare.com"};
     try {
       spdlog::info("Setting RuntimeNTPServers...");
       SetRuntimeNTPServers(servers);

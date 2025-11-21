@@ -13,43 +13,43 @@
 namespace org {
 namespace bluez {
 
-class BatteryProviderManager1_proxy
-{
-public:
-    static constexpr const char* INTERFACE_NAME = "org.bluez.BatteryProviderManager1";
+class BatteryProviderManager1_proxy {
+ public:
+  static constexpr const char* INTERFACE_NAME =
+      "org.bluez.BatteryProviderManager1";
 
-protected:
-    BatteryProviderManager1_proxy(sdbus::IProxy& proxy)
-        : m_proxy(proxy)
-    {
-    }
+ protected:
+  BatteryProviderManager1_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
 
-    BatteryProviderManager1_proxy(const BatteryProviderManager1_proxy&) = delete;
-    BatteryProviderManager1_proxy& operator=(const BatteryProviderManager1_proxy&) = delete;
-    BatteryProviderManager1_proxy(BatteryProviderManager1_proxy&&) = delete;
-    BatteryProviderManager1_proxy& operator=(BatteryProviderManager1_proxy&&) = delete;
+  BatteryProviderManager1_proxy(const BatteryProviderManager1_proxy&) = delete;
+  BatteryProviderManager1_proxy& operator=(
+      const BatteryProviderManager1_proxy&) = delete;
+  BatteryProviderManager1_proxy(BatteryProviderManager1_proxy&&) = delete;
+  BatteryProviderManager1_proxy& operator=(BatteryProviderManager1_proxy&&) =
+      delete;
 
-    ~BatteryProviderManager1_proxy() = default;
+  ~BatteryProviderManager1_proxy() = default;
 
-    void registerProxy()
-    {
-    }
+  void registerProxy() {}
 
-public:
-    void RegisterBatteryProvider(const sdbus::ObjectPath& provider)
-    {
-        m_proxy.callMethod("RegisterBatteryProvider").onInterface(INTERFACE_NAME).withArguments(provider);
-    }
+ public:
+  void RegisterBatteryProvider(const sdbus::ObjectPath& provider) {
+    m_proxy.callMethod("RegisterBatteryProvider")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(provider);
+  }
 
-    void UnregisterBatteryProvider(const sdbus::ObjectPath& provider)
-    {
-        m_proxy.callMethod("UnregisterBatteryProvider").onInterface(INTERFACE_NAME).withArguments(provider);
-    }
+  void UnregisterBatteryProvider(const sdbus::ObjectPath& provider) {
+    m_proxy.callMethod("UnregisterBatteryProvider")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(provider);
+  }
 
-private:
-    sdbus::IProxy& m_proxy;
+ private:
+  sdbus::IProxy& m_proxy;
 };
 
-}} // namespaces
+}  // namespace bluez
+}  // namespace org
 
 #endif

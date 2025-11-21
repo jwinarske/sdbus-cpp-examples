@@ -13,38 +13,34 @@
 namespace org {
 namespace bluez {
 
-class Input1_proxy
-{
-public:
-    static constexpr const char* INTERFACE_NAME = "org.bluez.Input1";
+class Input1_proxy {
+ public:
+  static constexpr const char* INTERFACE_NAME = "org.bluez.Input1";
 
-protected:
-    Input1_proxy(sdbus::IProxy& proxy)
-        : m_proxy(proxy)
-    {
-    }
+ protected:
+  Input1_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
 
-    Input1_proxy(const Input1_proxy&) = delete;
-    Input1_proxy& operator=(const Input1_proxy&) = delete;
-    Input1_proxy(Input1_proxy&&) = delete;
-    Input1_proxy& operator=(Input1_proxy&&) = delete;
+  Input1_proxy(const Input1_proxy&) = delete;
+  Input1_proxy& operator=(const Input1_proxy&) = delete;
+  Input1_proxy(Input1_proxy&&) = delete;
+  Input1_proxy& operator=(Input1_proxy&&) = delete;
 
-    ~Input1_proxy() = default;
+  ~Input1_proxy() = default;
 
-    void registerProxy()
-    {
-    }
+  void registerProxy() {}
 
-public:
-    std::string ReconnectMode()
-    {
-        return m_proxy.getProperty("ReconnectMode").onInterface(INTERFACE_NAME).get<std::string>();
-    }
+ public:
+  std::string ReconnectMode() {
+    return m_proxy.getProperty("ReconnectMode")
+        .onInterface(INTERFACE_NAME)
+        .get<std::string>();
+  }
 
-private:
-    sdbus::IProxy& m_proxy;
+ private:
+  sdbus::IProxy& m_proxy;
 };
 
-}} // namespaces
+}  // namespace bluez
+}  // namespace org
 
 #endif

@@ -13,84 +13,85 @@
 namespace org {
 namespace freedesktop {
 
-class RealtimeKit1_proxy
-{
-public:
-    static constexpr const char* INTERFACE_NAME = "org.freedesktop.RealtimeKit1";
+class RealtimeKit1_proxy {
+ public:
+  static constexpr const char* INTERFACE_NAME = "org.freedesktop.RealtimeKit1";
 
-protected:
-    RealtimeKit1_proxy(sdbus::IProxy& proxy)
-        : m_proxy(proxy)
-    {
-    }
+ protected:
+  RealtimeKit1_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
 
-    RealtimeKit1_proxy(const RealtimeKit1_proxy&) = delete;
-    RealtimeKit1_proxy& operator=(const RealtimeKit1_proxy&) = delete;
-    RealtimeKit1_proxy(RealtimeKit1_proxy&&) = delete;
-    RealtimeKit1_proxy& operator=(RealtimeKit1_proxy&&) = delete;
+  RealtimeKit1_proxy(const RealtimeKit1_proxy&) = delete;
+  RealtimeKit1_proxy& operator=(const RealtimeKit1_proxy&) = delete;
+  RealtimeKit1_proxy(RealtimeKit1_proxy&&) = delete;
+  RealtimeKit1_proxy& operator=(RealtimeKit1_proxy&&) = delete;
 
-    ~RealtimeKit1_proxy() = default;
+  ~RealtimeKit1_proxy() = default;
 
-    void registerProxy()
-    {
-    }
+  void registerProxy() {}
 
-public:
-    void MakeThreadRealtime(const uint64_t& thread, const uint32_t& priority)
-    {
-        m_proxy.callMethod("MakeThreadRealtime").onInterface(INTERFACE_NAME).withArguments(thread, priority);
-    }
+ public:
+  void MakeThreadRealtime(const uint64_t& thread, const uint32_t& priority) {
+    m_proxy.callMethod("MakeThreadRealtime")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(thread, priority);
+  }
 
-    void MakeThreadRealtimeWithPID(const uint64_t& process, const uint64_t& thread, const uint32_t& priority)
-    {
-        m_proxy.callMethod("MakeThreadRealtimeWithPID").onInterface(INTERFACE_NAME).withArguments(process, thread, priority);
-    }
+  void MakeThreadRealtimeWithPID(const uint64_t& process,
+                                 const uint64_t& thread,
+                                 const uint32_t& priority) {
+    m_proxy.callMethod("MakeThreadRealtimeWithPID")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(process, thread, priority);
+  }
 
-    void MakeThreadHighPriority(const uint64_t& thread, const int32_t& priority)
-    {
-        m_proxy.callMethod("MakeThreadHighPriority").onInterface(INTERFACE_NAME).withArguments(thread, priority);
-    }
+  void MakeThreadHighPriority(const uint64_t& thread, const int32_t& priority) {
+    m_proxy.callMethod("MakeThreadHighPriority")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(thread, priority);
+  }
 
-    void MakeThreadHighPriorityWithPID(const uint64_t& process, const uint64_t& thread, const int32_t& priority)
-    {
-        m_proxy.callMethod("MakeThreadHighPriorityWithPID").onInterface(INTERFACE_NAME).withArguments(process, thread, priority);
-    }
+  void MakeThreadHighPriorityWithPID(const uint64_t& process,
+                                     const uint64_t& thread,
+                                     const int32_t& priority) {
+    m_proxy.callMethod("MakeThreadHighPriorityWithPID")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(process, thread, priority);
+  }
 
-    void ResetKnown()
-    {
-        m_proxy.callMethod("ResetKnown").onInterface(INTERFACE_NAME);
-    }
+  void ResetKnown() {
+    m_proxy.callMethod("ResetKnown").onInterface(INTERFACE_NAME);
+  }
 
-    void ResetAll()
-    {
-        m_proxy.callMethod("ResetAll").onInterface(INTERFACE_NAME);
-    }
+  void ResetAll() {
+    m_proxy.callMethod("ResetAll").onInterface(INTERFACE_NAME);
+  }
 
-    void Exit()
-    {
-        m_proxy.callMethod("Exit").onInterface(INTERFACE_NAME);
-    }
+  void Exit() { m_proxy.callMethod("Exit").onInterface(INTERFACE_NAME); }
 
-public:
-    int64_t RTTimeUSecMax()
-    {
-        return m_proxy.getProperty("RTTimeUSecMax").onInterface(INTERFACE_NAME).get<int64_t>();
-    }
+ public:
+  int64_t RTTimeUSecMax() {
+    return m_proxy.getProperty("RTTimeUSecMax")
+        .onInterface(INTERFACE_NAME)
+        .get<int64_t>();
+  }
 
-    int32_t MaxRealtimePriority()
-    {
-        return m_proxy.getProperty("MaxRealtimePriority").onInterface(INTERFACE_NAME).get<int32_t>();
-    }
+  int32_t MaxRealtimePriority() {
+    return m_proxy.getProperty("MaxRealtimePriority")
+        .onInterface(INTERFACE_NAME)
+        .get<int32_t>();
+  }
 
-    int32_t MinNiceLevel()
-    {
-        return m_proxy.getProperty("MinNiceLevel").onInterface(INTERFACE_NAME).get<int32_t>();
-    }
+  int32_t MinNiceLevel() {
+    return m_proxy.getProperty("MinNiceLevel")
+        .onInterface(INTERFACE_NAME)
+        .get<int32_t>();
+  }
 
-private:
-    sdbus::IProxy& m_proxy;
+ private:
+  sdbus::IProxy& m_proxy;
 };
 
-}} // namespaces
+}  // namespace freedesktop
+}  // namespace org
 
 #endif

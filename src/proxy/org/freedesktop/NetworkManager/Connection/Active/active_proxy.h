@@ -15,121 +15,140 @@ namespace freedesktop {
 namespace NetworkManager {
 namespace Connection {
 
-class Active_proxy
-{
-public:
-    static constexpr const char* INTERFACE_NAME = "org.freedesktop.NetworkManager.Connection.Active";
+class Active_proxy {
+ public:
+  static constexpr const char* INTERFACE_NAME =
+      "org.freedesktop.NetworkManager.Connection.Active";
 
-protected:
-    Active_proxy(sdbus::IProxy& proxy)
-        : m_proxy(proxy)
-    {
-    }
+ protected:
+  Active_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
 
-    Active_proxy(const Active_proxy&) = delete;
-    Active_proxy& operator=(const Active_proxy&) = delete;
-    Active_proxy(Active_proxy&&) = delete;
-    Active_proxy& operator=(Active_proxy&&) = delete;
+  Active_proxy(const Active_proxy&) = delete;
+  Active_proxy& operator=(const Active_proxy&) = delete;
+  Active_proxy(Active_proxy&&) = delete;
+  Active_proxy& operator=(Active_proxy&&) = delete;
 
-    ~Active_proxy() = default;
+  ~Active_proxy() = default;
 
-    void registerProxy()
-    {
-        m_proxy.uponSignal("StateChanged").onInterface(INTERFACE_NAME).call([this](const uint32_t& state, const uint32_t& reason){ this->onStateChanged(state, reason); });
-    }
+  void registerProxy() {
+    m_proxy.uponSignal("StateChanged")
+        .onInterface(INTERFACE_NAME)
+        .call([this](const uint32_t& state, const uint32_t& reason) {
+          this->onStateChanged(state, reason);
+        });
+  }
 
-    virtual void onStateChanged(const uint32_t& state, const uint32_t& reason) = 0;
+  virtual void onStateChanged(const uint32_t& state,
+                              const uint32_t& reason) = 0;
 
-public:
-    sdbus::ObjectPath Connection()
-    {
-        return m_proxy.getProperty("Connection").onInterface(INTERFACE_NAME).get<sdbus::ObjectPath>();
-    }
+ public:
+  sdbus::ObjectPath Connection() {
+    return m_proxy.getProperty("Connection")
+        .onInterface(INTERFACE_NAME)
+        .get<sdbus::ObjectPath>();
+  }
 
-    sdbus::ObjectPath SpecificObject()
-    {
-        return m_proxy.getProperty("SpecificObject").onInterface(INTERFACE_NAME).get<sdbus::ObjectPath>();
-    }
+  sdbus::ObjectPath SpecificObject() {
+    return m_proxy.getProperty("SpecificObject")
+        .onInterface(INTERFACE_NAME)
+        .get<sdbus::ObjectPath>();
+  }
 
-    std::string Id()
-    {
-        return m_proxy.getProperty("Id").onInterface(INTERFACE_NAME).get<std::string>();
-    }
+  std::string Id() {
+    return m_proxy.getProperty("Id")
+        .onInterface(INTERFACE_NAME)
+        .get<std::string>();
+  }
 
-    std::string Uuid()
-    {
-        return m_proxy.getProperty("Uuid").onInterface(INTERFACE_NAME).get<std::string>();
-    }
+  std::string Uuid() {
+    return m_proxy.getProperty("Uuid")
+        .onInterface(INTERFACE_NAME)
+        .get<std::string>();
+  }
 
-    std::string Type()
-    {
-        return m_proxy.getProperty("Type").onInterface(INTERFACE_NAME).get<std::string>();
-    }
+  std::string Type() {
+    return m_proxy.getProperty("Type")
+        .onInterface(INTERFACE_NAME)
+        .get<std::string>();
+  }
 
-    std::vector<sdbus::ObjectPath> Devices()
-    {
-        return m_proxy.getProperty("Devices").onInterface(INTERFACE_NAME).get<std::vector<sdbus::ObjectPath>>();
-    }
+  std::vector<sdbus::ObjectPath> Devices() {
+    return m_proxy.getProperty("Devices")
+        .onInterface(INTERFACE_NAME)
+        .get<std::vector<sdbus::ObjectPath>>();
+  }
 
-    uint32_t State()
-    {
-        return m_proxy.getProperty("State").onInterface(INTERFACE_NAME).get<uint32_t>();
-    }
+  uint32_t State() {
+    return m_proxy.getProperty("State")
+        .onInterface(INTERFACE_NAME)
+        .get<uint32_t>();
+  }
 
-    uint32_t StateFlags()
-    {
-        return m_proxy.getProperty("StateFlags").onInterface(INTERFACE_NAME).get<uint32_t>();
-    }
+  uint32_t StateFlags() {
+    return m_proxy.getProperty("StateFlags")
+        .onInterface(INTERFACE_NAME)
+        .get<uint32_t>();
+  }
 
-    bool Default()
-    {
-        return m_proxy.getProperty("Default").onInterface(INTERFACE_NAME).get<bool>();
-    }
+  bool Default() {
+    return m_proxy.getProperty("Default")
+        .onInterface(INTERFACE_NAME)
+        .get<bool>();
+  }
 
-    sdbus::ObjectPath Ip4Config()
-    {
-        return m_proxy.getProperty("Ip4Config").onInterface(INTERFACE_NAME).get<sdbus::ObjectPath>();
-    }
+  sdbus::ObjectPath Ip4Config() {
+    return m_proxy.getProperty("Ip4Config")
+        .onInterface(INTERFACE_NAME)
+        .get<sdbus::ObjectPath>();
+  }
 
-    sdbus::ObjectPath Dhcp4Config()
-    {
-        return m_proxy.getProperty("Dhcp4Config").onInterface(INTERFACE_NAME).get<sdbus::ObjectPath>();
-    }
+  sdbus::ObjectPath Dhcp4Config() {
+    return m_proxy.getProperty("Dhcp4Config")
+        .onInterface(INTERFACE_NAME)
+        .get<sdbus::ObjectPath>();
+  }
 
-    bool Default6()
-    {
-        return m_proxy.getProperty("Default6").onInterface(INTERFACE_NAME).get<bool>();
-    }
+  bool Default6() {
+    return m_proxy.getProperty("Default6")
+        .onInterface(INTERFACE_NAME)
+        .get<bool>();
+  }
 
-    sdbus::ObjectPath Ip6Config()
-    {
-        return m_proxy.getProperty("Ip6Config").onInterface(INTERFACE_NAME).get<sdbus::ObjectPath>();
-    }
+  sdbus::ObjectPath Ip6Config() {
+    return m_proxy.getProperty("Ip6Config")
+        .onInterface(INTERFACE_NAME)
+        .get<sdbus::ObjectPath>();
+  }
 
-    sdbus::ObjectPath Dhcp6Config()
-    {
-        return m_proxy.getProperty("Dhcp6Config").onInterface(INTERFACE_NAME).get<sdbus::ObjectPath>();
-    }
+  sdbus::ObjectPath Dhcp6Config() {
+    return m_proxy.getProperty("Dhcp6Config")
+        .onInterface(INTERFACE_NAME)
+        .get<sdbus::ObjectPath>();
+  }
 
-    bool Vpn()
-    {
-        return m_proxy.getProperty("Vpn").onInterface(INTERFACE_NAME).get<bool>();
-    }
+  bool Vpn() {
+    return m_proxy.getProperty("Vpn").onInterface(INTERFACE_NAME).get<bool>();
+  }
 
-    sdbus::ObjectPath Controller()
-    {
-        return m_proxy.getProperty("Controller").onInterface(INTERFACE_NAME).get<sdbus::ObjectPath>();
-    }
+  sdbus::ObjectPath Controller() {
+    return m_proxy.getProperty("Controller")
+        .onInterface(INTERFACE_NAME)
+        .get<sdbus::ObjectPath>();
+  }
 
-    sdbus::ObjectPath Master()
-    {
-        return m_proxy.getProperty("Master").onInterface(INTERFACE_NAME).get<sdbus::ObjectPath>();
-    }
+  sdbus::ObjectPath Master() {
+    return m_proxy.getProperty("Master")
+        .onInterface(INTERFACE_NAME)
+        .get<sdbus::ObjectPath>();
+  }
 
-private:
-    sdbus::IProxy& m_proxy;
+ private:
+  sdbus::IProxy& m_proxy;
 };
 
-}}}} // namespaces
+}  // namespace Connection
+}  // namespace NetworkManager
+}  // namespace freedesktop
+}  // namespace org
 
 #endif

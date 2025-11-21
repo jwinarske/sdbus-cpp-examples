@@ -14,99 +14,102 @@ namespace org {
 namespace freedesktop {
 namespace login1 {
 
-class Seat_proxy
-{
-public:
-    static constexpr const char* INTERFACE_NAME = "org.freedesktop.login1.Seat";
+class Seat_proxy {
+ public:
+  static constexpr const char* INTERFACE_NAME = "org.freedesktop.login1.Seat";
 
-protected:
-    Seat_proxy(sdbus::IProxy& proxy)
-        : m_proxy(proxy)
-    {
-    }
+ protected:
+  Seat_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
 
-    Seat_proxy(const Seat_proxy&) = delete;
-    Seat_proxy& operator=(const Seat_proxy&) = delete;
-    Seat_proxy(Seat_proxy&&) = delete;
-    Seat_proxy& operator=(Seat_proxy&&) = delete;
+  Seat_proxy(const Seat_proxy&) = delete;
+  Seat_proxy& operator=(const Seat_proxy&) = delete;
+  Seat_proxy(Seat_proxy&&) = delete;
+  Seat_proxy& operator=(Seat_proxy&&) = delete;
 
-    ~Seat_proxy() = default;
+  ~Seat_proxy() = default;
 
-    void registerProxy()
-    {
-    }
+  void registerProxy() {}
 
-public:
-    void Terminate()
-    {
-        m_proxy.callMethod("Terminate").onInterface(INTERFACE_NAME);
-    }
+ public:
+  void Terminate() {
+    m_proxy.callMethod("Terminate").onInterface(INTERFACE_NAME);
+  }
 
-    void ActivateSession(const std::string& session_id)
-    {
-        m_proxy.callMethod("ActivateSession").onInterface(INTERFACE_NAME).withArguments(session_id);
-    }
+  void ActivateSession(const std::string& session_id) {
+    m_proxy.callMethod("ActivateSession")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(session_id);
+  }
 
-    void SwitchTo(const uint32_t& vtnr)
-    {
-        m_proxy.callMethod("SwitchTo").onInterface(INTERFACE_NAME).withArguments(vtnr);
-    }
+  void SwitchTo(const uint32_t& vtnr) {
+    m_proxy.callMethod("SwitchTo")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(vtnr);
+  }
 
-    void SwitchToNext()
-    {
-        m_proxy.callMethod("SwitchToNext").onInterface(INTERFACE_NAME);
-    }
+  void SwitchToNext() {
+    m_proxy.callMethod("SwitchToNext").onInterface(INTERFACE_NAME);
+  }
 
-    void SwitchToPrevious()
-    {
-        m_proxy.callMethod("SwitchToPrevious").onInterface(INTERFACE_NAME);
-    }
+  void SwitchToPrevious() {
+    m_proxy.callMethod("SwitchToPrevious").onInterface(INTERFACE_NAME);
+  }
 
-public:
-    std::string Id()
-    {
-        return m_proxy.getProperty("Id").onInterface(INTERFACE_NAME).get<std::string>();
-    }
+ public:
+  std::string Id() {
+    return m_proxy.getProperty("Id")
+        .onInterface(INTERFACE_NAME)
+        .get<std::string>();
+  }
 
-    sdbus::Struct<std::string, sdbus::ObjectPath> ActiveSession()
-    {
-        return m_proxy.getProperty("ActiveSession").onInterface(INTERFACE_NAME).get<sdbus::Struct<std::string, sdbus::ObjectPath>>();
-    }
+  sdbus::Struct<std::string, sdbus::ObjectPath> ActiveSession() {
+    return m_proxy.getProperty("ActiveSession")
+        .onInterface(INTERFACE_NAME)
+        .get<sdbus::Struct<std::string, sdbus::ObjectPath>>();
+  }
 
-    bool CanTTY()
-    {
-        return m_proxy.getProperty("CanTTY").onInterface(INTERFACE_NAME).get<bool>();
-    }
+  bool CanTTY() {
+    return m_proxy.getProperty("CanTTY")
+        .onInterface(INTERFACE_NAME)
+        .get<bool>();
+  }
 
-    bool CanGraphical()
-    {
-        return m_proxy.getProperty("CanGraphical").onInterface(INTERFACE_NAME).get<bool>();
-    }
+  bool CanGraphical() {
+    return m_proxy.getProperty("CanGraphical")
+        .onInterface(INTERFACE_NAME)
+        .get<bool>();
+  }
 
-    std::vector<sdbus::Struct<std::string, sdbus::ObjectPath>> Sessions()
-    {
-        return m_proxy.getProperty("Sessions").onInterface(INTERFACE_NAME).get<std::vector<sdbus::Struct<std::string, sdbus::ObjectPath>>>();
-    }
+  std::vector<sdbus::Struct<std::string, sdbus::ObjectPath>> Sessions() {
+    return m_proxy.getProperty("Sessions")
+        .onInterface(INTERFACE_NAME)
+        .get<std::vector<sdbus::Struct<std::string, sdbus::ObjectPath>>>();
+  }
 
-    bool IdleHint()
-    {
-        return m_proxy.getProperty("IdleHint").onInterface(INTERFACE_NAME).get<bool>();
-    }
+  bool IdleHint() {
+    return m_proxy.getProperty("IdleHint")
+        .onInterface(INTERFACE_NAME)
+        .get<bool>();
+  }
 
-    uint64_t IdleSinceHint()
-    {
-        return m_proxy.getProperty("IdleSinceHint").onInterface(INTERFACE_NAME).get<uint64_t>();
-    }
+  uint64_t IdleSinceHint() {
+    return m_proxy.getProperty("IdleSinceHint")
+        .onInterface(INTERFACE_NAME)
+        .get<uint64_t>();
+  }
 
-    uint64_t IdleSinceHintMonotonic()
-    {
-        return m_proxy.getProperty("IdleSinceHintMonotonic").onInterface(INTERFACE_NAME).get<uint64_t>();
-    }
+  uint64_t IdleSinceHintMonotonic() {
+    return m_proxy.getProperty("IdleSinceHintMonotonic")
+        .onInterface(INTERFACE_NAME)
+        .get<uint64_t>();
+  }
 
-private:
-    sdbus::IProxy& m_proxy;
+ private:
+  sdbus::IProxy& m_proxy;
 };
 
-}}} // namespaces
+}  // namespace login1
+}  // namespace freedesktop
+}  // namespace org
 
 #endif

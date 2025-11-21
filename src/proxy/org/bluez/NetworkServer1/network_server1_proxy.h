@@ -13,43 +13,40 @@
 namespace org {
 namespace bluez {
 
-class NetworkServer1_proxy
-{
-public:
-    static constexpr const char* INTERFACE_NAME = "org.bluez.NetworkServer1";
+class NetworkServer1_proxy {
+ public:
+  static constexpr const char* INTERFACE_NAME = "org.bluez.NetworkServer1";
 
-protected:
-    NetworkServer1_proxy(sdbus::IProxy& proxy)
-        : m_proxy(proxy)
-    {
-    }
+ protected:
+  NetworkServer1_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
 
-    NetworkServer1_proxy(const NetworkServer1_proxy&) = delete;
-    NetworkServer1_proxy& operator=(const NetworkServer1_proxy&) = delete;
-    NetworkServer1_proxy(NetworkServer1_proxy&&) = delete;
-    NetworkServer1_proxy& operator=(NetworkServer1_proxy&&) = delete;
+  NetworkServer1_proxy(const NetworkServer1_proxy&) = delete;
+  NetworkServer1_proxy& operator=(const NetworkServer1_proxy&) = delete;
+  NetworkServer1_proxy(NetworkServer1_proxy&&) = delete;
+  NetworkServer1_proxy& operator=(NetworkServer1_proxy&&) = delete;
 
-    ~NetworkServer1_proxy() = default;
+  ~NetworkServer1_proxy() = default;
 
-    void registerProxy()
-    {
-    }
+  void registerProxy() {}
 
-public:
-    void Register(const std::string& uuid, const std::string& bridge)
-    {
-        m_proxy.callMethod("Register").onInterface(INTERFACE_NAME).withArguments(uuid, bridge);
-    }
+ public:
+  void Register(const std::string& uuid, const std::string& bridge) {
+    m_proxy.callMethod("Register")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(uuid, bridge);
+  }
 
-    void Unregister(const std::string& uuid)
-    {
-        m_proxy.callMethod("Unregister").onInterface(INTERFACE_NAME).withArguments(uuid);
-    }
+  void Unregister(const std::string& uuid) {
+    m_proxy.callMethod("Unregister")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(uuid);
+  }
 
-private:
-    sdbus::IProxy& m_proxy;
+ private:
+  sdbus::IProxy& m_proxy;
 };
 
-}} // namespaces
+}  // namespace bluez
+}  // namespace org
 
 #endif
