@@ -27,7 +27,7 @@ class Network1ManagerClient final
   static constexpr auto OBJECT_PATH = "/org/freedesktop/network1";
 
   explicit Network1ManagerClient(sdbus::IConnection& connection);
-  ~Network1ManagerClient() override;
+  ~Network1ManagerClient();
 
   struct LinkInfo {
     int32_t ifindex{};

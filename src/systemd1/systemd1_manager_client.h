@@ -27,7 +27,7 @@ class Systemd1ManagerClient final
   static constexpr auto OBJECT_PATH = "/org/freedesktop/systemd1";
 
   explicit Systemd1ManagerClient(sdbus::IConnection& connection);
-  ~Systemd1ManagerClient() override;
+  ~Systemd1ManagerClient();
 
   // Implement Properties_proxy pure virtual to avoid abstract type
   void onPropertiesChanged(
