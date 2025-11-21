@@ -45,6 +45,10 @@ mkdir -p ${PROXY}/org/freedesktop/timedate1 |true
 
 ${XML2CPP} --verbose --proxy=${PROXY}/org/freedesktop/timedate1/timedate1_proxy.h interfaces/org/freedesktop/timedate1/timedate1.xml
 
+mkdir -p ${PROXY}/org/freedesktop/timesync1 |true
+
+${XML2CPP} --verbose --proxy=${PROXY}/org/freedesktop/timesync1/manager_proxy.h interfaces/org/freedesktop/timesync1/Manager/Manager.xml
+
 mkdir -p ${PROXY}/org/freedesktop/GeoClue2/{Manager,Client/Location} |true
 
 ${XML2CPP} --verbose --proxy=${PROXY}/org/freedesktop/GeoClue2/Manager/manager_proxy.h interfaces/org/freedesktop/GeoClue2/Manager/Manager.xml
