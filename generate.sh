@@ -41,6 +41,10 @@ mkdir -p ${PROXY}/org/freedesktop/locale1 |true
 
 ${XML2CPP} --verbose --proxy=${PROXY}/org/freedesktop/locale1/locale1_proxy.h interfaces/org/freedesktop/locale1/locale1.xml
 
+mkdir -p ${PROXY}/org/freedesktop/ModemManager1 |true
+
+${XML2CPP} --verbose --proxy=${PROXY}/org/freedesktop/ModemManager1/ModemManager1_proxy.h interfaces/org/freedesktop/ModemManager1/ModemManager1.xml
+
 mkdir -p ${PROXY}/org/freedesktop/timedate1 |true
 
 ${XML2CPP} --verbose --proxy=${PROXY}/org/freedesktop/timedate1/timedate1_proxy.h interfaces/org/freedesktop/timedate1/timedate1.xml
