@@ -24,8 +24,8 @@ jobs:
       - name: Run clang-format check
         run: |
           # Find all C++ source files and check formatting
-          find src -type f \( -name "*.cpp" -o -name "*.h" \
-            -o -name "*.hpp" \) -print0 | \
+          find src -type f \( -name "*.cpp" -o -name "*.cc" \
+            -o -name "*.h" -o -name "*.hpp" \) -print0 | \
             xargs -0 clang-format --dry-run --Werror
         shell: bash
 
@@ -55,7 +55,8 @@ jobs:
           path: .clang-tidy-cache
           key: >-
             clang-tidy-${{ runner.os }}-${{
-            hashFiles('**/*.cpp', '**/*.h', '**/*.hpp', '.clang-tidy') }}
+            hashFiles('**/*.cpp', '**/*.cc', '**/*.h', '**/*.hpp',
+            '.clang-tidy') }}
           restore-keys: |
             clang-tidy-${{ runner.os }}-
 
@@ -76,7 +77,8 @@ jobs:
           mkdir -p .clang-tidy-cache
 
           # Find all C++ source files and run clang-tidy
-          find src -type f \( -name "*.cpp" \) | while read file; do
+          find src -type f \( -name "*.cpp" -o -name "*.cc" \) | \
+            while read file; do
             echo "Analyzing $file..."
             clang-tidy "$file" \
               -p build \
@@ -107,9 +109,11 @@ jobs:
             ninja-build \
             libudev-dev \
             libsystemd-dev \
-            pkg-config \
-            ${{ matrix.compiler.cc }} \
-            ${{ matrix.compiler.cxx }}
+            pkg-config
+          # Install compilers (gcc and g++ are pre-installed on ubuntu-latest)
+          if [ "${{ matrix.compiler.name }}" = "clang" ]; then
+            sudo apt-get install -y clang
+          fi
 
       - name: Configure CMake
         run: |
@@ -131,8 +135,9 @@ jobs:
         run: |
           mkdir -p artifacts
           # Find all executables in src directories
-          # (exclude CMake test artifacts)
+          # (exclude CMake test artifacts and temporary files)
           find build/src -type f -executable \
+            -not -path "*/CMakeFiles/*" \
             -not -name "*.so*" \
             -not -name "*.a" \
             -exec cp {} artifacts/ \;
