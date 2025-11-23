@@ -8,7 +8,6 @@ target_link_libraries(wpa_supplicant1_client
         PUBLIC
         utils
         sdbus-c++
-        simdjson
         spdlog::spdlog
 )
 

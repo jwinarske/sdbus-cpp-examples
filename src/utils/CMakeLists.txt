@@ -6,7 +6,7 @@ add_library(utils STATIC
 target_link_libraries(utils
         PUBLIC
         sdbus-c++
-        simdjson
+        glaze::glaze
         spdlog::spdlog
 )
 if (ENABLE_LTO AND IPO_SUPPORT_RESULT)
