@@ -476,10 +476,9 @@ std::string Utils::scalarToString(const glz::generic& val) {
     double d = val.get<double>();
     // Check if the number is an integer to preserve precision
     // Only convert to int64 if it's within a safe range
-    constexpr double kMaxSafeInt64 = 9007199254740992.0;  // 2^53
-    constexpr double kMinSafeInt64 = -9007199254740992.0; // -2^53
-    if (d >= kMinSafeInt64 && d <= kMaxSafeInt64 && 
-        d == std::floor(d)) {
+    constexpr double kMaxSafeInt64 = 9007199254740992.0;   // 2^53
+    constexpr double kMinSafeInt64 = -9007199254740992.0;  // -2^53
+    if (d >= kMinSafeInt64 && d <= kMaxSafeInt64 && d == std::floor(d)) {
       return std::to_string(static_cast<int64_t>(d));
     }
     return std::to_string(d);
@@ -490,8 +489,7 @@ std::string Utils::scalarToString(const glz::generic& val) {
 }
 
 // NOLINTNEXTLINE(clang-tidy)
-std::string Utils::elementToLines(const glz::generic& el,
-                                  const int indent) {
+std::string Utils::elementToLines(const glz::generic& el, const int indent) {
   std::string out;
   const std::string pad(indent * 2, ' ');
 
@@ -532,12 +530,12 @@ std::string Utils::parseDescriptionJson(const std::string& json) {
   if (json.empty()) {
     return "<empty>";
   }
-  
+
   glz::generic doc;
   auto ec = glz::read_json(doc, json);
   if (ec) {
     return std::string("json_error: ") + glz::format_error(ec, json);
   }
-  
+
   return elementToLines(doc, 0);
 }
