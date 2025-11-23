@@ -124,7 +124,7 @@ jobs:
           cmake .. -GNinja \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-            -DCMAKE_CXX_FLAGS="-fno-modules"
+            -DCMAKE_CXX_STANDARD=20
         env:
           CC: clang
           CXX: clang++
