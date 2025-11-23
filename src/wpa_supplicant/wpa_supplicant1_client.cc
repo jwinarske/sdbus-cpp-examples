@@ -12,7 +12,7 @@ WpaSupplicant1Client::WpaSupplicant1Client(sdbus::IConnection& connection)
   this->GetAllAsync(
       wpa_supplicant1_proxy::INTERFACE_NAME,
       [](std::optional<sdbus::Error> error,
-         std::map<sdbus::PropertyName, sdbus::Variant> values) {
+         const std::map<sdbus::PropertyName, sdbus::Variant>& values) {
         if (error) {
           spdlog::warn("wpa_supplicant1 GetAllAsync failed: {} - {}",
                        error->getName(), error->getMessage());

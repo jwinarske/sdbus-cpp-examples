@@ -33,7 +33,7 @@ class GeoClue2Manager final
 
   explicit GeoClue2Manager(
       sdbus::IConnection& connection,
-      LocationPropertiesChangedCallback callback = nullptr);
+      const LocationPropertiesChangedCallback& callback = nullptr);
 
   virtual ~GeoClue2Manager();
 

@@ -16,8 +16,9 @@
 
 #include "../utils/utils.h"
 
-GeoClue2Manager::GeoClue2Manager(sdbus::IConnection& connection,
-                                 LocationPropertiesChangedCallback callback)
+GeoClue2Manager::GeoClue2Manager(
+    sdbus::IConnection& connection,
+    const LocationPropertiesChangedCallback& callback)
     : ProxyInterfaces{connection, sdbus::ServiceName(kBusName),
                       sdbus::ObjectPath(kObjectPath)},
       object_path_(sdbus::ObjectPath(kObjectPath)) {

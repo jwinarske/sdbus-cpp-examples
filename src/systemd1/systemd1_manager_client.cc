@@ -13,7 +13,7 @@ Systemd1ManagerClient::Systemd1ManagerClient(sdbus::IConnection& connection)
   this->GetAllAsync(
       org::freedesktop::systemd1::Manager_proxy::INTERFACE_NAME,
       [](std::optional<sdbus::Error> error,
-         std::map<sdbus::PropertyName, sdbus::Variant> values) {
+         const std::map<sdbus::PropertyName, sdbus::Variant>& values) {
         if (error) {
           spdlog::warn("systemd1.Manager GetAllAsync failed: {} - {}",
                        error->getName(), error->getMessage());

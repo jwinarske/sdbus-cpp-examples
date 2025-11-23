@@ -488,14 +488,14 @@ std::string Utils::scalarToString(const glz::generic& val) {
   return "[complex]";
 }
 
-// NOLINTNEXTLINE(clang-tidy)
+// NOLINTNEXTLINE(misc-no-recursion) // recursive JSON traversal by design
 std::string Utils::elementToLines(const glz::generic& el, const int indent) {
   std::string out;
   const std::string pad(indent * 2, ' ');
 
   if (el.is_object()) {
-    const auto& obj = el.get<glz::generic::object_t>();
-    for (const auto& [key, val] : obj) {
+    for (const auto& obj = el.get<glz::generic::object_t>();
+         const auto& [key, val] : obj) {
       if (val.is_object() || val.is_array()) {
         out += pad + key + ":\n";
         out += elementToLines(val, indent + 1);
@@ -532,8 +532,7 @@ std::string Utils::parseDescriptionJson(const std::string& json) {
   }
 
   glz::generic doc;
-  auto ec = glz::read_json(doc, json);
-  if (ec) {
+  if (const auto ec = glz::read_json(doc, json)) {
     return std::string("json_error: ") + glz::format_error(ec, json);
   }
 

@@ -14,8 +14,6 @@
 
 #include "login1_manager_client.h"
 
-#include <sys/socket.h>
-
 #include "../utils/utils.h"
 
 Login1ManagerClient::Login1ManagerClient(sdbus::IConnection& connection)
@@ -25,7 +23,7 @@ Login1ManagerClient::Login1ManagerClient(sdbus::IConnection& connection)
   const auto props = this->GetAllAsync(
       Manager_proxy::INTERFACE_NAME,
       [&](std::optional<sdbus::Error> error,
-          std::map<sdbus::PropertyName, sdbus::Variant> values) {
+          const std::map<sdbus::PropertyName, sdbus::Variant>& values) {
         if (!error) {
           onPropertiesChanged(
               sdbus::InterfaceName(Manager_proxy::INTERFACE_NAME), values, {});
@@ -60,19 +58,19 @@ Login1ManagerClient::Login1ManagerClient(sdbus::IConnection& connection)
 
 Login1ManagerClient::~Login1ManagerClient() {
   unregisterProxy();
-  for (const auto& [objectPath, seat] : seats_) {
+  for (const auto& objectPath : seats_ | std::views::keys) {
     if (seats_.contains(objectPath)) {
       seats_[objectPath].reset();
       seats_.erase(objectPath);
     }
   }
-  for (const auto& [objectPath, session] : sessions_) {
+  for (const auto& objectPath : sessions_ | std::views::keys) {
     if (sessions_.contains(objectPath)) {
       sessions_[objectPath].reset();
       sessions_.erase(objectPath);
     }
   }
-  for (const auto& [objectPath, seat] : users_) {
+  for (const auto& objectPath : users_ | std::views::keys) {
     if (users_.contains(objectPath)) {
       users_[objectPath].reset();
       users_.erase(objectPath);
