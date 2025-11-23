@@ -48,8 +48,7 @@ class Utils {
 
   static std::string scalarToString(const glz::generic& val);
 
-  static std::string elementToLines(const glz::generic& el,
-                                    int indent = 0);
+  static std::string elementToLines(const glz::generic& el, int indent = 0);
 
   static std::string parseDescriptionJson(const std::string& json);
 
