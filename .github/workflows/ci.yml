@@ -48,8 +48,7 @@ jobs:
           mkdir -p build
           cd build
           cmake .. -GNinja \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_CXX_STANDARD=23
+            -DCMAKE_BUILD_TYPE=Release
           ninja
         env:
           CC: gcc-14
@@ -123,8 +122,7 @@ jobs:
           cd build
           cmake .. -GNinja \
             -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-            -DCMAKE_CXX_STANDARD=20
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
         env:
           CC: gcc-14
           CXX: g++-14
@@ -203,7 +201,6 @@ jobs:
             cmake .. -GNinja \
               -DCMAKE_BUILD_TYPE=Release \
               -DENABLE_LTO=ON \
-              -DCMAKE_CXX_STANDARD=23 \
               -DCMAKE_CXX_FLAGS="-stdlib=libc++" \
               -DCMAKE_EXE_LINKER_FLAGS="-stdlib=libc++ -lc++abi" \
               -DLLVM_CONFIG=/usr/bin/llvm-config-19
@@ -211,8 +208,7 @@ jobs:
             # For GCC with libstdc++
             cmake .. -GNinja \
               -DCMAKE_BUILD_TYPE=Release \
-              -DENABLE_LTO=ON \
-              -DCMAKE_CXX_STANDARD=23
+              -DENABLE_LTO=ON
           fi
         env:
           CC: ${{ matrix.compiler.cc }}
