@@ -8,10 +8,15 @@ on:
     branches: [main, master]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   clang-format:
     name: Code Formatting Check
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -32,6 +37,8 @@ jobs:
   clang-tidy:
     name: Static Analysis (clang-tidy)
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -90,6 +97,8 @@ jobs:
   build:
     name: Build and Publish Artifacts
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     strategy:
       matrix:
         compiler:
