@@ -64,6 +64,7 @@ add_subdirectory(src/timedate1)
 add_subdirectory(src/timesync1)
 add_subdirectory(src/udisks2)
 add_subdirectory(src/upower)
+add_subdirectory(src/wpa_supplicant)
 
 add_subdirectory(src/utils)
 

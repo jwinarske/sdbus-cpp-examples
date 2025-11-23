@@ -1,0 +1,17 @@
+#include "wpa_supplicant1_client.h"
+
+#include <chrono>
+#include <thread>
+
+int main() {
+  const auto connection = sdbus::createSystemBusConnection();
+  connection->enterEventLoopAsync();
+
+  WpaSupplicant1Client client(*connection);
+
+  using namespace std::chrono_literals;
+  std::this_thread::sleep_for(2s);  // allow async enumeration
+
+  connection->leaveEventLoop();
+  return 0;
+}
