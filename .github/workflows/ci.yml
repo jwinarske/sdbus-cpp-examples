@@ -123,7 +123,8 @@ jobs:
           cd build
           cmake .. -GNinja \
             -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+            -DCMAKE_CXX_FLAGS="-fno-modules"
         env:
           CC: clang
           CXX: clang++
