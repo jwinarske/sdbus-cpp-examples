@@ -8,6 +8,7 @@ target_link_libraries(hostname1_client
         PUBLIC
         utils
         sdbus-c++
+        simdjson
         spdlog::spdlog
 )
 if (ENABLE_LTO AND IPO_SUPPORT_RESULT)

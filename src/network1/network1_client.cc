@@ -10,7 +10,7 @@ Network1ManagerClient::Network1ManagerClient(sdbus::IConnection& connection)
       connection_(connection) {
   // Async initial property fetch -> then enumerate links
   this->GetAllAsync(
-      org::freedesktop::network1::Manager_proxy::INTERFACE_NAME,
+      Manager_proxy::INTERFACE_NAME,
       [this](std::optional<sdbus::Error> error,
              std::map<sdbus::PropertyName, sdbus::Variant> values) {
         if (error) {
@@ -50,11 +50,21 @@ void Network1ManagerClient::enumerateLinks() {
     for (const auto& [ifindex, name, path] : links_) {
       spdlog::info("  ifindex={} name={} path={}", ifindex, name,
                    static_cast<std::string>(path));
-      // Do not instantiate Link_proxy directly (protected
-      // constructor/destructor). If needed, use generic proxy for method calls:
-      // auto linkProxy = sdbus::createProxy(connection_,
-      // sdbus::ServiceName(SERVICE_NAME), l.path);
-      // linkProxy->callMethod(\"Renew\").onInterface(org::freedesktop::network1::Link_proxy::INTERFACE_NAME);
+      const auto linkProxy = sdbus::createProxy(
+          connection_, sdbus::ServiceName(SERVICE_NAME), path);
+      std::string description;
+      linkProxy->callMethod("Describe")
+          .onInterface("org.freedesktop.network1.Link")
+          .storeResultsTo(description);
+
+      // Parse JSON description using simd-json and log a compact summary
+      std::string parsedSummary = Utils::parseDescriptionJson(description);
+      spdlog::info("\n{}", parsedSummary);
+
+      auto props = linkProxy->getAllProperties().onInterface(
+          "org.freedesktop.network1.Link");
+      Utils::print_changed_properties(sdbus::InterfaceName(path), props, {});
+      linkProxy->unregister();
     }
   } catch (const sdbus::Error& e) {
     spdlog::error("ListLinks failed: {} - {}", e.getName(), e.getMessage());

@@ -465,3 +465,70 @@ const std::unordered_map<
                              << std::get<1>(arg_so);
                         }
                       }}};
+
+std::string Utils::scalarToString(const simdjson::dom::element& val) {
+  if (val.is_null())
+    return "\"\"";
+  if (val.is_string())
+    return std::string(val.get_string().value());
+  if (val.is_int64())
+    return std::to_string(val.get_int64().value());
+  if (val.is_uint64())
+    return std::to_string(val.get_uint64().value());
+  if (val.is_double())
+    return std::to_string(val.get_double().value());
+  if (val.is_bool())
+    return val.get_bool().value() ? "true" : "false";
+  return "[complex]";
+}
+
+// NOLINTNEXTLINE(clang-tidy)
+std::string Utils::elementToLines(const simdjson::dom::element& el,
+                                  const int indent) {
+  std::string out;
+  const std::string pad(indent * 2, ' ');
+
+  if (el.is_object()) {
+    for (auto field : el.get_object()) {
+      std::string key(field.key);
+      if (auto& val = field.value; val.is_object() || val.is_array()) {
+        out += pad + key + ":\n";
+        out += elementToLines(val, indent + 1);
+      } else {
+        out += pad + key + ": " + scalarToString(val) + "\n";
+      }
+    }
+    return out;
+  }
+
+  if (el.is_array()) {
+    size_t idx = 0;
+    for (auto item : el.get_array()) {
+      std::string idxKey = "[" + std::to_string(idx++) + "]";
+      if (item.is_object() || item.is_array()) {
+        out += pad + idxKey + ":\n";
+        out += elementToLines(item, indent + 1);
+      } else {
+        out += pad + idxKey + ": " + scalarToString(item) + "\n";
+      }
+    }
+    return out;
+  }
+
+  // scalar
+  out += pad + scalarToString(el) + "\n";
+  return out;
+}
+
+std::string Utils::parseDescriptionJson(const std::string& json) {
+  if (json.empty()) {
+    return "<empty>";
+  }
+  try {
+    simdjson::dom::parser parser;
+    const simdjson::dom::element doc = parser.parse(json);
+    return elementToLines(doc, 0);
+  } catch (const simdjson::simdjson_error& e) {
+    return std::string("json_error: ") + e.what();
+  }
+}

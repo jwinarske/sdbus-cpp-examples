@@ -19,6 +19,7 @@
 #include <unordered_map>
 
 #include <sdbus-c++/sdbus-c++.h>
+#include <simdjson.h>
 
 #include <spdlog/spdlog.h>
 
@@ -44,6 +45,13 @@ class Utils {
 
   static bool isServicePresent(const std::vector<std::string>& dbus_interfaces,
                                const std::string_view& service);
+
+  static std::string scalarToString(const simdjson::dom::element& val);
+
+  static std::string elementToLines(const simdjson::dom::element& el,
+                                    int indent = 0);
+
+  static std::string parseDescriptionJson(const std::string& json);
 
  private:
   static const std::unordered_map<

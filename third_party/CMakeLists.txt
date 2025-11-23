@@ -21,3 +21,10 @@ if (ENABLE_LTO AND IPO_SUPPORT_RESULT)
     set_property(TARGET spdlog PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif ()
 target_link_libraries(spdlog PUBLIC toolchain::toolchain)
+
+#
+# simdjson
+#
+if(EXISTS "${CMAKE_SOURCE_DIR}/third_party/simdjson/CMakeLists.txt")
+    add_subdirectory(simdjson EXCLUDE_FROM_ALL)
+endif()

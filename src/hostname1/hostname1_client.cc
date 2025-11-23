@@ -22,6 +22,11 @@ Hostname1Client::Hostname1Client(sdbus::IConnection& connection)
     : ProxyInterfaces{connection, sdbus::ServiceName(INTERFACE_NAME),
                       sdbus::ObjectPath(OBJECT_PATH)} {
   registerProxy();
+  auto description = Describe();
+  // Parse description as JSON and print key: value lines
+  std::string parsed = Utils::parseDescriptionJson(description);
+  spdlog::info("Hostname1 description:\n{}\nParsed description:\n{}",
+               description, parsed);
 }
 
 Hostname1Client::~Hostname1Client() {
