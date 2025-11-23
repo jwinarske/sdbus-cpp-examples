@@ -47,6 +47,13 @@ if (ENABLE_LTO)
     endif ()
 endif ()
 
+#
+# Check for required system dependencies
+#
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(UDEV REQUIRED IMPORTED_TARGET libudev)
+message(STATUS "libudev ................ found (version ${UDEV_VERSION})")
+
 add_subdirectory(src/avahi)
 add_subdirectory(src/bluez)
 add_subdirectory(src/fwupd)
