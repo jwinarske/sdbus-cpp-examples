@@ -8,7 +8,6 @@ target_link_libraries(network1_client
         PUBLIC
         utils
         sdbus-c++
-        simdjson
         spdlog::spdlog
 )
 

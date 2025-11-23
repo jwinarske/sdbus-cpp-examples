@@ -23,8 +23,8 @@ endif ()
 target_link_libraries(spdlog PUBLIC toolchain::toolchain)
 
 #
-# simdjson
+# glaze
 #
-if(EXISTS "${CMAKE_SOURCE_DIR}/third_party/simdjson/CMakeLists.txt")
-    add_subdirectory(simdjson EXCLUDE_FROM_ALL)
+if(EXISTS "${CMAKE_SOURCE_DIR}/third_party/glaze/CMakeLists.txt")
+    add_subdirectory(glaze EXCLUDE_FROM_ALL)
 endif()
