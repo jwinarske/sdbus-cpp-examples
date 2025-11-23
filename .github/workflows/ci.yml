@@ -1,0 +1,150 @@
+---
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  clang-format:
+    name: Code Formatting Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install clang-format
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-format
+
+      - name: Run clang-format check
+        run: |
+          # Find all C++ source files and check formatting
+          find src -type f \( -name "*.cpp" -o -name "*.h" \
+            -o -name "*.hpp" \) -print0 | \
+            xargs -0 clang-format --dry-run --Werror
+        shell: bash
+
+  clang-tidy:
+    name: Static Analysis (clang-tidy)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            clang-tidy \
+            cmake \
+            ninja-build \
+            libudev-dev \
+            libsystemd-dev \
+            pkg-config
+
+      - name: Cache clang-tidy results
+        uses: actions/cache@v4
+        with:
+          path: .clang-tidy-cache
+          key: >-
+            clang-tidy-${{ runner.os }}-${{
+            hashFiles('**/*.cpp', '**/*.h', '**/*.hpp', '.clang-tidy') }}
+          restore-keys: |
+            clang-tidy-${{ runner.os }}-
+
+      - name: Configure CMake for clang-tidy
+        run: |
+          mkdir -p build
+          cd build
+          cmake .. -GNinja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+        env:
+          CC: clang
+          CXX: clang++
+
+      - name: Run clang-tidy
+        run: |
+          # Create cache directory if it doesn't exist
+          mkdir -p .clang-tidy-cache
+
+          # Find all C++ source files and run clang-tidy
+          find src -type f \( -name "*.cpp" \) | while read file; do
+            echo "Analyzing $file..."
+            clang-tidy "$file" \
+              -p build \
+              --warnings-as-errors='*' \
+              --header-filter='.*' || exit 1
+          done
+        shell: bash
+
+  build:
+    name: Build and Publish Artifacts
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        compiler:
+          - {cc: gcc, cxx: g++, name: gcc}
+          - {cc: clang, cxx: clang++, name: clang}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            cmake \
+            ninja-build \
+            libudev-dev \
+            libsystemd-dev \
+            pkg-config \
+            ${{ matrix.compiler.cc }} \
+            ${{ matrix.compiler.cxx }}
+
+      - name: Configure CMake
+        run: |
+          mkdir -p build
+          cd build
+          cmake .. -GNinja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DENABLE_LTO=ON
+        env:
+          CC: ${{ matrix.compiler.cc }}
+          CXX: ${{ matrix.compiler.cxx }}
+
+      - name: Build
+        run: |
+          cd build
+          ninja -v
+
+      - name: Collect executables
+        run: |
+          mkdir -p artifacts
+          # Find all executables in src directories
+          # (exclude CMake test artifacts)
+          find build/src -type f -executable \
+            -not -name "*.so*" \
+            -not -name "*.a" \
+            -exec cp {} artifacts/ \;
+
+          # List what we collected
+          echo "Collected artifacts:"
+          ls -lh artifacts/
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: binaries-${{ matrix.compiler.name }}
+          path: artifacts/*
+          if-no-files-found: error
+          retention-days: 30
