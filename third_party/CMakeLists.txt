@@ -20,6 +20,7 @@ set(SPDLOG_NO_THREAD_ID ON)
 set(SPDLOG_BUILD_PIC ON)
 set(SPDLOG_SANITIZE_ADDRESS ${SANITIZE_ADDRESS})
 add_library(spdlog INTERFACE)
+add_library(spdlog::spdlog ALIAS spdlog)
 target_compile_options(spdlog INTERFACE -isystem${CMAKE_CURRENT_SOURCE_DIR}/spdlog/include)
 
 #
