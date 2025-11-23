@@ -13,59 +13,58 @@
 namespace org {
 namespace freedesktop {
 
-class ModemManager1_proxy
-{
-public:
-    static constexpr const char* INTERFACE_NAME = "org.freedesktop.ModemManager1";
+class ModemManager1_proxy {
+ public:
+  static constexpr const char* INTERFACE_NAME = "org.freedesktop.ModemManager1";
 
-protected:
-    ModemManager1_proxy(sdbus::IProxy& proxy)
-        : m_proxy(proxy)
-    {
-    }
+ protected:
+  ModemManager1_proxy(sdbus::IProxy& proxy) : m_proxy(proxy) {}
 
-    ModemManager1_proxy(const ModemManager1_proxy&) = delete;
-    ModemManager1_proxy& operator=(const ModemManager1_proxy&) = delete;
-    ModemManager1_proxy(ModemManager1_proxy&&) = delete;
-    ModemManager1_proxy& operator=(ModemManager1_proxy&&) = delete;
+  ModemManager1_proxy(const ModemManager1_proxy&) = delete;
+  ModemManager1_proxy& operator=(const ModemManager1_proxy&) = delete;
+  ModemManager1_proxy(ModemManager1_proxy&&) = delete;
+  ModemManager1_proxy& operator=(ModemManager1_proxy&&) = delete;
 
-    ~ModemManager1_proxy() = default;
+  ~ModemManager1_proxy() = default;
 
-    void registerProxy()
-    {
-    }
+  void registerProxy() {}
 
-public:
-    void ScanDevices()
-    {
-        m_proxy.callMethod("ScanDevices").onInterface(INTERFACE_NAME);
-    }
+ public:
+  void ScanDevices() {
+    m_proxy.callMethod("ScanDevices").onInterface(INTERFACE_NAME);
+  }
 
-    void SetLogging(const std::string& level)
-    {
-        m_proxy.callMethod("SetLogging").onInterface(INTERFACE_NAME).withArguments(level);
-    }
+  void SetLogging(const std::string& level) {
+    m_proxy.callMethod("SetLogging")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(level);
+  }
 
-    void ReportKernelEvent(const std::map<std::string, sdbus::Variant>& properties)
-    {
-        m_proxy.callMethod("ReportKernelEvent").onInterface(INTERFACE_NAME).withArguments(properties);
-    }
+  void ReportKernelEvent(
+      const std::map<std::string, sdbus::Variant>& properties) {
+    m_proxy.callMethod("ReportKernelEvent")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(properties);
+  }
 
-    void InhibitDevice(const std::string& uid, const bool& inhibit)
-    {
-        m_proxy.callMethod("InhibitDevice").onInterface(INTERFACE_NAME).withArguments(uid, inhibit);
-    }
+  void InhibitDevice(const std::string& uid, const bool& inhibit) {
+    m_proxy.callMethod("InhibitDevice")
+        .onInterface(INTERFACE_NAME)
+        .withArguments(uid, inhibit);
+  }
 
-public:
-    std::string Version()
-    {
-        return m_proxy.getProperty("Version").onInterface(INTERFACE_NAME).get<std::string>();
-    }
+ public:
+  std::string Version() {
+    return m_proxy.getProperty("Version")
+        .onInterface(INTERFACE_NAME)
+        .get<std::string>();
+  }
 
-private:
-    sdbus::IProxy& m_proxy;
+ private:
+  sdbus::IProxy& m_proxy;
 };
 
-}} // namespaces
+}  // namespace freedesktop
+}  // namespace org
 
 #endif
