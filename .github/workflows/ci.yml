@@ -142,7 +142,8 @@ jobs:
             clang-tidy "$file" \
               -p build \
               --warnings-as-errors='*' \
-              --header-filter='^(?!.*third_party).*$' || exit 1
+              --header-filter='^(?!.*third_party).*$' \
+              --system-headers=false || exit 1
           done
         shell: bash
 
