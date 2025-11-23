@@ -40,6 +40,7 @@ InputReader::~InputReader() {
   stop();
 }
 
+// NOLINTNEXTLINE(readability-static-accessed-through-instance)
 InputReader::Task InputReader::read_input() {
   spdlog::debug("hidraw device: {}", device_);
 
@@ -133,7 +134,7 @@ InputReader::Task InputReader::read_input() {
   close(fd);
   stop();
 
-  co_return;
+  co_return;  // NOLINT(readability-static-accessed-through-instance)
 }
 
 std::string InputReader::dpad_to_string(const Direction dpad) {

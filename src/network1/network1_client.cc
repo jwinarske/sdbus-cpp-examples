@@ -12,7 +12,7 @@ Network1ManagerClient::Network1ManagerClient(sdbus::IConnection& connection)
   this->GetAllAsync(
       Manager_proxy::INTERFACE_NAME,
       [this](std::optional<sdbus::Error> error,
-             std::map<sdbus::PropertyName, sdbus::Variant> values) {
+             const std::map<sdbus::PropertyName, sdbus::Variant>& values) {
         if (error) {
           spdlog::warn("network1.Manager GetAllAsync failed: {} - {}",
                        error->getName(), error->getMessage());
