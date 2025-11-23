@@ -14,6 +14,7 @@
 
 #include "utils.h"
 
+#include <cmath>
 #include <iomanip>
 
 void Utils::append_property(const sdbus::Variant& value,
@@ -471,8 +472,18 @@ std::string Utils::scalarToString(const glz::generic& val) {
     return "\"\"";
   if (val.is_string())
     return val.get<std::string>();
-  if (val.is_number())
-    return std::to_string(val.get<double>());
+  if (val.is_number()) {
+    double d = val.get<double>();
+    // Check if the number is an integer to preserve precision
+    // Only convert to int64 if it's within a safe range
+    constexpr double kMaxSafeInt64 = 9007199254740992.0;  // 2^53
+    constexpr double kMinSafeInt64 = -9007199254740992.0; // -2^53
+    if (d >= kMinSafeInt64 && d <= kMaxSafeInt64 && 
+        d == std::floor(d)) {
+      return std::to_string(static_cast<int64_t>(d));
+    }
+    return std::to_string(d);
+  }
   if (val.is_boolean())
     return val.get<bool>() ? "true" : "false";
   return "[complex]";
