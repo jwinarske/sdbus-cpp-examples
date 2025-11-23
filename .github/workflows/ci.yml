@@ -185,6 +185,7 @@ jobs:
               clang-19 \
               llvm-19 \
               llvm-19-dev \
+              lld-19 \
               libc++-19-dev \
               libc++abi-19-dev
           fi
