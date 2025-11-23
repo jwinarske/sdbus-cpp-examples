@@ -134,13 +134,14 @@ jobs:
           mkdir -p .clang-tidy-cache
 
           # Find all C++ source files and run clang-tidy
+          # Exclude third_party directory from analysis
           find src -type f \( -name "*.cpp" -o -name "*.cc" \) | \
             while read file; do
             echo "Analyzing $file..."
             clang-tidy "$file" \
               -p build \
               --warnings-as-errors='*' \
-              --header-filter='.*' || exit 1
+              --header-filter='^(?!.*third_party).*$' || exit 1
           done
         shell: bash
 
