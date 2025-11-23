@@ -15,12 +15,12 @@ install(TARGETS toolchain EXPORT sdbus-c++-targets)
 #
 # spdlog
 #
-add_subdirectory(spdlog)
-set(SPDLOG_INSTALL OFF CACHE BOOL "Do not install spdlog" FORCE)
-if (ENABLE_LTO AND IPO_SUPPORT_RESULT)
-    set_property(TARGET spdlog PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
-endif ()
-target_link_libraries(spdlog PUBLIC toolchain::toolchain)
+set(SPDLOG_NO_EXCEPTIONS ON)
+set(SPDLOG_NO_THREAD_ID ON)
+set(SPDLOG_BUILD_PIC ON)
+set(SPDLOG_SANITIZE_ADDRESS ${SANITIZE_ADDRESS})
+add_library(spdlog INTERFACE)
+target_compile_options(spdlog INTERFACE -isystem${CMAKE_CURRENT_SOURCE_DIR}/spdlog/include)
 
 #
 # glaze
