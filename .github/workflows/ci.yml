@@ -133,6 +133,8 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y \
               clang-19 \
+              llvm-19 \
+              llvm-19-dev \
               libc++-19-dev \
               libc++abi-19-dev
           fi
@@ -149,7 +151,8 @@ jobs:
               -DENABLE_LTO=ON \
               -DCMAKE_CXX_STANDARD=23 \
               -DCMAKE_CXX_FLAGS="-stdlib=libc++" \
-              -DCMAKE_EXE_LINKER_FLAGS="-stdlib=libc++ -lc++abi"
+              -DCMAKE_EXE_LINKER_FLAGS="-stdlib=libc++ -lc++abi" \
+              -DLLVM_CONFIG=/usr/bin/llvm-config-19
           else
             # For GCC with libstdc++
             cmake .. -GNinja \
