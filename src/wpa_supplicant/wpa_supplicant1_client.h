@@ -26,7 +26,7 @@ class WpaSupplicant1Client final
   static constexpr auto OBJECT_PATH = "/fi/w1/wpa_supplicant1";
 
   explicit WpaSupplicant1Client(sdbus::IConnection& connection);
-  ~WpaSupplicant1Client() override;
+  ~WpaSupplicant1Client();
 
  private:
   sdbus::IConnection& connection_;
