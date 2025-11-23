@@ -14,6 +14,7 @@
 
 #include "utils.h"
 
+#include <cmath>
 #include <iomanip>
 
 void Utils::append_property(const sdbus::Variant& value,
@@ -466,32 +467,38 @@ const std::unordered_map<
                         }
                       }}};
 
-std::string Utils::scalarToString(const simdjson::dom::element& val) {
+std::string Utils::scalarToString(const glz::generic& val) {
   if (val.is_null())
     return "\"\"";
   if (val.is_string())
-    return std::string(val.get_string().value());
-  if (val.is_int64())
-    return std::to_string(val.get_int64().value());
-  if (val.is_uint64())
-    return std::to_string(val.get_uint64().value());
-  if (val.is_double())
-    return std::to_string(val.get_double().value());
-  if (val.is_bool())
-    return val.get_bool().value() ? "true" : "false";
+    return val.get<std::string>();
+  if (val.is_number()) {
+    double d = val.get<double>();
+    // Check if the number is an integer to preserve precision
+    // Only convert to int64 if it's within a safe range
+    constexpr double kMaxSafeInt64 = 9007199254740992.0;  // 2^53
+    constexpr double kMinSafeInt64 = -9007199254740992.0; // -2^53
+    if (d >= kMinSafeInt64 && d <= kMaxSafeInt64 && 
+        d == std::floor(d)) {
+      return std::to_string(static_cast<int64_t>(d));
+    }
+    return std::to_string(d);
+  }
+  if (val.is_boolean())
+    return val.get<bool>() ? "true" : "false";
   return "[complex]";
 }
 
 // NOLINTNEXTLINE(clang-tidy)
-std::string Utils::elementToLines(const simdjson::dom::element& el,
+std::string Utils::elementToLines(const glz::generic& el,
                                   const int indent) {
   std::string out;
   const std::string pad(indent * 2, ' ');
 
   if (el.is_object()) {
-    for (auto field : el.get_object()) {
-      std::string key(field.key);
-      if (auto& val = field.value; val.is_object() || val.is_array()) {
+    const auto& obj = el.get<glz::generic::object_t>();
+    for (const auto& [key, val] : obj) {
+      if (val.is_object() || val.is_array()) {
         out += pad + key + ":\n";
         out += elementToLines(val, indent + 1);
       } else {
@@ -502,8 +509,9 @@ std::string Utils::elementToLines(const simdjson::dom::element& el,
   }
 
   if (el.is_array()) {
+    const auto& arr = el.get<glz::generic::array_t>();
     size_t idx = 0;
-    for (auto item : el.get_array()) {
+    for (const auto& item : arr) {
       std::string idxKey = "[" + std::to_string(idx++) + "]";
       if (item.is_object() || item.is_array()) {
         out += pad + idxKey + ":\n";
@@ -524,11 +532,12 @@ std::string Utils::parseDescriptionJson(const std::string& json) {
   if (json.empty()) {
     return "<empty>";
   }
-  try {
-    simdjson::dom::parser parser;
-    const simdjson::dom::element doc = parser.parse(json);
-    return elementToLines(doc, 0);
-  } catch (const simdjson::simdjson_error& e) {
-    return std::string("json_error: ") + e.what();
+  
+  glz::generic doc;
+  auto ec = glz::read_json(doc, json);
+  if (ec) {
+    return std::string("json_error: ") + glz::format_error(ec, json);
   }
+  
+  return elementToLines(doc, 0);
 }

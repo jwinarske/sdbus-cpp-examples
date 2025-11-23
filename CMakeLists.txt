@@ -9,7 +9,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 project(sdbus-cpp-examples)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -46,6 +46,13 @@ if (ENABLE_LTO)
         message(STATUS "IPO .................... not supported: ${IPO_SUPPORT_OUTPUT}")
     endif ()
 endif ()
+
+#
+# Check for required system dependencies
+#
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(UDEV REQUIRED IMPORTED_TARGET libudev)
+message(STATUS "libudev ................ found (version ${UDEV_VERSION})")
 
 add_subdirectory(src/avahi)
 add_subdirectory(src/bluez)
