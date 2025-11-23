@@ -12,6 +12,54 @@ permissions:
   contents: read
 
 jobs:
+  codeql:
+    name: CodeQL Security Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+      actions: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: cpp
+          queries: security-and-quality
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            cmake \
+            ninja-build \
+            libudev-dev \
+            libsystemd-dev \
+            pkg-config \
+            gcc-14 \
+            g++-14
+
+      - name: Build for CodeQL
+        run: |
+          mkdir -p build
+          cd build
+          cmake .. -GNinja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_CXX_STANDARD=23
+          ninja
+        env:
+          CC: gcc-14
+          CXX: g++-14
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:cpp"
+
   clang-format:
     name: Code Formatting Check
     runs-on: ubuntu-latest
