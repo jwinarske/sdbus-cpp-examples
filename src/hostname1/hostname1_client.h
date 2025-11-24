@@ -26,6 +26,42 @@ class Hostname1Client final
   static constexpr auto INTERFACE_NAME = "org.freedesktop.hostname1";
   static constexpr auto OBJECT_PATH = "/org/freedesktop/hostname1";
 
+  struct Hostname1 {
+    std::string Hostname;
+    std::string StaticHostname;
+    std::optional<std::string> PrettyHostname;
+    std::optional<std::string> DefaultHostname;
+    std::optional<std::string> HostnameSource;
+    std::optional<std::string> IconName;
+    std::optional<std::string> Chassis;
+    std::optional<std::string> ChassisAssetTag;
+    std::optional<std::string> Deployment;
+    std::optional<std::string> Location;
+    std::string KernelName;
+    std::string KernelRelease;
+    std::string KernelVersion;
+    std::string OperatingSystemPrettyName;
+    std::string OperatingSystemCPEName;
+    std::optional<std::string> OperatingSystemHomeURL;
+    std::optional<uint64_t> OperatingSystemSupportEnd;
+    std::optional<std::vector<std::string>> OperatingSystemReleaseData;
+    std::optional<std::string> OperatingSystemImageID;
+    std::optional<std::string> OperatingSystemImageVersion;
+    std::optional<std::vector<std::string>> MachineInformationData;
+    std::optional<std::string> HardwareVendor;
+    std::optional<std::string> HardwareModel;
+    std::optional<std::string> HardwareSerial;
+    std::optional<std::string> HardwareSKU;
+    std::optional<std::string> HardwareVersion;
+    std::optional<std::string> FirmwareVersion;
+    std::optional<std::string> FirmwareVendor;
+    std::optional<uint64_t> FirmwareDate;
+    std::optional<std::string> MachineID;
+    std::optional<std::string> BootID;
+    std::optional<std::string> ProductUUID;
+    std::optional<std::string> VSockCID;
+  };
+
   explicit Hostname1Client(sdbus::IConnection& connection);
 
   virtual ~Hostname1Client();
@@ -34,37 +70,15 @@ class Hostname1Client final
       const std::map<sdbus::PropertyName, sdbus::Variant>& changedProperties);
 
   void printHostname1() const;
+  static void printHostname1(const Hostname1& val);
 
-  struct hostname1 {
-    std::string Hostname;
-    std::string StaticHostname;
-    std::string PrettyHostname;
-    std::string DefaultHostname;
-    std::string HostnameSource;
-    std::string IconName;
-    std::string Chassis;
-    std::string Deployment;
-    std::string Location;
-    std::string KernelName;
-    std::string KernelRelease;
-    std::string KernelVersion;
-    std::string OperatingSystemPrettyName;
-    std::string OperatingSystemCPEName;
-    std::optional<uint64_t> OperatingSystemSupportEnd;
-    std::string HomeURL;
-    std::string HardwareVendor;
-    std::string HardwareModel;
-    std::string FirmwareVersion;
-    std::string FirmwareVendor;
-    std::optional<uint64_t> FirmwareDate;
-    std::optional<std::vector<uint8_t>> MachineID;
-    std::optional<std::vector<uint8_t>> BootID;
-  };
-
-  [[nodiscard]] const hostname1& getHostname1() const { return hostname1_; }
+  [[nodiscard]] const Hostname1& getHostname1() const { return hostname1_; }
 
  private:
-  hostname1 hostname1_{};
+  Hostname1 hostname1_{};
+
+  std::optional<std::vector<uint8_t>> MachineID_;
+  std::optional<std::vector<uint8_t>> BootID_;
 
   void onPropertiesChanged(
       const sdbus::InterfaceName& interfaceName,
