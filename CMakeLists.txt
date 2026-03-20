@@ -56,6 +56,7 @@ message(STATUS "libudev ................ found (version ${UDEV_VERSION})")
 
 add_subdirectory(src/avahi)
 add_subdirectory(src/bluez)
+add_subdirectory(src/connman)
 add_subdirectory(src/fwupd)
 add_subdirectory(src/geoclue2)
 add_subdirectory(src/hostname1)
