@@ -31,7 +31,7 @@ int main() {
     LOG_INFO("Local Service Cookie: {}", server.GetLocalServiceCookie());
     LOG_INFO("State: {}", server.GetState());
     LOG_INFO("Version: {}", server.GetVersionString());
-    LOG_INFO("NSSS upport available: {}",
+    LOG_INFO("NSS Support available: {}",
              server.IsNSSSupportAvailable() ? "Yes" : "No");
   }
 

@@ -114,5 +114,32 @@ void UDisks2Manager::onInterfacesRemoved(
     const std::vector<sdbus::InterfaceName>& interfaces) {
   for (const auto& interface : interfaces) {
     LOG_INFO("[{}] Remove - {}", objectPath, interface);
+    if ("org.freedesktop.UDisks2.Manager.NVMe" == interface) {
+      manager_nvme_.reset();
+    } else if ("org.freedesktop.UDisks2.Block" == interface) {
+      std::lock_guard lock(block_mutex_);
+      blocks_.erase(objectPath);
+    } else if ("org.freedesktop.UDisks2.Drive" == interface) {
+      std::lock_guard lock(drive_mutex_);
+      drives_.erase(objectPath);
+    } else if ("org.freedesktop.UDisks2.NVMe.Namespace" == interface) {
+      std::lock_guard lock(namespace_mutex_);
+      namespaces_.erase(objectPath);
+    } else if ("org.freedesktop.UDisks2.NVMe.Controller" == interface) {
+      std::lock_guard lock(nvme_controller_mutex_);
+      nvme_controllers_.erase(objectPath);
+    } else if ("org.freedesktop.UDisks2.PartitionTable" == interface) {
+      std::lock_guard lock(partition_table_mutex_);
+      partition_tables_.erase(objectPath);
+    } else if ("org.freedesktop.UDisks2.Partition" == interface) {
+      std::lock_guard lock(partition_mutex_);
+      partitions_.erase(objectPath);
+    } else if ("org.freedesktop.UDisks2.Filesystem" == interface) {
+      std::lock_guard lock(filesystem_mutex_);
+      filesystems_.erase(objectPath);
+    } else if ("org.freedesktop.UDisks2.Swapspace" == interface) {
+      std::lock_guard lock(swapspace_mutex_);
+      swapspaces_.erase(objectPath);
+    }
   }
 }

@@ -100,7 +100,7 @@ void Hostname1Client::printHostname1() const {
   if (!hostname1_.Hostname.empty()) {
     os << "\tHostname: " << hostname1_.Hostname << std::endl;
   }
-  if (hostname1_.StaticHostname.empty()) {
+  if (!hostname1_.StaticHostname.empty()) {
     os << "\tStaticHostname: " << hostname1_.StaticHostname << std::endl;
   }
   if (hostname1_.PrettyHostname.has_value()) {
@@ -194,7 +194,7 @@ void Hostname1Client::printHostname1(const Hostname1& val) {
   if (!val.Hostname.empty()) {
     os << "\tHostname: " << val.Hostname << std::endl;
   }
-  if (val.StaticHostname.empty()) {
+  if (!val.StaticHostname.empty()) {
     os << "\tStaticHostname: " << val.StaticHostname << std::endl;
   }
   if (val.PrettyHostname.has_value()) {

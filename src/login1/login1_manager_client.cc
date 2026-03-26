@@ -58,24 +58,9 @@ Login1ManagerClient::Login1ManagerClient(sdbus::IConnection& connection)
 
 Login1ManagerClient::~Login1ManagerClient() {
   unregisterProxy();
-  for (const auto& objectPath : seats_ | std::views::keys) {
-    if (seats_.contains(objectPath)) {
-      seats_[objectPath].reset();
-      seats_.erase(objectPath);
-    }
-  }
-  for (const auto& objectPath : sessions_ | std::views::keys) {
-    if (sessions_.contains(objectPath)) {
-      sessions_[objectPath].reset();
-      sessions_.erase(objectPath);
-    }
-  }
-  for (const auto& objectPath : users_ | std::views::keys) {
-    if (users_.contains(objectPath)) {
-      users_[objectPath].reset();
-      users_.erase(objectPath);
-    }
-  }
+  seats_.clear();
+  sessions_.clear();
+  users_.clear();
 }
 
 void Login1ManagerClient::onPropertiesChanged(

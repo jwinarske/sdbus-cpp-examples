@@ -18,8 +18,11 @@
 #include <atomic>
 #include <chrono>
 #include <csignal>
+#include <cstring>
 #include <memory>
 #include <optional>
+
+#include <unistd.h>
 
 #include <sdbus-c++/sdbus-c++.h>
 #include "logging.h"
@@ -55,7 +58,16 @@ inline void signalHandler(int signum) {
       break;
   }
 
-  LOG_INFO("Received signal {} - initiating graceful shutdown", signame);
+  // Only use async-signal-safe operations in signal handlers.
+  // write() and _exit() are safe; spdlog is not.
+  const char prefix[] = "Received signal ";
+  const char suffix[] = " - initiating graceful shutdown\n";
+  // NOLINTNEXTLINE(bugprone-unused-return-value)
+  (void)::write(STDERR_FILENO, prefix, sizeof(prefix) - 1);
+  // NOLINTNEXTLINE(bugprone-unused-return-value)
+  (void)::write(STDERR_FILENO, signame, std::strlen(signame));
+  // NOLINTNEXTLINE(bugprone-unused-return-value)
+  (void)::write(STDERR_FILENO, suffix, sizeof(suffix) - 1);
   g_running = false;
 }
 

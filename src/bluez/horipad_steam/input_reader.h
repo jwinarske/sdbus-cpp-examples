@@ -15,8 +15,6 @@
 #ifndef SRC_BLUEZ_XBOX_CONTROLLER_INPUT_READER_HPP_
 #define SRC_BLUEZ_XBOX_CONTROLLER_INPUT_READER_HPP_
 
-#include "horipad_stream_01ab_0196.h"
-
 #include <atomic>
 #include <coroutine>
 

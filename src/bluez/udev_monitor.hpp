@@ -29,7 +29,7 @@
 #include <sys/epoll.h>
 #include <unistd.h>
 
-#include <spdlog/spdlog.h>
+#include "../utils/logging.h"
 
 // ---------------------------------------------------------------------------
 // RAII wrappers for libudev handles
@@ -72,8 +72,7 @@ class UdevMonitor {
                   callback)
       : sub_systems_(std::move(sub_systems)), callback_(callback) {
     if (pipe(pipe_fds_) == -1) {
-      spdlog::error("Failed to create pipe: {} ({})", std::strerror(errno),
-                    errno);
+      LOG_ERROR("Failed to create pipe: {} ({})", std::strerror(errno), errno);
       pipe_fds_[0] = -1;
       pipe_fds_[1] = -1;
       return;
@@ -125,8 +124,8 @@ class UdevMonitor {
     // Signal the worker thread to exit
     if (pipe_fds_[1] != -1) {
       if (const ssize_t wrote = write(pipe_fds_[1], "x", 1); wrote == -1) {
-        spdlog::error("Failed to write to stop pipe: {} ({})",
-                      std::strerror(errno), errno);
+        LOG_ERROR("Failed to write to stop pipe: {} ({})", std::strerror(errno),
+                  errno);
       }
     }
   }
@@ -142,7 +141,7 @@ class UdevMonitor {
     // RAII: udev context — automatically udev_unref'd on scope exit
     const UdevPtr udev(udev_new());
     if (!udev) {
-      spdlog::error("Failed to create udev context");
+      LOG_ERROR("Failed to create udev context");
       is_running_ = false;
       return;
     }
@@ -150,7 +149,7 @@ class UdevMonitor {
     // RAII: udev monitor — automatically udev_monitor_unref'd on scope exit
     const UdevMonitorPtr mon(udev_monitor_new_from_netlink(udev.get(), "udev"));
     if (!mon) {
-      spdlog::error("Failed to create udev monitor");
+      LOG_ERROR("Failed to create udev monitor");
       is_running_ = false;
       return;
     }
@@ -159,7 +158,7 @@ class UdevMonitor {
       if (int res = udev_monitor_filter_add_match_subsystem_devtype(
               mon.get(), sub_system.c_str(), nullptr);
           res != 0) {
-        spdlog::error(
+        LOG_ERROR(
             "udev_monitor_filter_add_match_subsystem_devtype failed on {} = {}",
             sub_system, res);
       }
@@ -170,8 +169,7 @@ class UdevMonitor {
     // RAII: epoll fd — automatically closed on scope exit
     const EpollFd epoll_fd(epoll_create1(0));
     if (!epoll_fd.valid()) {
-      spdlog::error("Failed to create epoll: {} ({})", std::strerror(errno),
-                    errno);
+      LOG_ERROR("Failed to create epoll: {} ({})", std::strerror(errno), errno);
       is_running_ = false;
       return;
     }
@@ -180,16 +178,16 @@ class UdevMonitor {
     ev.events = EPOLLIN;
     ev.data.fd = fd;
     if (epoll_ctl(epoll_fd.get(), EPOLL_CTL_ADD, fd, &ev) == -1) {
-      spdlog::error("Failed to add udev fd to epoll: {} ({})",
-                    std::strerror(errno), errno);
+      LOG_ERROR("Failed to add udev fd to epoll: {} ({})", std::strerror(errno),
+                errno);
       is_running_ = false;
       return;
     }
 
     ev.data.fd = pipe_fds_[0];
     if (epoll_ctl(epoll_fd.get(), EPOLL_CTL_ADD, pipe_fds_[0], &ev) == -1) {
-      spdlog::error("Failed to add pipe fd to epoll: {} ({})",
-                    std::strerror(errno), errno);
+      LOG_ERROR("Failed to add pipe fd to epoll: {} ({})", std::strerror(errno),
+                errno);
       is_running_ = false;
       return;
     }
@@ -202,14 +200,13 @@ class UdevMonitor {
         if (errno == EINTR) {
           continue;  // Interrupted by signal, retry
         }
-        spdlog::error("epoll_wait failed: {} ({})", std::strerror(errno),
-                      errno);
+        LOG_ERROR("epoll_wait failed: {} ({})", std::strerror(errno), errno);
         break;
       }
 
       for (int n = 0; n < triggered_event_count; ++n) {
         if (events[n].data.fd == pipe_fds_[0]) {
-          spdlog::info("Pipe was written to, exiting the loop");
+          LOG_INFO("Pipe was written to, exiting the loop");
           is_running_ = false;
           break;
         }
@@ -225,7 +222,7 @@ class UdevMonitor {
               if (action && subsystem) {
                 callback_(action, devnode, subsystem);
               } else {
-                spdlog::debug(
+                LOG_DEBUG(
                     "Skipping callback for device with missing properties: "
                     "action={}, devnode={}, subsystem={}",
                     action ? action : "null", devnode ? devnode : "null",
@@ -239,7 +236,7 @@ class UdevMonitor {
     }
 
     // All resources (epoll_fd, mon, udev) are released by their destructors.
-    spdlog::debug("UdevMonitor worker thread exiting");
+    LOG_DEBUG("UdevMonitor worker thread exiting");
   }
 };
 

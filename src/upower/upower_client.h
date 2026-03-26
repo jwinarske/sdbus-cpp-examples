@@ -58,8 +58,7 @@ class UPowerClient final
   std::map<sdbus::ObjectPath, std::shared_ptr<UPowerDisplayDevice>> devices_;
 
   void onDeviceAdded(const sdbus::ObjectPath& device) override {
-    if (device_filter_.empty() ||
-        !device_filter_.empty() && device_filter_ == device) {
+    if (device_filter_.empty() || device_filter_ == device) {
       LOG_INFO("onDeviceAdded: {}", device);
       std::lock_guard lock(devices_mutex_);
       if (!devices_.contains(device)) {
@@ -70,8 +69,7 @@ class UPowerClient final
   }
 
   void onDeviceRemoved(const sdbus::ObjectPath& device) override {
-    if (device_filter_.empty() ||
-        !device_filter_.empty() && device_filter_ == device) {
+    if (device_filter_.empty() || device_filter_ == device) {
       LOG_INFO("onDeviceRemoved: {}", device);
       std::lock_guard lock(devices_mutex_);
       if (devices_.contains(device)) {
