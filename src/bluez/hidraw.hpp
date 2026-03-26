@@ -30,7 +30,9 @@
 #include <linux/input.h>
 #include <linux/types.h>
 
-#include <spdlog/spdlog.h>
+#include <cctype>
+
+#include "../utils/logging.h"
 
 #include "hexdump.hpp"
 
@@ -150,26 +152,26 @@ class Hidraw {
     // Use RAII wrapper for automatic cleanup
     const UdevPtr udev(udev_new());
     if (!udev) {
-      spdlog::error("Can't create udev");
+      LOG_ERROR("Can't create udev");
       return results;  // Safe - RAII cleans up automatically
     }
 
     // Use RAII wrapper for enumerating
     const UdevEnumeratePtr enumerate(udev_enumerate_new(udev.get()));
     if (!enumerate) {
-      spdlog::error("Can't create udev enumerate");
+      LOG_ERROR("Can't create udev enumerate");
       return results;  // Safe - both RAII objects clean up
     }
 
     if (const int res = udev_enumerate_add_match_subsystem(enumerate.get(),
                                                            sub_system.c_str());
         res < 0) {
-      spdlog::error("Failed to add subsystem match: {}", sub_system);
+      LOG_ERROR("Failed to add subsystem match: {}", sub_system);
       return results;  // Safe - RAII cleanup
     }
 
     if (const int res = udev_enumerate_scan_devices(enumerate.get()); res < 0) {
-      spdlog::error("Failed to scan devices");
+      LOG_ERROR("Failed to scan devices");
       return results;  // Safe - RAII cleanup
     }
 
@@ -186,7 +188,7 @@ class Hidraw {
       // Use RAII wrapper for a device
       UdevDevicePtr dev(udev_device_new_from_syspath(udev.get(), path));
       if (!dev) {
-        spdlog::debug("Failed to get device from syspath: {}", path);
+        LOG_DEBUG("Failed to get device from syspath: {}", path);
         continue;  // Skip this device, continue with others
       }
 
@@ -201,7 +203,7 @@ class Hidraw {
               udev_device_get_property_value(dev.get(), properties_name);
           properties[properties_name] = value ? value : "";
           if (debug) {
-            spdlog::debug("  {} = {}", properties_name, value ? value : "");
+            LOG_DEBUG("  {} = {}", properties_name, value ? value : "");
           }
         }
       }
@@ -262,19 +264,21 @@ class Hidraw {
         if (compare_subsystem_device_paths(input_path, hidraw_path)) {
           if (hidraw_properties.contains(DEV_NAME)) {
             const auto& hidraw_dev_name = hidraw_properties.at(DEV_NAME);
+            if (!input_properties.contains("UNIQ")) {
+              continue;
+            }
             auto serial_number = input_properties.at("UNIQ");
             const auto dev_key =
                 create_device_key_from_serial_number(serial_number);
-            spdlog::info(
-                "Associated input device path: {} with hidraw device: {}",
-                input_path, hidraw_dev_name);
+            LOG_INFO("Associated input device path: {} with hidraw device: {}",
+                     input_path, hidraw_dev_name);
             devices_[dev_key] = hidraw_dev_name;
           }
         }
       }
     }
     for (const auto& value : devices_ | std::views::values) {
-      spdlog::debug("hidraw device: {}", value);
+      LOG_DEBUG("hidraw device: {}", value);
     }
     return true;
   }
@@ -327,18 +331,18 @@ class Hidraw {
 
     // Validate that both substrings were found
     if (input_pos == std::string::npos) {
-      spdlog::debug("Path does not contain '/input': {}", input_path);
+      LOG_DEBUG("Path does not contain '/input': {}", input_path);
       return false;
     }
 
     if (hidraw_pos == std::string::npos) {
-      spdlog::debug("Path does not contain '/hidraw': {}", hidraw_path);
+      LOG_DEBUG("Path does not contain '/hidraw': {}", hidraw_path);
       return false;
     }
 
     // Ensure the positions are after the prefix
     if (input_pos < prefix.size() || hidraw_pos < prefix.size()) {
-      spdlog::debug("Invalid path structure - subsystem before prefix");
+      LOG_DEBUG("Invalid path structure - subsystem before prefix");
       return false;
     }
 
@@ -366,7 +370,7 @@ class Hidraw {
 
     // Convert to uppercase
     std::ranges::transform(converted_serial, converted_serial.begin(),
-                           ::toupper);
+                           [](unsigned char c) { return std::toupper(c); });
 
     // Replace ':' with '_'
     std::ranges::replace(converted_serial, ':', '_');

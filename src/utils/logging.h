@@ -183,7 +183,7 @@ inline spdlog::level::level_enum getLogLevelFromEnv() {
     return spdlog::level::off;
 
   // Unknown value — fall back to info and warn the operator
-  spdlog::warn("LOG_LEVEL '{}' is not recognised; defaulting to 'info'", level);
+  spdlog::warn("LOG_LEVEL '{}' is not recognized; defaulting to 'info'", level);
   return spdlog::level::info;
 }
 

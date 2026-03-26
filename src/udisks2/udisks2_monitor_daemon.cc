@@ -33,6 +33,7 @@
 
 #include "../proxy/org/freedesktop/UDisks2/Block/block_proxy.h"
 #include "../utils/logging.h"
+#include "../utils/signal_handler.h"
 
 // Forward declarations
 class RemovableDeviceMonitor;
@@ -518,10 +519,12 @@ int main() {
     // The event loop runs in a separate thread handling D-Bus messages
     // Note: In a production daemon, implement proper signal handling (SIGTERM,
     // SIGINT) to gracefully shut down and call connection->leaveEventLoop()
-    constexpr auto kDaemonIdleSleepInterval = std::chrono::seconds(1);
-    while (true) {
-      std::this_thread::sleep_for(kDaemonIdleSleepInterval);
+    installSignalHandlers();
+    auto result = monitorLoop(*connection);
+    if (result) {
+      LOG_ERROR("Monitor loop: {}", *result);
     }
+    connection->leaveEventLoop();
   } catch (const std::exception& e) {
     LOG_ERROR("Fatal error: {}", e.what());
     return 1;

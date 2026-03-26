@@ -14,6 +14,8 @@
 
 #include "dual_sense.h"
 
+#include <cctype>
+
 #include "../../utils/property_utils.h"
 #include "../../utils/resource_limits.h"
 
@@ -42,8 +44,10 @@ DualSense::DualSense(sdbus::IConnection& connection)
                               sub_system ? sub_system : "");
                     if (std::strcmp(sub_system, "hidraw") == 0) {
                       if (std::strcmp(action, "remove") == 0) {
-                        input_reader_->stop();
-                        input_reader_.reset();
+                        if (input_reader_) {
+                          input_reader_->stop();
+                          input_reader_.reset();
+                        }
                       }
                       if (!get_hidraw_devices(input_match_bt)) {
                         get_hidraw_devices(input_match_usb);
@@ -250,7 +254,8 @@ std::string DualSense::convert_mac_to_path(const std::string& mac_address) {
       "/org/freedesktop/UPower/devices/battery_ps_controller_battery_";
   std::string converted_mac = mac_address;
   std::ranges::replace(converted_mac, ':', 'o');
-  std::ranges::transform(converted_mac, converted_mac.begin(), ::tolower);
+  std::ranges::transform(converted_mac, converted_mac.begin(),
+                         [](unsigned char c) { return std::tolower(c); });
   result += converted_mac;
   return result;
 }

@@ -94,6 +94,12 @@ InputReader::Task InputReader::read_input() {
     }
     LOG_INFO("Report Descriptor Size: {}", desc_size);
 
+    if (desc_size < 0 ||
+        static_cast<unsigned>(desc_size) > HID_MAX_DESCRIPTOR_SIZE) {
+      LOG_ERROR("Invalid report descriptor size: {}", desc_size);
+      break;
+    }
+
     // Report Descriptor
     hidraw_report_descriptor rpt_desc{};
     rpt_desc.size = desc_size;

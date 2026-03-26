@@ -45,8 +45,10 @@ HoripadSteam::HoripadSteam(sdbus::IConnection& connection)
                               sub_system ? sub_system : "");
                     if (std::strcmp(sub_system, "hidraw") == 0) {
                       if (std::strcmp(action, "remove") == 0) {
-                        input_reader_->stop();
-                        input_reader_.reset();
+                        if (input_reader_) {
+                          input_reader_->stop();
+                          input_reader_.reset();
+                        }
                       }
                       if (!get_hidraw_devices(input_match_params_bt)) {
                         get_hidraw_devices(input_match_params_usb);

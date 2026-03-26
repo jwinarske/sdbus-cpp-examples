@@ -69,5 +69,5 @@ int main() {
         std::chrono::duration_cast<std::chrono::seconds>(kMaxReconnectDelay));
   }
 
-  return 1;
+  return 0;
 }

@@ -21,7 +21,7 @@
 class UDisks2PartitionTable final
     : public sdbus::ProxyInterfaces<
           sdbus::Properties_proxy,
-          org::freedesktop::UDisks2::Partition_proxy> {
+          org::freedesktop::UDisks2::PartitionTable_proxy> {
  public:
   UDisks2PartitionTable(sdbus::IConnection& connection,
                         const sdbus::ObjectPath& objectPath)
