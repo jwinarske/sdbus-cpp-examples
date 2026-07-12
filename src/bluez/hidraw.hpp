@@ -33,46 +33,9 @@
 #include <cctype>
 
 #include "../utils/logging.h"
+#include "../utils/unique_fd.h"
 
 #include "hexdump.hpp"
-
-/// RAII wrapper for a POSIX file descriptor.
-/// Automatically closes the fd when it goes out of scope, preventing leaks
-/// on every error-path break/return/exception.
-struct UniqueFd {
-  explicit UniqueFd(const int fd) noexcept : fd_(fd) {}
-
-  ~UniqueFd() {
-    if (fd_ >= 0) {
-      ::close(fd_);
-    }
-  }
-
-  // Non-copyable, movable
-  UniqueFd(const UniqueFd&) = delete;
-  UniqueFd& operator=(const UniqueFd&) = delete;
-
-  UniqueFd(UniqueFd&& other) noexcept : fd_(other.fd_) { other.fd_ = -1; }
-  UniqueFd& operator=(UniqueFd&& other) noexcept {
-    if (this != &other) {
-      if (fd_ >= 0) {
-        ::close(fd_);
-      }
-      fd_ = other.fd_;
-      other.fd_ = -1;
-    }
-    return *this;
-  }
-
-  /// Returns true if the fd is valid (>= 0).
-  [[nodiscard]] bool valid() const noexcept { return fd_ >= 0; }
-
-  /// Returns the raw file descriptor.
-  [[nodiscard]] int get() const noexcept { return fd_; }
-
- private:
-  int fd_;
-};
 
 class Hidraw {
  public:

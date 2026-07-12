@@ -11,9 +11,6 @@ target_link_libraries(systemd1_client
         spdlog::spdlog
 )
 
-if (ENABLE_LTO AND IPO_SUPPORT_RESULT)
-    set_property(TARGET systemd1_client PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
-endif ()
 
 install(TARGETS systemd1_client
         RUNTIME DESTINATION share/sdbus-cpp-examples)

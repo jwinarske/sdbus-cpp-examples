@@ -20,6 +20,7 @@
 #include "../../upower/upower_client.h"
 #include "../adapter1.h"
 #include "../device1.h"
+#include "../hidraw.hpp"
 #include "../input1.h"
 #include "../udev_monitor.hpp"
 

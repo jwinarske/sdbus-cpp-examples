@@ -7,3 +7,5 @@ _codeql_detected_source_root
 .vscode/
 
 clang-format-files
+# clang-tidy run artifacts
+tidy-results-*.txt

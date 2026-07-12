@@ -10,9 +10,6 @@ target_link_libraries(hostname1_client
         sdbus-c++
         spdlog::spdlog
 )
-if (ENABLE_LTO AND IPO_SUPPORT_RESULT)
-    set_property(TARGET hostname1_client PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
-endif ()
 
 install(TARGETS hostname1_client
         RUNTIME DESTINATION share/sdbus-cpp-examples)

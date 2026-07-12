@@ -42,7 +42,7 @@ jobs:
       - name: Install dependencies
         # awalsh128/cache-apt-pkgs-action — caches the .deb set between runs.
         # Tag-pinned to match the convention used in the sibling drm-cxx repo.
-        uses: awalsh128/cache-apt-pkgs-action@v1
+        uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9 # v1
         with:
           packages: cmake ninja-build libudev-dev libsystemd-dev pkg-config gcc-14 g++-14
           version: 1.0
@@ -79,7 +79,7 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Install clang-format
-        uses: awalsh128/cache-apt-pkgs-action@v1
+        uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9 # v1
         with:
           packages: clang-format
           version: 1.0
@@ -117,7 +117,7 @@ jobs:
 
       - name: Install dependencies
         # Repo added above, so the cache action can resolve the LLVM packages.
-        uses: awalsh128/cache-apt-pkgs-action@v1
+        uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9 # v1
         with:
           packages: >-
             clang-19 clang-tidy-19 llvm-19 llvm-19-dev lld-19
@@ -208,7 +208,7 @@ jobs:
             'deb https://apt.llvm.org/noble/ llvm-toolchain-noble-19 main'
 
       - name: Install dependencies
-        uses: awalsh128/cache-apt-pkgs-action@v1
+        uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9 # v1
         with:
           packages: "cmake ninja-build libudev-dev libsystemd-dev pkg-config ${{ matrix.compiler.name == 'gcc-14' && 'gcc-14 g++-14' || 'clang-19 llvm-19 llvm-19-dev lld-19 libc++-19-dev libc++abi-19-dev' }}"
           version: 1.0
@@ -217,7 +217,7 @@ jobs:
         # Caches object files across runs. The pinned submodules
         # (sdbus-c++, spdlog, glaze) don't change, so their compiles hit the
         # cache after the first run. Tag-pinned per the drm-cxx convention.
-        uses: hendrikmuhs/ccache-action@v1
+        uses: hendrikmuhs/ccache-action@5ebbd400eff9e74630f759d94ddd7b6c26299639 # v1
         with:
           key: ${{ matrix.compiler.name }}
 

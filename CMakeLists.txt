@@ -42,6 +42,14 @@ if (ENABLE_LTO)
     )
     if (IPO_SUPPORT_RESULT)
         message(STATUS "IPO .................... supported")
+        # Enable LTO for optimized configurations only. Debug builds skip it
+        # so local iteration stays fast; Release/MinSizeRel/RelWithDebInfo
+        # (the CI and default build types) keep it. Setting these before the
+        # add_subdirectory() calls below makes every target inherit them, so
+        # no per-target set_property() is needed.
+        set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ON)
+        set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_MINSIZEREL ON)
+        set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELWITHDEBINFO ON)
     else ()
         message(STATUS "IPO .................... not supported: ${IPO_SUPPORT_OUTPUT}")
     endif ()

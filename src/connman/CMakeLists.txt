@@ -11,9 +11,6 @@ target_link_libraries(connman_client
         spdlog::spdlog
 )
 
-if (ENABLE_LTO AND IPO_SUPPORT_RESULT)
-    set_property(TARGET connman_client PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
-endif ()
 
 install(TARGETS connman_client
         RUNTIME DESTINATION share/sdbus-cpp-examples)
