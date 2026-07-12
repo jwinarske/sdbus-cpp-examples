@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "../utils/signal_handler.h"
+#include "../utils/event_loop.h"
+#include "../utils/signal_source.h"
 #include "bluez_client.h"
 
 int main() {
@@ -20,29 +21,22 @@ int main() {
     // Initialize logging with environment variable configuration
     logging_config::initializeLogging("bluez_client");
 
-    installSignalHandlers();
+    // Single-threaded loop drives the D-Bus connection and signal delivery.
+    // Construct the SignalSource before any thread starts (e.g. spdlog's
+    // flush thread) so SIGINT/SIGTERM are blocked and delivered via the loop.
+    EventLoop loop;
+    SignalSource signals(loop);
+    loop.add(&signals);
 
     const auto connection = sdbus::createSystemBusConnection();
-    connection->enterEventLoopAsync();
 
     BluezClient client(*connection);
 
     LOG_INFO("BlueZ client running - Press Ctrl+C to exit");
 
-    // Monitor loop with shared connection health timing defaults
-    auto result = monitorLoop(*connection);
-
-    if (result) {
-      // Connection was lost
-      LOG_ERROR("Exiting due to: {}", *result);
-    } else {
-      // Graceful shutdown via signal
-      LOG_INFO("Shutting down...");
-    }
-
-    connection->leaveEventLoop();
-
-    return result ? 1 : 0;
+    const int rc = loop.run(*connection);
+    LOG_INFO("Shutting down...");
+    return rc;
 
   } catch (const sdbus::Error& e) {
     LOG_ERROR("D-Bus error: {} - {}", e.getName(), e.getMessage());
