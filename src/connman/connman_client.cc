@@ -30,9 +30,16 @@ ConnmanManagerClient::ConnmanManagerClient(sdbus::IConnection& connection)
   registerProxy();
 
   try {
-    // Load initial technologies
+    std::scoped_lock lock(maps_mutex_);
+    // Load initial technologies. Insert inline (rather than via
+    // onTechnologyAdded) so we don't re-acquire the non-recursive maps_mutex_.
     for (const auto& tech : GetTechnologies()) {
-      onTechnologyAdded(tech.get<0>(), tech.get<1>());
+      const auto& path = tech.get<0>();
+      LOG_INFO("Technology added: {}", path);
+      if (technologies_.find(path) == technologies_.end()) {
+        technologies_[path] = std::make_unique<ConnmanTechnologyClient>(
+            getProxy().getConnection(), path);
+      }
     }
 
     // Load initial services
@@ -69,6 +76,7 @@ void ConnmanManagerClient::onTechnologyAdded(
     const std::map<std::string, sdbus::Variant>& properties) {
   (void)properties;
   try {
+    std::scoped_lock lock(maps_mutex_);
     LOG_INFO("Technology added: {}", path);
     if (technologies_.find(path) == technologies_.end()) {
       technologies_[path] = std::make_unique<ConnmanTechnologyClient>(
@@ -81,6 +89,7 @@ void ConnmanManagerClient::onTechnologyAdded(
 
 void ConnmanManagerClient::onTechnologyRemoved(const sdbus::ObjectPath& path) {
   try {
+    std::scoped_lock lock(maps_mutex_);
     LOG_INFO("Technology removed: {}", path);
     technologies_.erase(path);
   } catch (const std::exception& e) {
@@ -94,6 +103,7 @@ void ConnmanManagerClient::onServicesChanged(
         changed,
     const std::vector<sdbus::ObjectPath>& removed) {
   try {
+    std::scoped_lock lock(maps_mutex_);
     for (const auto& service : changed) {
       const auto& path = service.get<0>();
       const auto& props = service.get<1>();

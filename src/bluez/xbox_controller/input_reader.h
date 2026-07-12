@@ -16,7 +16,7 @@
 #define SRC_BLUEZ_XBOX_CONTROLLER_INPUT_READER_HPP_
 
 #include <atomic>
-#include <coroutine>
+#include <thread>
 
 #include "../hidraw.hpp"
 #include "xbox_controller_02fd.h"
@@ -44,20 +44,16 @@ class InputReader {
   ~InputReader();
 
  private:
-  struct Task {
-    struct promise_type {
-      static Task get_return_object() { return {}; }
-      static std::suspend_never initial_suspend() { return {}; }
-      static std::suspend_never final_suspend() noexcept { return {}; }
-      static void return_void() {}
-      static void unhandled_exception() { std::terminate(); }
-    };
-  };
-
   std::string device_;
   std::atomic<bool> stop_flag_;
+  // eventfd used to interrupt the blocking read loop immediately on stop().
+  UniqueFd stop_event_fd_;
+  // Worker thread that owns the blocking read loop. Joined in the destructor
+  // before any other member is torn down, so the loop can never outlive this
+  // object (no use-after-free) and never blocks the D-Bus/main thread.
+  std::thread thread_;
 
-  Task read_input();
+  void read_input();
 
   static std::string dpad_to_string(Direction dpad);
 

@@ -27,6 +27,7 @@ inline constexpr std::size_t kMaxGattDescriptors = 32768;
 inline constexpr std::size_t kMaxBatteryEntries = 1024;
 inline constexpr std::size_t kMaxInputEntries = 1024;
 inline constexpr std::size_t kMaxUPowerClients = 256;
+inline constexpr std::size_t kMaxUnits = 16384;
 
 inline bool IsAtCapacity(const std::size_t current_size,
                          const std::size_t limit) {

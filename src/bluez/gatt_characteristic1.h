@@ -35,28 +35,29 @@ class GattCharacteristic1 final
       const sdbus::ObjectPath(&objectPath),
       const std::map<sdbus::MemberName, sdbus::Variant>& properties)
       : ProxyInterfaces{connection, destination, objectPath} {
-    if (const auto key = sdbus::MemberName("Flags"); properties.contains(key)) {
-      properties_.flags = properties.at(key).get<std::vector<std::string>>();
-    }
-    if (isNotifyFlagSet()) {
-      if (const auto key = sdbus::MemberName("NotifyAcquired");
-          properties.contains(key)) {
-        properties_.notify_acquired = properties.at(key).get<bool>();
+    // Iterate the provided properties once and dispatch on the key. This avoids
+    // scanning every known property (and the per-property map lookup +
+    // MemberName allocation). "Flags" sorts before "NotifyAcquired"/"Notifying"
+    // in the map, so it is assigned before those guarded assignments are
+    // reached, preserving the original isNotifyFlagSet() behavior.
+    for (const auto& [key, value] : properties) {
+      if (key == "Flags") {
+        properties_.flags = value.get<std::vector<std::string>>();
+      } else if (key == "NotifyAcquired") {
+        if (isNotifyFlagSet()) {
+          properties_.notify_acquired = value.get<bool>();
+        }
+      } else if (key == "Notifying") {
+        if (isNotifyFlagSet()) {
+          properties_.notifying = value.get<bool>();
+        }
+      } else if (key == "Service") {
+        properties_.service = value.get<sdbus::ObjectPath>();
+      } else if (key == "UUID") {
+        properties_.uuid = value.get<std::string>();
+      } else if (key == "Value") {
+        properties_.value = value.get<std::vector<std::uint8_t>>();
       }
-      if (const auto key = sdbus::MemberName("Notifying");
-          properties.contains(key)) {
-        properties_.notifying = properties.at(key).get<bool>();
-      }
-    }
-    if (const auto key = sdbus::MemberName("Service");
-        properties.contains(key)) {
-      properties_.service = properties.at(key).get<sdbus::ObjectPath>();
-    }
-    if (const auto key = sdbus::MemberName("UUID"); properties.contains(key)) {
-      properties_.uuid = properties.at(key).get<std::string>();
-    }
-    if (const auto key = sdbus::MemberName("Value"); properties.contains(key)) {
-      properties_.value = properties.at(key).get<std::vector<std::uint8_t>>();
     }
   }
 

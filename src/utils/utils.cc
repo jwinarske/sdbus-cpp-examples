@@ -131,10 +131,8 @@ const std::unordered_map<
                       }},
                      {"s",
                       [](const sdbus::Variant& v, std::ostringstream& os) {
-                        os << (v.get<std::string>().empty()
-                                   ? "\"\""
-                                   : v.get<std::string>())
-                           << std::endl;
+                        const auto s = v.get<std::string>();
+                        os << (s.empty() ? "\"\"" : s) << std::endl;
                       }},
                      {"x",
                       [](const sdbus::Variant& v, std::ostringstream& os) {
@@ -148,62 +146,64 @@ const std::unordered_map<
                       }},
                      {"as",
                       [](const sdbus::Variant& v, std::ostringstream& os) {
+                        const auto vec = v.get<std::vector<std::string>>();
                         os << std::endl;
-                        for (const auto& s :
-                             v.get<std::vector<std::string>>()) {
+                        for (const auto& s : vec) {
                           os << "\t" << s << std::endl;
                         }
-                        if (v.get<std::vector<std::string>>().empty())
+                        if (vec.empty())
                           os << "\t" << "\"\"" << std::endl;
                       }},
                      {"au",
                       [](const sdbus::Variant& v, std::ostringstream& os) {
+                        const auto vec = v.get<std::vector<std::uint32_t>>();
                         os << std::endl;
-                        for (const auto& s :
-                             v.get<std::vector<std::uint32_t>>()) {
+                        for (const auto& s : vec) {
                           os << "\t" << std::to_string(s) << std::endl;
                         }
-                        if (v.get<std::vector<std::uint32_t>>().empty())
+                        if (vec.empty())
                           os << "\t" << "\"\"" << std::endl;
                         else
                           os << std::endl;
                       }},
                      {"aau",
                       [](const sdbus::Variant& v, std::ostringstream& os) {
+                        const auto vec =
+                            v.get<std::vector<std::vector<std::uint32_t>>>();
                         os << std::endl;
-                        for (const auto& it :
-                             v.get<std::vector<std::vector<std::uint32_t>>>()) {
+                        for (const auto& it : vec) {
                           for (const auto& address : it) {
                             os << "\t" << std::to_string(address) << std::endl;
                           }
                         }
-                        if (v.get<std::vector<std::vector<std::uint32_t>>>()
-                                .empty())
+                        if (vec.empty())
                           os << "\t" << "\"\"" << std::endl;
                         else
                           os << std::endl;
                       }},
                      {"ay",
                       [](const sdbus::Variant& v, std::ostringstream& os) {
-                        for (const auto& b : v.get<std::vector<uint8_t>>()) {
+                        const auto vec = v.get<std::vector<uint8_t>>();
+                        for (const auto& b : vec) {
                           os << std::hex << std::setw(2) << std::setfill('0')
                              << static_cast<int>(b) << " ";
                         }
-                        if (v.get<std::vector<uint8_t>>().empty())
+                        if (vec.empty())
                           os << "\t" << "\"\"" << std::endl;
                         else
                           os << std::endl;
                       }},
                      {"aay",
                       [](const sdbus::Variant& v, std::ostringstream& os) {
-                        for (const auto& it :
-                             v.get<std::vector<std::vector<uint8_t>>>()) {
+                        const auto vec =
+                            v.get<std::vector<std::vector<uint8_t>>>();
+                        for (const auto& it : vec) {
                           for (const auto& b : it) {
                             os << std::hex << std::setw(2) << std::setfill('0')
                                << static_cast<int>(b) << " ";
                           }
                         }
-                        if (v.get<std::vector<std::vector<uint8_t>>>().empty())
+                        if (vec.empty())
                           os << "\t" << "\"\"" << std::endl;
                         else
                           os << std::endl;

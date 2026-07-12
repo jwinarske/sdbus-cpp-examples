@@ -63,8 +63,11 @@ void appendTimeUSecAsDate(const uint64_t timeUSec, std::ostringstream& ss) {
       std::chrono::microseconds(timeUSec));
   const std::time_t timeT = std::chrono::system_clock::to_time_t(timePoint);
   std::tm tm_buf{};
-  const std::tm* tm = localtime_r(&timeT, &tm_buf);
-  ss << "\tDate: " << std::put_time(tm, "%d-%m-%Y %H:%M:%S") << std::endl;
+  if (const std::tm* tm = localtime_r(&timeT, &tm_buf); tm != nullptr) {
+    ss << "\tDate: " << std::put_time(tm, "%d-%m-%Y %H:%M:%S") << std::endl;
+  } else {
+    ss << "\tDate: (invalid)" << std::endl;
+  }
 }
 
 void Timedate1Client::printTimedate1() const {

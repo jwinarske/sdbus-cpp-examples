@@ -85,70 +85,44 @@ class Device1 final : public sdbus::ProxyInterfaces<sdbus::Properties_proxy,
       const sdbus::InterfaceName& interfaceName,
       const std::map<sdbus::PropertyName, sdbus::Variant>& changedProperties,
       const std::vector<sdbus::PropertyName>& invalidatedProperties) override {
-    if (const auto key = sdbus::MemberName("Adapter");
-        changedProperties.contains(key)) {
-      properties_.adapter = changedProperties.at(key).get<sdbus::ObjectPath>();
-    }
-    if (const auto key = sdbus::MemberName("Address");
-        changedProperties.contains(key)) {
-      properties_.address = changedProperties.at(key).get<std::string>();
-    }
-    if (const auto key = sdbus::MemberName("AddressType");
-        changedProperties.contains(key)) {
-      properties_.address_type = changedProperties.at(key).get<std::string>();
-    }
-    if (const auto key = sdbus::MemberName("Bonded");
-        changedProperties.contains(key)) {
-      properties_.bonded = changedProperties.at(key).get<bool>();
-    }
-    if (const auto key = sdbus::MemberName("Blocked");
-        changedProperties.contains(key)) {
-      properties_.blocked = changedProperties.at(key).get<bool>();
-    }
-    if (const auto key = sdbus::MemberName("Connected");
-        changedProperties.contains(key)) {
-      properties_.connected = changedProperties.at(key).get<bool>();
-    }
-    if (const auto key = sdbus::MemberName("LegacyPairing");
-        changedProperties.contains(key)) {
-      properties_.legacy_pairing = changedProperties.at(key).get<bool>();
-    }
-    if (const auto key = sdbus::MemberName("Paired");
-        changedProperties.contains(key)) {
-      properties_.paired = changedProperties.at(key).get<bool>();
-    }
-    if (const auto key = sdbus::MemberName("Modalias");
-        changedProperties.contains(key)) {
-      properties_.modalias =
-          parse_modalias(changedProperties.at(key).get<std::string>());
-    }
-    if (const auto key = sdbus::MemberName("Name");
-        changedProperties.contains(key)) {
-      properties_.name = changedProperties.at(key).get<std::string>();
-    }
-    if (const auto key = sdbus::MemberName("ServiceData");
-        changedProperties.contains(key)) {
-      properties_.service_data =
-          changedProperties.at(key)
-              .get<std::map<std::string, sdbus::Variant>>();
-    }
-    if (const auto key = sdbus::MemberName("RSSI");
-        changedProperties.contains(key)) {
-      properties_.rssi = changedProperties.at(key).get<std::int16_t>();
-      LOG_DEBUG("RSSI: {}", properties_.rssi);
-    }
-    if (const auto key = sdbus::MemberName("ServicesResolved");
-        changedProperties.contains(key)) {
-      properties_.services_resolved = changedProperties.at(key).get<bool>();
-    }
-    if (const auto key = sdbus::MemberName("Trusted");
-        changedProperties.contains(key)) {
-      properties_.trusted = changedProperties.at(key).get<bool>();
-    }
-    if (const auto key = sdbus::MemberName("UUIDs");
-        changedProperties.contains(key)) {
-      properties_.uuids =
-          changedProperties.at(key).get<std::vector<std::string>>();
+    // Iterate the changed properties once and dispatch on the key. A
+    // PropertiesChanged signal usually carries only a handful of properties,
+    // so this avoids scanning every known property (and the per-property map
+    // lookup + MemberName allocation) on every signal.
+    for (const auto& [key, value] : changedProperties) {
+      if (key == "Adapter") {
+        properties_.adapter = value.get<sdbus::ObjectPath>();
+      } else if (key == "Address") {
+        properties_.address = value.get<std::string>();
+      } else if (key == "AddressType") {
+        properties_.address_type = value.get<std::string>();
+      } else if (key == "Bonded") {
+        properties_.bonded = value.get<bool>();
+      } else if (key == "Blocked") {
+        properties_.blocked = value.get<bool>();
+      } else if (key == "Connected") {
+        properties_.connected = value.get<bool>();
+      } else if (key == "LegacyPairing") {
+        properties_.legacy_pairing = value.get<bool>();
+      } else if (key == "Paired") {
+        properties_.paired = value.get<bool>();
+      } else if (key == "Modalias") {
+        properties_.modalias = parse_modalias(value.get<std::string>());
+      } else if (key == "Name") {
+        properties_.name = value.get<std::string>();
+      } else if (key == "ServiceData") {
+        properties_.service_data =
+            value.get<std::map<std::string, sdbus::Variant>>();
+      } else if (key == "RSSI") {
+        properties_.rssi = value.get<std::int16_t>();
+        LOG_DEBUG("RSSI: {}", properties_.rssi);
+      } else if (key == "ServicesResolved") {
+        properties_.services_resolved = value.get<bool>();
+      } else if (key == "Trusted") {
+        properties_.trusted = value.get<bool>();
+      } else if (key == "UUIDs") {
+        properties_.uuids = value.get<std::vector<std::string>>();
+      }
     }
 #if 0
     Utils::print_changed_properties(interfaceName, changedProperties,

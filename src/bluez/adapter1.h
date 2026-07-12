@@ -60,64 +60,42 @@ class Adapter1 final
       const sdbus::InterfaceName& interfaceName,
       const std::map<sdbus::PropertyName, sdbus::Variant>& changedProperties,
       const std::vector<sdbus::PropertyName>& invalidatedProperties) override {
-    if (const auto key = sdbus::MemberName("Address");
-        changedProperties.contains(key)) {
-      properties_.address = changedProperties.at(key).get<std::string>();
-    }
-    if (const auto key = sdbus::MemberName("AddressType");
-        changedProperties.contains(key)) {
-      properties_.address_type = changedProperties.at(key).get<std::string>();
-    }
-    if (const auto key = sdbus::MemberName("Alias");
-        changedProperties.contains(key)) {
-      properties_.alias = changedProperties.at(key).get<std::string>();
-    }
-    if (const auto key = sdbus::MemberName("Class");
-        changedProperties.contains(key)) {
-      properties_.class_type = changedProperties.at(key).get<std::uint32_t>();
-    }
-    if (const auto key = sdbus::MemberName("Discoverable");
-        changedProperties.contains(key)) {
-      properties_.discoverable = changedProperties.at(key).get<bool>();
-    }
-    if (const auto key = sdbus::MemberName("DiscoverableTimeout");
-        changedProperties.contains(key)) {
-      properties_.discoverable_timeout =
-          changedProperties.at(key).get<std::uint32_t>();
-    }
-    if (const auto key = sdbus::MemberName("Discovering");
-        changedProperties.contains(key)) {
-      properties_.discovering = changedProperties.at(key).get<bool>();
+    // Iterate the changed properties once and dispatch on the key. A
+    // PropertiesChanged signal usually carries only a handful of properties,
+    // so this avoids scanning every known property (and the per-property map
+    // lookup + MemberName allocation) on every signal.
+    for (const auto& [key, value] : changedProperties) {
+      if (key == "Address") {
+        properties_.address = value.get<std::string>();
+      } else if (key == "AddressType") {
+        properties_.address_type = value.get<std::string>();
+      } else if (key == "Alias") {
+        properties_.alias = value.get<std::string>();
+      } else if (key == "Class") {
+        properties_.class_type = value.get<std::uint32_t>();
+      } else if (key == "Discoverable") {
+        properties_.discoverable = value.get<bool>();
+      } else if (key == "DiscoverableTimeout") {
+        properties_.discoverable_timeout = value.get<std::uint32_t>();
+      } else if (key == "Discovering") {
+        properties_.discovering = value.get<bool>();
 
-      if (!properties_.discovering) {
-        this->StartDiscovery();
+        if (!properties_.discovering) {
+          this->StartDiscovery();
+        }
+      } else if (key == "Modalias") {
+        properties_.modalias = value.get<std::string>();
+      } else if (key == "Name") {
+        properties_.name = value.get<std::string>();
+      } else if (key == "Pairable") {
+        properties_.pairable = value.get<bool>();
+      } else if (key == "PairableTimeout") {
+        properties_.pairable_timeout = value.get<std::uint32_t>();
+      } else if (key == "Powered") {
+        properties_.powered = value.get<bool>();
+      } else if (key == "UUIDs") {
+        properties_.uuids = value.get<std::vector<std::string>>();
       }
-    }
-    if (const auto key = sdbus::MemberName("Modalias");
-        changedProperties.contains(key)) {
-      properties_.modalias = changedProperties.at(key).get<std::string>();
-    }
-    if (const auto key = sdbus::MemberName("Name");
-        changedProperties.contains(key)) {
-      properties_.name = changedProperties.at(key).get<std::string>();
-    }
-    if (const auto key = sdbus::MemberName("Pairable");
-        changedProperties.contains(key)) {
-      properties_.pairable = changedProperties.at(key).get<bool>();
-    }
-    if (const auto key = sdbus::MemberName("PairableTimeout");
-        changedProperties.contains(key)) {
-      properties_.pairable_timeout =
-          changedProperties.at(key).get<std::uint32_t>();
-    }
-    if (const auto key = sdbus::MemberName("Powered");
-        changedProperties.contains(key)) {
-      properties_.powered = changedProperties.at(key).get<bool>();
-    }
-    if (const auto key = sdbus::MemberName("UUIDs");
-        changedProperties.contains(key)) {
-      properties_.uuids =
-          changedProperties.at(key).get<std::vector<std::string>>();
     }
   }
 };

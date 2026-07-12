@@ -53,6 +53,7 @@ void UDisks2Manager::onInterfacesAdded(
       continue;
     }
     if ("org.freedesktop.UDisks2.Manager.NVMe" == interface) {
+      std::lock_guard lock(manager_nvme_mutex_);
       manager_nvme_ = std::make_unique<UDisks2ManagerNvme>(
           getProxy().getConnection(), objectPath);
     } else if ("org.freedesktop.UDisks2.Block" == interface) {
@@ -115,6 +116,7 @@ void UDisks2Manager::onInterfacesRemoved(
   for (const auto& interface : interfaces) {
     LOG_INFO("[{}] Remove - {}", objectPath, interface);
     if ("org.freedesktop.UDisks2.Manager.NVMe" == interface) {
+      std::lock_guard lock(manager_nvme_mutex_);
       manager_nvme_.reset();
     } else if ("org.freedesktop.UDisks2.Block" == interface) {
       std::lock_guard lock(block_mutex_);

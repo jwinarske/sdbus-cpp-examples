@@ -32,21 +32,19 @@ class GattService1
                const sdbus::ObjectPath(&objectPath),
                const std::map<sdbus::MemberName, sdbus::Variant>& properties)
       : ProxyInterfaces{connection, destination, objectPath} {
-    if (const auto key = sdbus::MemberName("Device");
-        properties.contains(key)) {
-      properties_.device = properties.at(key).get<sdbus::ObjectPath>();
-    }
-    if (const auto key = sdbus::MemberName("Includes");
-        properties.contains(key)) {
-      properties_.includes =
-          properties.at(key).get<std::vector<sdbus::ObjectPath>>();
-    }
-    if (const auto key = sdbus::MemberName("Primary");
-        properties.contains(key)) {
-      properties_.primary = properties.at(key).get<bool>();
-    }
-    if (const auto key = sdbus::MemberName("UUID"); properties.contains(key)) {
-      properties_.uuid = properties.at(key).get<std::string>();
+    // Iterate the provided properties once and dispatch on the key. This avoids
+    // scanning every known property (and the per-property map lookup +
+    // MemberName allocation).
+    for (const auto& [key, value] : properties) {
+      if (key == "Device") {
+        properties_.device = value.get<sdbus::ObjectPath>();
+      } else if (key == "Includes") {
+        properties_.includes = value.get<std::vector<sdbus::ObjectPath>>();
+      } else if (key == "Primary") {
+        properties_.primary = value.get<bool>();
+      } else if (key == "UUID") {
+        properties_.uuid = value.get<std::string>();
+      }
     }
   }
 
