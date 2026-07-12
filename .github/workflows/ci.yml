@@ -11,6 +11,12 @@ on:
 permissions:
   contents: read
 
+# Cancel superseded runs on the same ref (e.g. rapid pushes to a PR) so CI
+# minutes aren't spent finishing work a newer commit already invalidated.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   codeql:
     name: CodeQL Security Analysis
@@ -34,23 +40,23 @@ jobs:
           queries: security-and-quality
 
       - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            cmake \
-            ninja-build \
-            libudev-dev \
-            libsystemd-dev \
-            pkg-config \
-            gcc-14 \
-            g++-14
+        # awalsh128/cache-apt-pkgs-action — caches the .deb set between runs.
+        # Tag-pinned to match the convention used in the sibling drm-cxx repo.
+        uses: awalsh128/cache-apt-pkgs-action@v1
+        with:
+          packages: cmake ninja-build libudev-dev libsystemd-dev pkg-config gcc-14 g++-14
+          version: 1.0
 
       - name: Build for CodeQL
+        # No ccache here: CodeQL's extractor must observe real compiler
+        # invocations, and a ccache hit skips them. LTO is disabled — it adds
+        # link-time cost with no analysis value (CodeQL analyses the frontend).
         run: |
           mkdir -p build
           cd build
           cmake .. -GNinja \
-            -DCMAKE_BUILD_TYPE=Release
+            -DCMAKE_BUILD_TYPE=Release \
+            -DENABLE_LTO=OFF
           ninja
         env:
           CC: gcc-14
@@ -73,9 +79,10 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Install clang-format
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y clang-format
+        uses: awalsh128/cache-apt-pkgs-action@v1
+        with:
+          packages: clang-format
+          version: 1.0
 
       - name: Run clang-format check
         run: |
@@ -96,28 +103,27 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           submodules: recursive
+          # Full history so a pull_request run can diff against the base branch
+          # and tidy only the files it changed (see the run step).
+          fetch-depth: 0
 
-      - name: Install dependencies
+      - name: Add LLVM apt repository
         run: |
-          # Install LLVM 19 with libc++
+          # Install LLVM 19 with libc++ from apt.llvm.org
           wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | \
             sudo tee /etc/apt/trusted.gpg.d/llvm.asc
           sudo add-apt-repository -y \
             'deb https://apt.llvm.org/noble/ llvm-toolchain-noble-19 main'
-          sudo apt-get update
-          sudo apt-get install -y \
-            clang-19 \
-            clang-tidy-19 \
-            llvm-19 \
-            llvm-19-dev \
-            lld-19 \
-            libc++-19-dev \
-            libc++abi-19-dev \
-            cmake \
-            ninja-build \
-            libudev-dev \
-            libsystemd-dev \
-            pkg-config
+
+      - name: Install dependencies
+        # Repo added above, so the cache action can resolve the LLVM packages.
+        uses: awalsh128/cache-apt-pkgs-action@v1
+        with:
+          packages: >-
+            clang-19 clang-tidy-19 llvm-19 llvm-19-dev lld-19
+            libc++-19-dev libc++abi-19-dev
+            cmake ninja-build libudev-dev libsystemd-dev pkg-config
+          version: 1.0
 
       - name: Configure CMake for clang-tidy
         run: |
@@ -129,7 +135,7 @@ jobs:
             -DCMAKE_CXX_FLAGS="-stdlib=libc++" \
             -DCMAKE_EXE_LINKER_FLAGS="-stdlib=libc++ -lc++abi" \
             -DLLVM_CONFIG=/usr/bin/llvm-config-19
-          
+
           sed -i \
             -e 's/-fdeps-format=p1689r5//g' \
             -e 's/-fmodules-ts//g' \
@@ -142,34 +148,38 @@ jobs:
           CXX: clang++-19
 
       - name: Run clang-tidy
+        # On a pull_request, tidy only the .cc translation units the PR changes
+        # (parallel across all cores). The push-to-main run re-tidies the whole
+        # tree as the regression net, so cross-file breakage a changed-files
+        # pass can't see is still caught on merge.
         run: |
-          # Find all C++ source files and run clang-tidy
-          # Exclude third_party directory from analysis
-          export FILE_LIST=$(find src -type d -name third_party -prune -false -o -name '*.cc' -o -name '*.hpp' -o -name '*.h')
-          
-          clang-tidy-19 --version
-          clang-tidy-19 --help
-          
-          clang-tidy-19 \
-            -p build \
-            -export-fixes=tidy-results-suggested-fixes.txt \
-            -extra-arg='-Ithird_party/glaze/include' \
-            -extra-arg='-Ithird_party/sdbus-cpp/include' \
-            -extra-arg='-Ithird_party/spdlog/include' \
-            -warnings-as-errors='*' \
-            -header-filter='^(?!.*third_party).*$' \
-            --dump-config
+          set -euo pipefail
+          TIDY_ARGS=(
+            -p build
+            -extra-arg=-Ithird_party/glaze/include
+            -extra-arg=-Ithird_party/sdbus-cpp/include
+            -extra-arg=-Ithird_party/spdlog/include
+            -warnings-as-errors=*
+            -header-filter='^(?!.*third_party).*$'
+          )
 
-          run-clang-tidy-19 \
-            -p build \
-            -export-fixes=tidy-results-suggested-fixes.txt \
-            -extra-arg='-Ithird_party/glaze/include' \
-            -extra-arg='-Ithird_party/sdbus-cpp/include' \
-            -extra-arg='-Ithird_party/spdlog/include' \
-            -warnings-as-errors='*' \
-            -header-filter='^(?!.*third_party).*$' \
-            $FILE_LIST
-
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            base_ref="origin/${{ github.base_ref }}"
+            git fetch --no-tags --quiet origin "${{ github.base_ref }}"
+            mapfile -t files < <(git diff --name-only --diff-filter=d \
+              "${base_ref}...HEAD" | grep -E '^src/.*\.cc$' || true)
+            if [ "${#files[@]}" -eq 0 ]; then
+              echo "clang-tidy: no changed .cc files to lint"
+              exit 0
+            fi
+            printf 'clang-tidy: %d changed file(s)\n' "${#files[@]}"
+            run-clang-tidy-19 "${TIDY_ARGS[@]}" "${files[@]}"
+          else
+            echo "clang-tidy: full tree"
+            FILE_LIST=$(find src -type d -name third_party -prune -false \
+              -o -name '*.cc' -o -name '*.hpp' -o -name '*.h')
+            run-clang-tidy-19 "${TIDY_ARGS[@]}" $FILE_LIST
+          fi
         shell: bash
 
   build:
@@ -189,46 +199,41 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install dependencies
+      - name: Add LLVM apt repository
+        if: matrix.compiler.name == 'llvm-19'
         run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            cmake \
-            ninja-build \
-            libudev-dev \
-            libsystemd-dev \
-            pkg-config
+          wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | \
+            sudo tee /etc/apt/trusted.gpg.d/llvm.asc
+          sudo add-apt-repository -y \
+            'deb https://apt.llvm.org/noble/ llvm-toolchain-noble-19 main'
 
-      - name: Install compiler toolchain
-        run: |
-          if [ "${{ matrix.compiler.name }}" = "gcc-14" ]; then
-            sudo apt-get install -y gcc-14 g++-14
-          elif [ "${{ matrix.compiler.name }}" = "llvm-19" ]; then
-            # Install LLVM 19 with libc++
-            wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | \
-              sudo tee /etc/apt/trusted.gpg.d/llvm.asc
-            sudo add-apt-repository -y \
-              'deb https://apt.llvm.org/noble/ llvm-toolchain-noble-19 main'
-            sudo apt-get update
-            sudo apt-get install -y \
-              clang-19 \
-              llvm-19 \
-              llvm-19-dev \
-              lld-19 \
-              libc++-19-dev \
-              libc++abi-19-dev
-          fi
+      - name: Install dependencies
+        uses: awalsh128/cache-apt-pkgs-action@v1
+        with:
+          packages: "cmake ninja-build libudev-dev libsystemd-dev pkg-config ${{ matrix.compiler.name == 'gcc-14' && 'gcc-14 g++-14' || 'clang-19 llvm-19 llvm-19-dev lld-19 libc++-19-dev libc++abi-19-dev' }}"
+          version: 1.0
+
+      - name: Set up ccache
+        # Caches object files across runs. The pinned submodules
+        # (sdbus-c++, spdlog, glaze) don't change, so their compiles hit the
+        # cache after the first run. Tag-pinned per the drm-cxx convention.
+        uses: hendrikmuhs/ccache-action@v1
+        with:
+          key: ${{ matrix.compiler.name }}
 
       - name: Configure CMake
         run: |
           mkdir -p build
           cd build
-          # Configure with C++23 support
+          # Configure with C++23 support. Compiler launcher routes compiles
+          # through ccache.
           if [ "${{ matrix.compiler.stdlib }}" = "libc++" ]; then
             # For LLVM with libc++
             cmake .. -GNinja \
               -DCMAKE_BUILD_TYPE=Release \
               -DENABLE_LTO=ON \
+              -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+              -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
               -DCMAKE_CXX_FLAGS="-stdlib=libc++" \
               -DCMAKE_EXE_LINKER_FLAGS="-stdlib=libc++ -lc++abi" \
               -DLLVM_CONFIG=/usr/bin/llvm-config-19
@@ -236,7 +241,9 @@ jobs:
             # For GCC with libstdc++
             cmake .. -GNinja \
               -DCMAKE_BUILD_TYPE=Release \
-              -DENABLE_LTO=ON
+              -DENABLE_LTO=ON \
+              -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+              -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
           fi
         env:
           CC: ${{ matrix.compiler.cc }}
