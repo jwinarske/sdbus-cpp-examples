@@ -12,34 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "../../utils/signal_handler.h"
+#include <chrono>
+
+#include "../../utils/event_loop.h"
+#include "../../utils/signal_source.h"
 #include "horipad_steam.h"
 
 int main() {
   try {
-    installSignalHandlers();
+    // Single-threaded loop: it drives the D-Bus connection, the udev monitor,
+    // and signal delivery, so every callback runs on this thread. Construct the
+    // SignalSource first so SIGINT/SIGTERM are blocked before any thread is
+    // started (e.g. spdlog's periodic flush thread) and can only be delivered
+    // via the loop's signalfd.
+    EventLoop loop;
+    SignalSource signals(loop);
+    loop.add(&signals);
 
     spdlog::set_level(spdlog::level::debug);
-    spdlog::flush_every(kLogFlushInterval);
+    spdlog::flush_every(std::chrono::seconds(5));
 
     const auto connection = sdbus::createSystemBusConnection();
-    connection->enterEventLoopAsync();
 
     HoripadSteam client(*connection);
+    loop.add(&client);  // HoripadSteam is a UdevMonitor (an EventSource)
 
     LOG_INFO("HoriPad Steam client running - Press Ctrl+C to exit");
 
-    // Monitor loop with shared connection health timing defaults
-    auto result = monitorLoop(*connection);
-
-    if (result) {
-      LOG_ERROR("Exiting due to: {}", *result);
-    } else {
-      LOG_INFO("Shutting down...");
-    }
-
-    connection->leaveEventLoop();
-    return result ? 1 : 0;
+    const int rc = loop.run(*connection);
+    LOG_INFO("Shutting down...");
+    return rc;
 
   } catch (const sdbus::Error& e) {
     LOG_ERROR("D-Bus error: {} - {}", e.getName(), e.getMessage());

@@ -47,26 +47,13 @@ class XboxController final
   static constexpr auto INTROSPECTABLE_INTERFACE_NAME =
       "org.freedesktop.DBus.Introspectable";
 
-  // Locking policy: avoid nested locking where possible.
-  // If nested locking is required, always acquire in this order:
-  // adapters_mutex_ -> devices_mutex_ -> input1_mutex_ ->
-  // upower_display_devices_mutex_.
-  std::mutex adapters_mutex_;
+  // All of the state below is only ever touched from the single EventLoop
+  // thread: the D-Bus object-manager callbacks and the UdevMonitor callback
+  // are both dispatched by the loop, so no locking is required.
   std::map<sdbus::ObjectPath, std::unique_ptr<Adapter1>> adapters_;
-
-  std::mutex devices_mutex_;
   std::map<sdbus::ObjectPath, std::unique_ptr<Device1>> devices_;
-
-  std::mutex input1_mutex_;
   std::map<sdbus::ObjectPath, std::unique_ptr<Input1>> input1_;
-
-  std::mutex upower_display_devices_mutex_;
   std::map<std::string, std::unique_ptr<UPowerClient>> upower_clients_;
-
-  // Guards input_reader_, which is created/started from onInterfacesAdded
-  // (D-Bus event-loop or main thread) and stopped/reset from the udev monitor
-  // worker thread.
-  std::mutex input_reader_mutex_;
   std::unique_ptr<InputReader> input_reader_;
 
   void onInterfacesAdded(
