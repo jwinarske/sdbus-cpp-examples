@@ -25,14 +25,17 @@
 #include <sdbus-c++/sdbus-c++.h>
 
 #include "logging.h"
+#include "sys.h"
 
 namespace {
 constexpr std::size_t kNotPresent = static_cast<std::size_t>(-1);
 }  // namespace
 
-EventLoop::EventLoop() : wake_fd_(::eventfd(0, EFD_CLOEXEC | EFD_NONBLOCK)) {
-  if (!wake_fd_.valid()) {
-    LOG_ERROR("EventLoop: failed to create eventfd: {}", strerror(errno));
+EventLoop::EventLoop() {
+  if (auto fd = sys::make_eventfd(0, EFD_CLOEXEC | EFD_NONBLOCK)) {
+    wake_fd_ = std::move(*fd);
+  } else {
+    LOG_ERROR("EventLoop: failed to create eventfd: {}", fd.error().message());
   }
 }
 

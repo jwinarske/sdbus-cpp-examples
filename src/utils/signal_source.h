@@ -25,6 +25,7 @@
 
 #include "event_loop.h"
 #include "logging.h"
+#include "sys.h"
 #include "unique_fd.h"
 
 /// Turns POSIX signals into an EventLoop stop(). The signals are blocked
@@ -45,12 +46,13 @@ class SignalSource final : public EventSource {
     if (sigprocmask(SIG_BLOCK, &mask_, nullptr) < 0) {
       LOG_ERROR("SignalSource: sigprocmask failed: {}", strerror(errno));
     }
-    fd_ = UniqueFd(::signalfd(-1, &mask_, SFD_CLOEXEC | SFD_NONBLOCK));
-    if (!fd_.valid()) {
+    if (auto fd = sys::make_signalfd(-1, mask_, SFD_CLOEXEC | SFD_NONBLOCK)) {
+      fd_ = std::move(*fd);
+    } else {
       LOG_ERROR(
           "SignalSource: signalfd failed: {}; restoring default signal "
           "disposition",
-          strerror(errno));
+          fd.error().message());
       // Undo the block, otherwise the signals stay blocked with no consumer and
       // the process can no longer be stopped via SIGINT/SIGTERM.
       sigprocmask(SIG_UNBLOCK, &mask_, nullptr);

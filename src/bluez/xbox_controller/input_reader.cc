@@ -21,6 +21,7 @@
 #include <unistd.h>
 
 #include "../../utils/logging.h"
+#include "../../utils/sys.h"
 #include "../hidraw.hpp"
 #include "input_reader.h"
 
@@ -32,11 +33,12 @@ void InputReader::open_and_init() {
   LOG_DEBUG("hidraw device: {}", device_);
 
   // Non-blocking so dispatch()'s read() never stalls the event loop.
-  UniqueFd fd(open(device_.c_str(), O_RDWR | O_NONBLOCK | O_CLOEXEC));
-  if (!fd.valid()) {
-    LOG_ERROR("unable to open device");
+  auto opened = sys::open_fd(device_.c_str(), O_RDWR | O_NONBLOCK | O_CLOEXEC);
+  if (!opened) {
+    LOG_ERROR("unable to open device: {}", opened.error().message());
     return;
   }
+  UniqueFd fd = std::move(*opened);
 
   // Raw Info
   hidraw_devinfo raw_dev_info{};
