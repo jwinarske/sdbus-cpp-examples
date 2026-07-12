@@ -12,16 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SRC_BLUEZ_XBOX_CONTROLLER_INPUT_READER_HPP_
-#define SRC_BLUEZ_XBOX_CONTROLLER_INPUT_READER_HPP_
+#ifndef SRC_BLUEZ_HORIPAD_STEAM_INPUT_READER_HPP_
+#define SRC_BLUEZ_HORIPAD_STEAM_INPUT_READER_HPP_
 
-#include <atomic>
-#include <thread>
+#include <cstdint>
+#include <string>
 
+#include "../../utils/event_loop.h"
 #include "../../utils/unique_fd.h"
 #include "horipad_stream_01ab_0196.h"
 
-class InputReader {
+/// Reads and decodes hidraw input reports for a HoriPad Steam controller as an
+/// EventSource: the hidraw fd is polled by the EventLoop and dispatch() reads
+/// and prints one report per readable event. Register it with the loop only
+/// when valid().
+class InputReader final : public EventSource {
  public:
   enum class Direction : uint8_t {
     North = 0,
@@ -36,24 +41,20 @@ class InputReader {
   };
 
   explicit InputReader(std::string device);
+  ~InputReader() override = default;
 
-  void start();
+  [[nodiscard]] bool valid() const { return fd_.valid(); }
 
-  void stop();
-
-  ~InputReader();
+  [[nodiscard]] int fd() const override { return fd_.get(); }
+  void dispatch(short revents) override;
 
  private:
   std::string device_;
-  std::atomic<bool> stop_flag_;
-  // eventfd used to interrupt the blocking read loop immediately on stop().
-  UniqueFd stop_event_fd_;
-  // Worker thread that owns the blocking read loop. Joined in the destructor
-  // before any other member is torn down, so the loop can never outlive this
-  // object (no use-after-free) and never blocks the D-Bus/main thread.
-  std::thread thread_;
+  UniqueFd fd_;
+  std::uint16_t product_ = 0;
 
-  void read_input();
+  // Opens the device and reads its descriptor; leaves fd_ invalid on failure.
+  void open_and_init();
 
   static std::string dpad_to_string(Direction dpad);
 
@@ -66,4 +67,4 @@ class InputReader {
   static void PrintInputReport14(const inputReport14_t& input_report14);
 };
 
-#endif  // SRC_BLUEZ_XBOX_CONTROLLER_INPUT_READER_HPP_
+#endif  // SRC_BLUEZ_HORIPAD_STEAM_INPUT_READER_HPP_

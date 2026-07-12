@@ -56,6 +56,15 @@ void EventLoop::remove(EventSource* source) {
   wake();
 }
 
+void EventLoop::retire(std::unique_ptr<EventSource> source) {
+  to_remove_.push_back(source.get());
+  // Hold ownership until the next apply_pending() destroys it, so the object
+  // outlives the current dispatch pass (its fd may still be in this
+  // iteration's poll set).
+  to_retire_.push_back(std::move(source));
+  wake();
+}
+
 void EventLoop::stop(const int exit_code) noexcept {
   exit_code_.store(exit_code, std::memory_order_relaxed);
   running_.store(false, std::memory_order_relaxed);
@@ -67,6 +76,9 @@ void EventLoop::apply_pending() {
     std::erase(sources_, source);
   }
   to_remove_.clear();
+  // Now that any retired sources are out of sources_ and the previous poll set
+  // is gone, it is safe to destroy them.
+  to_retire_.clear();
 
   for (auto* source : to_add_) {
     if (std::ranges::find(sources_, source) == sources_.end()) {

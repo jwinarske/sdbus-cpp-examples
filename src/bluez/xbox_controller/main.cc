@@ -26,7 +26,7 @@ int main() {
     SignalSource signals(loop);
     loop.add(&signals);
 
-    XboxController client(*connection);
+    XboxController client(*connection, loop);
     loop.add(&client);  // XboxController is a UdevMonitor (an EventSource)
 
     LOG_INFO("Xbox controller client running - Press Ctrl+C to exit");

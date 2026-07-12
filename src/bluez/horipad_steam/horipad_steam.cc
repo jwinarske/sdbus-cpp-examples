@@ -32,7 +32,7 @@ const std::vector<std::pair<std::string, std::string>> input_match_params_usb =
      {"ID_MODEL_ID", "01ab"},
      {"TAGS", ":seat:"}};
 
-HoripadSteam::HoripadSteam(sdbus::IConnection& connection)
+HoripadSteam::HoripadSteam(sdbus::IConnection& connection, EventLoop& loop)
     : ProxyInterfaces(connection,
                       sdbus::ServiceName(INTERFACE_NAME),
                       sdbus::ObjectPath("/")),
@@ -46,15 +46,17 @@ HoripadSteam::HoripadSteam(sdbus::IConnection& connection)
                     if (std::strcmp(sub_system, "hidraw") == 0) {
                       if (std::strcmp(action, "remove") == 0) {
                         if (input_reader_) {
-                          input_reader_->stop();
-                          input_reader_.reset();
+                          // Retire (not reset) so the reader outlives this
+                          // dispatch pass; the loop destroys it safely.
+                          loop_.retire(std::move(input_reader_));
                         }
                       }
                       if (!get_hidraw_devices(input_match_params_bt)) {
                         get_hidraw_devices(input_match_params_usb);
                       }
                     }
-                  }) {
+                  }),
+      loop_(loop) {
   if (!get_hidraw_devices(input_match_params_bt)) {
     get_hidraw_devices(input_match_params_usb);
   }
@@ -153,8 +155,14 @@ void HoripadSteam::onInterfacesAdded(
             !hidraw_device.empty()) {
           LOG_INFO("Adding hidraw device: {}", hidraw_device_key);
           if (!input_reader_) {
-            input_reader_ = std::make_unique<InputReader>(hidraw_device);
-            input_reader_->start();
+            auto reader = std::make_unique<InputReader>(hidraw_device);
+            if (reader->valid()) {
+              loop_.add(reader.get());
+              input_reader_ = std::move(reader);
+            } else {
+              LOG_ERROR("Failed to initialize hidraw reader: {}",
+                        hidraw_device);
+            }
           }
         }
       }
