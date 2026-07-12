@@ -12,25 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SRC_BLUEZ_XBOX_CONTROLLER_INPUT_READER_HPP_
-#define SRC_BLUEZ_XBOX_CONTROLLER_INPUT_READER_HPP_
+#ifndef SRC_BLUEZ_PS5_DUAL_SENSE_INPUT_READER_HPP_
+#define SRC_BLUEZ_PS5_DUAL_SENSE_INPUT_READER_HPP_
 
 #include <array>
-#include <atomic>
-#include <thread>
+#include <cstdint>
+#include <string>
 
+#include "../../utils/event_loop.h"
 #include "../../utils/unique_fd.h"
 #include "dual_sense_0ce6.h"
 
-class InputReader {
+/// Reads and decodes hidraw input reports for a PS5 DualSense controller as an
+/// EventSource. The device is opened and its feature reports fetched in the
+/// constructor; dispatch() then reads and prints one input report per readable
+/// event on the loop thread. Register it with the loop only when valid().
+class InputReader final : public EventSource {
  public:
   explicit InputReader(std::string device);
+  ~InputReader() override = default;
 
-  void start();
+  [[nodiscard]] bool valid() const { return fd_.valid(); }
 
-  void stop();
-
-  ~InputReader();
+  [[nodiscard]] int fd() const override { return fd_.get(); }
+  void dispatch(short revents) override;
 
  private:
   struct CalibrationData {
@@ -46,20 +51,16 @@ class InputReader {
   };
 
   std::string device_;
-  std::atomic<bool> stop_flag_;
-  // eventfd used to interrupt the blocking read loop immediately on stop().
-  UniqueFd stop_event_fd_;
+  UniqueFd fd_;
+  std::uint16_t product_ = 0;
 
   ReportFeatureInMacAll controller_and_host_mac_{};
   ReportFeatureInVersion version_{};
   HardwareCalibrationData hw_cal_data_{};
 
-  // Worker thread that owns the blocking read loop. Joined in the destructor
-  // before any other member is torn down, so the loop can never outlive this
-  // object (no use-after-free) and never blocks the D-Bus/main thread.
-  std::thread thread_;
-
-  void read_input();
+  // Opens the device, reads its descriptors and feature reports; leaves fd_
+  // invalid on failure.
+  void open_and_init();
 
   static std::string dpad_to_string(Direction dpad);
   static std::string power_state_to_string(PowerState state);
@@ -85,4 +86,4 @@ class InputReader {
   static void PrintControllerStateBt(BTSimpleGetStateData const& state);
 };
 
-#endif  // SRC_BLUEZ_XBOX_CONTROLLER_INPUT_READER_HPP_
+#endif  // SRC_BLUEZ_PS5_DUAL_SENSE_INPUT_READER_HPP_

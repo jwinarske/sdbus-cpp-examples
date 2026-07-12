@@ -34,7 +34,7 @@ int main() {
 
     const auto connection = sdbus::createSystemBusConnection();
 
-    HoripadSteam client(*connection);
+    HoripadSteam client(*connection, loop);
     loop.add(&client);  // HoripadSteam is a UdevMonitor (an EventSource)
 
     LOG_INFO("HoriPad Steam client running - Press Ctrl+C to exit");

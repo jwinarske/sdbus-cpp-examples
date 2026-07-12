@@ -34,7 +34,7 @@ int main() {
 
     const auto connection = sdbus::createSystemBusConnection();
 
-    DualSense client(*connection);
+    DualSense client(*connection, loop);
     loop.add(&client);  // DualSense is a UdevMonitor (an EventSource)
 
     LOG_INFO("PS5 DualSense client running - Press Ctrl+C to exit");

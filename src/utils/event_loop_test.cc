@@ -20,6 +20,7 @@
 //   3. stop() unblocks run() and returns the requested code.
 // A timerfd acts as a hard deadline so the test can never hang.
 
+#include <array>
 #include <cstdint>
 #include <cstring>
 #include <memory>
@@ -27,6 +28,7 @@
 #include <string>
 #include <vector>
 
+#include <fcntl.h>
 #include <sys/eventfd.h>
 #include <sys/timerfd.h>
 #include <unistd.h>
@@ -103,6 +105,69 @@ class DeadlineSource final : public EventSource {
   bool fired_ = false;
 };
 
+// Counts how many times it is dispatched; used to prove a POLLHUP fd is dropped
+// rather than spun on.
+class HupSource final : public EventSource {
+ public:
+  explicit HupSource(const int fd) : fd_(fd) {}
+  [[nodiscard]] int fd() const override { return fd_; }
+  void dispatch(short /*revents*/) override { ++count_; }
+  [[nodiscard]] int count() const { return count_; }
+
+ private:
+  int fd_;
+  int count_ = 0;
+};
+
+// Stops the loop cleanly when its timer fires.
+class StopTimer final : public EventSource {
+ public:
+  StopTimer(const int fd, EventLoop& loop) : fd_(fd), loop_(loop) {}
+  [[nodiscard]] int fd() const override { return fd_; }
+  void dispatch(short /*revents*/) override { loop_.stop(0); }
+
+ private:
+  int fd_;
+  EventLoop& loop_;
+};
+
+// Regression test for the POLLHUP busy-spin: a closed pipe's read end reports
+// POLLHUP level-triggered on every poll(). The loop must dispatch it once and
+// then stop polling it, so the dispatch count stays tiny instead of spinning to
+// thousands before the 300ms deadline.
+bool test_pollhup_removal(sdbus::IConnection& connection) {
+  std::array<int, 2> pipefd{-1, -1};
+  if (::pipe2(pipefd.data(), O_CLOEXEC | O_NONBLOCK) != 0) {
+    LOG_ERROR("EventLoop HUP test: pipe2 failed: {}", strerror(errno));
+    return false;
+  }
+  UniqueFd read_end(pipefd[0]);
+  ::close(pipefd[1]);  // closing the write end makes read_end report POLLHUP
+
+  EventLoop loop;
+  HupSource hup(read_end.get());
+  loop.add(&hup);
+
+  UniqueFd timer(::timerfd_create(CLOCK_MONOTONIC, TFD_CLOEXEC));
+  itimerspec spec{};
+  spec.it_value.tv_nsec = 300'000'000;  // 300ms
+  if (!timer.valid() || ::timerfd_settime(timer.get(), 0, &spec, nullptr) < 0) {
+    LOG_ERROR("EventLoop HUP test: timer setup failed: {}", strerror(errno));
+    return false;
+  }
+  StopTimer stopper(timer.get(), loop);
+  loop.add(&stopper);
+
+  loop.run(connection);
+
+  // With the fix, the HUP source is dispatched once and then removed; without
+  // it the loop spins and dispatches thousands of times before the deadline.
+  const bool ok = hup.count() <= 3;
+  LOG_INFO("EventLoop HUP test: dispatched {} time(s) ({})", hup.count(),
+           ok ? "PASS" : "FAIL");
+  return ok;
+}
+
 }  // namespace
 
 int main() {
@@ -172,15 +237,21 @@ int main() {
 
   const int rc = loop.run(*connection);
 
-  const bool passed = rc == 0 && !deadline.fired() &&
-                      tokens.count() == kTokens && done.reply_ok;
-  if (passed) {
-    LOG_INFO("EventLoop test: PASS (tokens={}, reply_ok={})", tokens.count(),
-             done.reply_ok);
+  const bool sources_ok = rc == 0 && !deadline.fired() &&
+                          tokens.count() == kTokens && done.reply_ok;
+  if (!sources_ok) {
+    LOG_ERROR(
+        "EventLoop test: FAIL (rc={}, deadline_fired={}, tokens={}, "
+        "reply_ok={})",
+        rc, deadline.fired(), tokens.count(), done.reply_ok);
+  }
+
+  const bool hup_ok = test_pollhup_removal(*connection);
+
+  if (sources_ok && hup_ok) {
+    LOG_INFO("EventLoop test: PASS (tokens={}, reply_ok={}, hup ok)",
+             tokens.count(), done.reply_ok);
     return 0;
   }
-  LOG_ERROR(
-      "EventLoop test: FAIL (rc={}, deadline_fired={}, tokens={}, reply_ok={})",
-      rc, deadline.fired(), tokens.count(), done.reply_ok);
   return 1;
 }

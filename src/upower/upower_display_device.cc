@@ -24,13 +24,31 @@ UPowerDisplayDevice::UPowerDisplayDevice(sdbus::IConnection& connection,
                       objectPath),
       object_path_(objectPath) {
   registerProxy();
-  try {
-    const auto properties = this->GetAll("org.freedesktop.UPower.Device");
-    UPowerDisplayDevice::onPropertiesChanged(
-        sdbus::InterfaceName("org.freedesktop.UPower.Device"), properties, {});
-  } catch (const sdbus::Error& e) {
-    LOG_ERROR("UPowerDisplayDevice::UPowerDisplayDevice: {}", e.what());
-  }
+  // Fetch properties asynchronously so construction never blocks the loop on a
+  // D-Bus round-trip. A pending call is cancelled by unregisterProxy() if this
+  // object is destroyed before the reply arrives.
+  GetAllAsync(
+      sdbus::InterfaceName("org.freedesktop.UPower.Device"),
+      // sdbus requires the error argument by value (function_traits).
+      // NOLINTNEXTLINE(performance-unnecessary-value-param)
+      [this](std::optional<sdbus::Error> error,
+             const std::map<sdbus::PropertyName, sdbus::Variant>& properties) {
+        if (error) {
+          LOG_ERROR("UPowerDisplayDevice GetAll failed: {} - {}",
+                    error->getName(), error->getMessage());
+          return;
+        }
+        // A property whose runtime type differs from the expected one makes
+        // Variant::get<T>() throw; contain it so it can't escape the reply slot
+        // (the pre-async code wrapped GetAll in the same guard).
+        try {
+          onPropertiesChanged(
+              sdbus::InterfaceName("org.freedesktop.UPower.Device"), properties,
+              {});
+        } catch (const sdbus::Error& e) {
+          LOG_ERROR("UPowerDisplayDevice property parse failed: {}", e.what());
+        }
+      });
 }
 
 UPowerDisplayDevice::~UPowerDisplayDevice() {

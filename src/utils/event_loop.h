@@ -16,6 +16,7 @@
 #define SRC_UTILS_EVENT_LOOP_H
 
 #include <atomic>
+#include <memory>
 #include <vector>
 
 #include <poll.h>
@@ -73,6 +74,13 @@ class EventLoop {
   /// dispatch() — reset it after the next iteration (or after run() returns).
   void remove(EventSource* source);
 
+  /// Unregister a source and take ownership of destroying it at a safe point
+  /// (after the current dispatch pass completes). Use this to drop a source
+  /// from within a callback — e.g. a udev "remove" handler retiring the reader
+  /// for the device that just went away — without risking a use-after-free on
+  /// a source whose fd is still in the poll set for the current iteration.
+  void retire(std::unique_ptr<EventSource> source);
+
   /// Drive `bus` and every registered source until stop() is called or an
   /// unrecoverable error occurs. Returns the code passed to stop() (0 on a
   /// clean external stop, non-zero on internal error).
@@ -94,6 +102,9 @@ class EventLoop {
   std::vector<EventSource*> sources_;
   std::vector<EventSource*> to_add_;
   std::vector<EventSource*> to_remove_;
+  // Sources awaiting destruction; kept alive until the next apply_pending() so
+  // a source retired mid-dispatch outlives the current poll iteration.
+  std::vector<std::unique_ptr<EventSource>> to_retire_;
 };
 
 #endif  // SRC_UTILS_EVENT_LOOP_H

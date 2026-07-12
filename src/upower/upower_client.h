@@ -35,13 +35,49 @@ class UPowerClient final
                         sdbus::ObjectPath("/org/freedesktop/UPower")},
         device_filter_(std::move(device_filter)) {
     registerProxy();
-    const auto properties = this->GetAll(UPower_proxy::INTERFACE_NAME);
-    UPowerClient::onPropertiesChanged(
-        sdbus::InterfaceName(UPower_proxy::INTERFACE_NAME), properties, {});
-    for (const auto devices = EnumerateDevices();
-         const auto& device : devices) {
-      UPowerClient::onDeviceAdded(device);
-    }
+    // Fetch properties and enumerate devices asynchronously so construction
+    // never blocks the caller's event loop on a D-Bus round-trip. The replies
+    // are delivered on whichever loop drives this connection; pending calls are
+    // cancelled by unregisterProxy() if this object is destroyed first.
+    GetAllAsync(
+        sdbus::InterfaceName(UPower_proxy::INTERFACE_NAME),
+        // sdbus requires the error argument by value (function_traits).
+        // NOLINTNEXTLINE(performance-unnecessary-value-param)
+        [this](
+            std::optional<sdbus::Error> error,
+            const std::map<sdbus::PropertyName, sdbus::Variant>& properties) {
+          if (error) {
+            LOG_ERROR("UPower GetAll failed: {} - {}", error->getName(),
+                      error->getMessage());
+            return;
+          }
+          // A property whose runtime type differs from the expected one makes
+          // Variant::get<T>() throw; contain it so it can't escape the reply
+          // slot (the pre-async code wrapped GetAll in the same guard).
+          try {
+            onPropertiesChanged(
+                sdbus::InterfaceName(UPower_proxy::INTERFACE_NAME), properties,
+                {});
+          } catch (const sdbus::Error& e) {
+            LOG_ERROR("UPower property parse failed: {}", e.what());
+          }
+        });
+    getProxy()
+        .callMethodAsync("EnumerateDevices")
+        .onInterface(UPower_proxy::INTERFACE_NAME)
+        // sdbus requires the error argument by value (function_traits).
+        // NOLINTNEXTLINE(performance-unnecessary-value-param)
+        .uponReplyInvoke([this](std::optional<sdbus::Error> error,
+                                const std::vector<sdbus::ObjectPath>& devices) {
+          if (error) {
+            LOG_ERROR("UPower EnumerateDevices failed: {} - {}",
+                      error->getName(), error->getMessage());
+            return;
+          }
+          for (const auto& device : devices) {
+            onDeviceAdded(device);
+          }
+        });
   }
 
   virtual ~UPowerClient() {

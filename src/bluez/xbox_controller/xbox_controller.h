@@ -32,7 +32,7 @@ class XboxController final
       public Hidraw,
       public UdevMonitor {
  public:
-  explicit XboxController(sdbus::IConnection& connection);
+  XboxController(sdbus::IConnection& connection, EventLoop& loop);
 
   ~XboxController() override;
 
@@ -55,6 +55,10 @@ class XboxController final
   std::map<sdbus::ObjectPath, std::unique_ptr<Input1>> input1_;
   std::map<std::string, std::unique_ptr<UPowerClient>> upower_clients_;
   std::unique_ptr<InputReader> input_reader_;
+
+  // The loop that polls the InputReader source; used to add it on device
+  // arrival and retire it on removal.
+  EventLoop& loop_;
 
   void onInterfacesAdded(
       const sdbus::ObjectPath& objectPath,
