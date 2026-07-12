@@ -10,9 +10,6 @@ target_link_libraries(flatpak_system_helper_client
         sdbus-c++
         spdlog::spdlog
 )
-if (ENABLE_LTO AND IPO_SUPPORT_RESULT)
-    set_property(TARGET flatpak_system_helper_client PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
-endif ()
 
 install(TARGETS flatpak_system_helper_client
         RUNTIME DESTINATION share/sdbus-cpp-examples)

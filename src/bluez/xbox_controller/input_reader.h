@@ -18,7 +18,7 @@
 #include <atomic>
 #include <thread>
 
-#include "../hidraw.hpp"
+#include "../../utils/unique_fd.h"
 #include "xbox_controller_02fd.h"
 
 class InputReader {

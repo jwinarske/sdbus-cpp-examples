@@ -10,9 +10,6 @@ target_link_libraries(udisks2_client
         sdbus-c++
         spdlog::spdlog
 )
-if (ENABLE_LTO AND IPO_SUPPORT_RESULT)
-    set_property(TARGET udisks2_client PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
-endif ()
 
 install(TARGETS udisks2_client
         RUNTIME DESTINATION share/sdbus-cpp-examples)
@@ -27,9 +24,6 @@ target_link_libraries(udisks2_monitor_daemon
         sdbus-c++
         spdlog::spdlog
 )
-if (ENABLE_LTO AND IPO_SUPPORT_RESULT)
-    set_property(TARGET udisks2_monitor_daemon PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
-endif ()
 
 install(TARGETS udisks2_monitor_daemon
         RUNTIME DESTINATION share/sdbus-cpp-examples)

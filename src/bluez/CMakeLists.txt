@@ -10,9 +10,6 @@ target_link_libraries(bluez_client
         sdbus-c++
         spdlog::spdlog
 )
-if (ENABLE_LTO AND IPO_SUPPORT_RESULT)
-    set_property(TARGET bluez_client PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
-endif ()
 
 install(TARGETS bluez_client
         RUNTIME DESTINATION share/sdbus-cpp-examples)

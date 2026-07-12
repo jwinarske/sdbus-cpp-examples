@@ -18,7 +18,7 @@
 #include <atomic>
 #include <thread>
 
-#include "../hidraw.hpp"
+#include "../../utils/unique_fd.h"
 #include "horipad_stream_01ab_0196.h"
 
 class InputReader {

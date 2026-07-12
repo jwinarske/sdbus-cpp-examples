@@ -150,4 +150,12 @@ clang-analyzer-security.*,
 cppcoreguidelines-pro-bounds-*,
 cppcoreguidelines-pro-type-reinterpret-cast'
 
+# Promote all enabled checks to errors so a local `clang-tidy` run fails the
+# same way CI does (CI passes -warnings-as-errors='*' on the command line).
+WarningsAsErrors: '*'
+
+# Lint this project's own headers, but not third-party submodules or the
+# generated proxy headers under src/proxy/.
+HeaderFilterRegex: '^(?!.*(third_party|/proxy/)).*$'
+
 

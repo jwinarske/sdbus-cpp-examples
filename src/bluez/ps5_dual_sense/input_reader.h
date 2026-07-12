@@ -19,7 +19,7 @@
 #include <atomic>
 #include <thread>
 
-#include "../hidraw.hpp"
+#include "../../utils/unique_fd.h"
 #include "dual_sense_0ce6.h"
 
 class InputReader {

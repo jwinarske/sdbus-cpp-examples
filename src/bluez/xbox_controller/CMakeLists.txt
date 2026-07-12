@@ -17,9 +17,6 @@ target_link_libraries(xbox_controller_client
         spdlog::spdlog
         PkgConfig::UDEV
 )
-if (ENABLE_LTO AND IPO_SUPPORT_RESULT)
-    set_property(TARGET xbox_controller_client PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
-endif ()
 
 install(TARGETS xbox_controller_client
         RUNTIME DESTINATION share/sdbus-cpp-examples)
