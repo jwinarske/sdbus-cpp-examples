@@ -44,7 +44,6 @@ DualSense::DualSense(sdbus::IConnection& connection)
                               sub_system ? sub_system : "");
                     if (std::strcmp(sub_system, "hidraw") == 0) {
                       if (std::strcmp(action, "remove") == 0) {
-                        std::scoped_lock reader_lock(input_reader_mutex_);
                         if (input_reader_) {
                           input_reader_->stop();
                           input_reader_.reset();
@@ -66,7 +65,6 @@ DualSense::DualSense(sdbus::IConnection& connection)
 }
 
 DualSense::~DualSense() {
-  stop();
   unregisterProxy();
 }
 
@@ -81,7 +79,6 @@ void DualSense::onInterfacesAdded(
       continue;
     }
     if (interface == org::bluez::Adapter1_proxy::INTERFACE_NAME) {
-      std::scoped_lock lock(adapters_mutex_);
       if (!adapters_.contains(objectPath)) {
         if (resource_limits::IsAtCapacity(adapters_.size(),
                                           resource_limits::kMaxAdapters)) {
@@ -120,7 +117,6 @@ void DualSense::onInterfacesAdded(
       std::string power_path_to_add;
       std::string hidraw_device_key;
       {
-        std::scoped_lock lock(devices_mutex_);
         if (devices_.contains(objectPath)) {
           continue;
         }
@@ -158,7 +154,6 @@ void DualSense::onInterfacesAdded(
         if (const std::string hidraw_device = FindHidDevice(hidraw_device_key);
             !hidraw_device.empty()) {
           LOG_INFO("Adding hidraw device: {}", hidraw_device_key);
-          std::scoped_lock reader_lock(input_reader_mutex_);
           if (!input_reader_) {
             input_reader_ = std::make_unique<InputReader>(hidraw_device);
             input_reader_->start();
@@ -166,10 +161,7 @@ void DualSense::onInterfacesAdded(
         }
       }
 
-      // Avoid nested locking with devices_mutex_ +
-      // upower_display_devices_mutex_.
       if (!power_path_to_add.empty()) {
-        std::scoped_lock power_lock(upower_display_devices_mutex_);
         if (!upower_clients_.contains(power_path_to_add)) {
           if (resource_limits::IsAtCapacity(
                   upower_clients_.size(), resource_limits::kMaxUPowerClients)) {
@@ -185,7 +177,6 @@ void DualSense::onInterfacesAdded(
         }
       }
     } else if (interface == org::bluez::Input1_proxy::INTERFACE_NAME) {
-      std::lock_guard lock(input1_mutex_);
       if (!input1_.contains(objectPath)) {
         if (resource_limits::IsAtCapacity(input1_.size(),
                                           resource_limits::kMaxInputEntries)) {
@@ -208,7 +199,6 @@ void DualSense::onInterfacesRemoved(
     const std::vector<sdbus::InterfaceName>& interfaces) {
   for (const auto& interface : interfaces) {
     if (interface == org::bluez::Adapter1_proxy::INTERFACE_NAME) {
-      std::scoped_lock lock(adapters_mutex_);
       if (adapters_.contains(objectPath)) {
         adapters_[objectPath].reset();
         adapters_.erase(objectPath);
@@ -216,7 +206,6 @@ void DualSense::onInterfacesRemoved(
     } else if (interface == org::bluez::Device1_proxy::INTERFACE_NAME) {
       std::string power_path_to_remove;
       {
-        std::scoped_lock devices_lock(devices_mutex_);
         if (devices_.contains(objectPath)) {
           auto& device = devices_[objectPath];
           if (auto props = device->GetProperties();
@@ -233,7 +222,6 @@ void DualSense::onInterfacesRemoved(
       }
 
       if (!power_path_to_remove.empty()) {
-        std::scoped_lock power_lock(upower_display_devices_mutex_);
         if (upower_clients_.contains(power_path_to_remove)) {
           LOG_INFO("[Remove] UPower Display Device: {}", power_path_to_remove);
           auto& power_device = upower_clients_[power_path_to_remove];
@@ -242,7 +230,6 @@ void DualSense::onInterfacesRemoved(
         }
       }
     } else if (interface == org::bluez::Input1_proxy::INTERFACE_NAME) {
-      std::lock_guard lock(input1_mutex_);
       if (input1_.contains(objectPath)) {
         input1_[objectPath].reset();
         input1_.erase(objectPath);
