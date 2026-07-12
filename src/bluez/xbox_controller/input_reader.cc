@@ -42,9 +42,8 @@ void InputReader::open_and_init() {
 
   // Raw Info
   hidraw_devinfo raw_dev_info{};
-  if (const auto res = ioctl(fd.get(), HIDIOCGRAWINFO, &raw_dev_info);
-      res < 0) {
-    LOG_ERROR("HIDIOCGRAWINFO");
+  if (auto r = sys::ioctl(fd.get(), HIDIOCGRAWINFO, &raw_dev_info); !r) {
+    LOG_ERROR("HIDIOCGRAWINFO failed: {}", r.error().message());
     return;
   }
   product_ = raw_dev_info.product;
@@ -54,18 +53,18 @@ void InputReader::open_and_init() {
 
   // Raw Name
   std::array<char, 256> buf{};
-  auto res = ioctl(fd.get(), HIDIOCGRAWNAME(buf.size()), buf.data());
-  if (res < 0) {
-    LOG_ERROR("HIDIOCGRAWNAME");
+  if (auto r = sys::ioctl(fd.get(), HIDIOCGRAWNAME(buf.size()), buf.data());
+      !r) {
+    LOG_ERROR("HIDIOCGRAWNAME failed: {}", r.error().message());
     return;
   }
   buf.back() = '\0';  // guarantee null-termination
   LOG_INFO("HID Name: {}", buf.data());
 
   // Raw Physical Location
-  res = ioctl(fd.get(), HIDIOCGRAWPHYS(buf.size()), buf.data());
-  if (res < 0) {
-    LOG_ERROR("HIDIOCGRAWPHYS");
+  if (auto r = sys::ioctl(fd.get(), HIDIOCGRAWPHYS(buf.size()), buf.data());
+      !r) {
+    LOG_ERROR("HIDIOCGRAWPHYS failed: {}", r.error().message());
     return;
   }
   buf.back() = '\0';  // guarantee null-termination
@@ -73,9 +72,8 @@ void InputReader::open_and_init() {
 
   // Report Descriptor Size
   int desc_size = 0;
-  res = ioctl(fd.get(), HIDIOCGRDESCSIZE, &desc_size);
-  if (res < 0) {
-    LOG_ERROR("HIDIOCGRDESCSIZE");
+  if (auto r = sys::ioctl(fd.get(), HIDIOCGRDESCSIZE, &desc_size); !r) {
+    LOG_ERROR("HIDIOCGRDESCSIZE failed: {}", r.error().message());
     return;
   }
   LOG_INFO("Report Descriptor Size: {}", desc_size);
@@ -89,9 +87,8 @@ void InputReader::open_and_init() {
   // Report Descriptor
   hidraw_report_descriptor rpt_desc{};
   rpt_desc.size = desc_size;
-  res = ioctl(fd.get(), HIDIOCGRDESC, &rpt_desc);
-  if (res < 0) {
-    LOG_ERROR("HIDIOCGRDESC");
+  if (auto r = sys::ioctl(fd.get(), HIDIOCGRDESC, &rpt_desc); !r) {
+    LOG_ERROR("HIDIOCGRDESC failed: {}", r.error().message());
     return;
   }
 

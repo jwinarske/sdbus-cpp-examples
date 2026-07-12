@@ -19,6 +19,7 @@
 
 #include <fcntl.h>
 #include <sys/eventfd.h>
+#include <sys/ioctl.h>
 #include <sys/timerfd.h>
 
 #include "logging.h"
@@ -56,6 +57,16 @@ int main() {
         "make_eventfd yields a valid fd");
   check(sys::make_timerfd(CLOCK_MONOTONIC, TFD_CLOEXEC).has_value(),
         "make_timerfd yields a valid fd");
+
+  // ioctl failure: a terminal ioctl on a non-tty fd reports ENOTTY.
+  if (auto efd = sys::make_eventfd(0, EFD_CLOEXEC)) {
+    winsize ws{};
+    auto r = sys::ioctl(efd->get(), TIOCGWINSZ, &ws);
+    check(!r && r.error() == std::errc::inappropriate_io_control_operation,
+          "ioctl on non-tty reports ENOTTY");
+  } else {
+    check(false, "make_eventfd for the ioctl test failed");
+  }
 
   if (failures == 0) {
     LOG_INFO("sys test: PASS");
