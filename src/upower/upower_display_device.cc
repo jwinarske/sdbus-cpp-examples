@@ -38,9 +38,16 @@ UPowerDisplayDevice::UPowerDisplayDevice(sdbus::IConnection& connection,
                     error->getName(), error->getMessage());
           return;
         }
-        onPropertiesChanged(
-            sdbus::InterfaceName("org.freedesktop.UPower.Device"), properties,
-            {});
+        // A property whose runtime type differs from the expected one makes
+        // Variant::get<T>() throw; contain it so it can't escape the reply slot
+        // (the pre-async code wrapped GetAll in the same guard).
+        try {
+          onPropertiesChanged(
+              sdbus::InterfaceName("org.freedesktop.UPower.Device"), properties,
+              {});
+        } catch (const sdbus::Error& e) {
+          LOG_ERROR("UPowerDisplayDevice property parse failed: {}", e.what());
+        }
       });
 }
 

@@ -120,27 +120,28 @@ void InputReader::dispatch(const short revents) {
   if (result == 0) {
     return;
   }
+  const auto bytes_read = static_cast<size_t>(result);
 
   if (product_ == 0x01ab || product_ == 0x0196) {
     if (const auto report_id = buffer.at(0); report_id == 7) {
       inputReport07_t input_report07{};
       std::memcpy(&input_report07, buffer.data(),
-                  std::min(sizeof(inputReport07_t), buffer.size()));
+                  std::min(sizeof(inputReport07_t), bytes_read));
       PrintInputReport7(input_report07);
     } else if (report_id == 10) {
       inputReport10_t input_report10{};
       std::memcpy(&input_report10, buffer.data(),
-                  std::min(sizeof(inputReport10_t), buffer.size()));
+                  std::min(sizeof(inputReport10_t), bytes_read));
       PrintInputReport10(input_report10);
     } else if (report_id == 12) {
       inputReport12_t input_report12{};
       std::memcpy(&input_report12, buffer.data(),
-                  std::min(sizeof(inputReport12_t), buffer.size()));
+                  std::min(sizeof(inputReport12_t), bytes_read));
       PrintInputReport12(input_report12);
     } else if (report_id == 14) {
       inputReport14_t input_report14{};
       std::memcpy(&input_report14, buffer.data(),
-                  std::min(sizeof(inputReport14_t), buffer.size()));
+                  std::min(sizeof(inputReport14_t), bytes_read));
       PrintInputReport14(input_report14);
     } else {
       LOG_ERROR("Unknown report id: {}", report_id);

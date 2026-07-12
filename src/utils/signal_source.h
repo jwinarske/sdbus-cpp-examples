@@ -47,7 +47,13 @@ class SignalSource final : public EventSource {
     }
     fd_ = UniqueFd(::signalfd(-1, &mask_, SFD_CLOEXEC | SFD_NONBLOCK));
     if (!fd_.valid()) {
-      LOG_ERROR("SignalSource: signalfd failed: {}", strerror(errno));
+      LOG_ERROR(
+          "SignalSource: signalfd failed: {}; restoring default signal "
+          "disposition",
+          strerror(errno));
+      // Undo the block, otherwise the signals stay blocked with no consumer and
+      // the process can no longer be stopped via SIGINT/SIGTERM.
+      sigprocmask(SIG_UNBLOCK, &mask_, nullptr);
     }
   }
 

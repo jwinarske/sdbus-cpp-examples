@@ -51,9 +51,16 @@ class UPowerClient final
                       error->getMessage());
             return;
           }
-          onPropertiesChanged(
-              sdbus::InterfaceName(UPower_proxy::INTERFACE_NAME), properties,
-              {});
+          // A property whose runtime type differs from the expected one makes
+          // Variant::get<T>() throw; contain it so it can't escape the reply
+          // slot (the pre-async code wrapped GetAll in the same guard).
+          try {
+            onPropertiesChanged(
+                sdbus::InterfaceName(UPower_proxy::INTERFACE_NAME), properties,
+                {});
+          } catch (const sdbus::Error& e) {
+            LOG_ERROR("UPower property parse failed: {}", e.what());
+          }
         });
     getProxy()
         .callMethodAsync("EnumerateDevices")

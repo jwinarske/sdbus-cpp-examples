@@ -66,8 +66,10 @@ void EventLoop::retire(std::unique_ptr<EventSource> source) {
 }
 
 void EventLoop::stop(const int exit_code) noexcept {
+  // release/acquire so run() observes exit_code_ once it sees running_ == false
+  // (independently of the eventfd/poll barriers).
   exit_code_.store(exit_code, std::memory_order_relaxed);
-  running_.store(false, std::memory_order_relaxed);
+  running_.store(false, std::memory_order_release);
   wake();  // write() is async-signal-safe
 }
 
@@ -75,25 +77,31 @@ void EventLoop::apply_pending() {
   for (auto* source : to_remove_) {
     std::erase(sources_, source);
   }
-  to_remove_.clear();
-  // Now that any retired sources are out of sources_ and the previous poll set
-  // is gone, it is safe to destroy them.
-  to_retire_.clear();
 
   for (auto* source : to_add_) {
+    // Skip a source that is also being removed/retired this round: added and
+    // retired within the same iteration, its object is about to be destroyed
+    // by the to_retire_ clear below, so re-inserting its pointer would dangle.
+    if (std::ranges::find(to_remove_, source) != to_remove_.end()) {
+      continue;
+    }
     if (std::ranges::find(sources_, source) == sources_.end()) {
       sources_.push_back(source);
     }
   }
   to_add_.clear();
+  to_remove_.clear();
+  // Now that any retired sources are out of sources_ and cannot be re-added, it
+  // is safe to destroy them.
+  to_retire_.clear();
 }
 
 int EventLoop::run(sdbus::IConnection& bus) {
   running_.store(true, std::memory_order_relaxed);
 
-  while (running_.load(std::memory_order_relaxed)) {
+  while (running_.load(std::memory_order_acquire)) {
     apply_pending();
-    if (!running_.load(std::memory_order_relaxed)) {
+    if (!running_.load(std::memory_order_acquire)) {
       break;
     }
 
@@ -158,12 +166,20 @@ int EventLoop::run(sdbus::IConnection& bus) {
     // of the loop), so indexing the snapshot built above stays valid even if a
     // dispatch() calls add()/remove().
     for (std::size_t i = 0; i < sources_.size(); ++i) {
-      if (const short revents = pfds[first_source_idx + i].revents;
-          revents != 0) {
-        sources_[i]->dispatch(revents);
+      const short revents = pfds[first_source_idx + i].revents;
+      if (revents == 0) {
+        continue;
+      }
+      sources_[i]->dispatch(revents);
+      // poll() reports POLLHUP/POLLERR level-triggered and unmaskable, so a
+      // hung-up or errored fd stays "ready" every iteration. Stop polling it
+      // (deferred to the next apply_pending()) so it can't spin the loop while
+      // its owner tears the source down.
+      if ((revents & (POLLHUP | POLLERR)) != 0) {
+        remove(sources_[i]);
       }
     }
   }
 
-  return exit_code_.load(std::memory_order_relaxed);
+  return exit_code_.load(std::memory_order_acquire);
 }

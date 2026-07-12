@@ -18,13 +18,15 @@
 
 int main() {
   try {
-    const auto connection = sdbus::createSystemBusConnection();
-
     // Single-threaded loop: it drives the D-Bus connection, the udev monitor,
-    // and signal delivery, so every callback runs on this thread.
+    // and signal delivery, so every callback runs on this thread. Construct the
+    // SignalSource first so SIGINT/SIGTERM are blocked before any thread is
+    // started and can only be delivered via the loop's signalfd.
     EventLoop loop;
     SignalSource signals(loop);
     loop.add(&signals);
+
+    const auto connection = sdbus::createSystemBusConnection();
 
     XboxController client(*connection, loop);
     loop.add(&client);  // XboxController is a UdevMonitor (an EventSource)
