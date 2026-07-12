@@ -7,6 +7,7 @@
 #include <algorithm>
 
 #include "../utils/logging.h"
+#include "../utils/resource_limits.h"
 
 Systemd1ManagerClient::Systemd1ManagerClient(sdbus::IConnection& connection)
     : ProxyInterfaces{connection, sdbus::ServiceName(SERVICE_NAME),
@@ -43,7 +44,17 @@ void Systemd1ManagerClient::onPropertiesChanged(
 
 void Systemd1ManagerClient::onUnitNew(const std::string& id,
                                       const sdbus::ObjectPath& unit) {
-  activeUnits_.push_back(id);
+  // systemd emits UnitNew for thousands of units and re-emits them over a long
+  // run; de-duplicate and cap growth so activeUnits_ cannot grow unbounded.
+  if (std::ranges::find(activeUnits_, id) == activeUnits_.end()) {
+    if (resource_limits::IsAtCapacity(activeUnits_.size(),
+                                      resource_limits::kMaxUnits)) {
+      LOG_WARN("[systemd1] Skipping UnitNew id={}: resource limit reached ({})",
+               id, resource_limits::kMaxUnits);
+    } else {
+      activeUnits_.push_back(id);
+    }
+  }
   LOG_INFO("[systemd1] UnitNew id={} path={}", id,
            static_cast<std::string>(unit));
 }

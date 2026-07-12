@@ -12,14 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <algorithm>
 #include <array>
 #include <atomic>
-#include <bit>
 #include <cstring>
 #include <thread>
 
 #include <fcntl.h>
 #include <sys/epoll.h>
+#include <sys/eventfd.h>
 #include <unistd.h>
 
 #include "../../utils/logging.h"
@@ -27,25 +28,43 @@
 #include "input_reader.h"
 
 InputReader::InputReader(std::string device)
-    : device_(std::move(device)), stop_flag_(false) {}
+    : device_(std::move(device)),
+      stop_flag_(false),
+      stop_event_fd_(::eventfd(0, EFD_CLOEXEC | EFD_NONBLOCK)) {
+  if (!stop_event_fd_.valid()) {
+    LOG_ERROR("Failed to create eventfd: {}", strerror(errno));
+  }
+}
 
 void InputReader::start() {
   LOG_DEBUG("InputReader start: {}", device_);
+  if (thread_.joinable()) {
+    return;  // already running
+  }
   stop_flag_ = false;
-  read_input();
+  thread_ = std::thread([this] { read_input(); });
 }
 
 void InputReader::stop() {
   LOG_DEBUG("InputReader stop: {}", device_);
   stop_flag_ = true;
+  // Wake the blocking epoll_wait so the loop observes stop_flag_ immediately.
+  if (stop_event_fd_.valid()) {
+    constexpr std::uint64_t one = 1;
+    if (::write(stop_event_fd_.get(), &one, sizeof(one)) < 0) {
+      LOG_ERROR("Failed to signal stop eventfd: {}", strerror(errno));
+    }
+  }
 }
 
 InputReader::~InputReader() {
   stop();
+  if (thread_.joinable()) {
+    thread_.join();
+  }
 }
 
-// NOLINTNEXTLINE(readability-static-accessed-through-instance)
-InputReader::Task InputReader::read_input() {
+void InputReader::read_input() {
   LOG_DEBUG("hidraw device: {}", device_);
 
   const UniqueFd fd(open(device_.c_str(), O_RDWR));
@@ -115,26 +134,87 @@ InputReader::Task InputReader::read_input() {
     os << CustomHexdump<400, false>(std::data(rpt_desc.value), rpt_desc.size);
     LOG_INFO(os.str());
 
-    while (!stop_flag_) {
-      std::array<std::uint8_t, sizeof(inputReport01_t)> buffer{};
-      ssize_t result = 0;
-      if (result = read(fd.get(), buffer.data(), buffer.size()); result < 0) {
-        LOG_ERROR("GetInputReport4 failed: {}", strerror(errno));
+    // Wait on both the hidraw fd and the stop eventfd so a blocking read can
+    // be interrupted immediately when stop() is called from another thread.
+    const UniqueFd epoll_fd(epoll_create1(EPOLL_CLOEXEC));
+    if (!epoll_fd.valid()) {
+      LOG_ERROR("epoll_create1 failed: {}", strerror(errno));
+      break;
+    }
+    epoll_event ev{};
+    ev.events = EPOLLIN;
+    ev.data.fd = fd.get();
+    if (epoll_ctl(epoll_fd.get(), EPOLL_CTL_ADD, fd.get(), &ev) == -1) {
+      LOG_ERROR("epoll_ctl(hidraw) failed: {}", strerror(errno));
+      break;
+    }
+    if (stop_event_fd_.valid()) {
+      ev.data.fd = stop_event_fd_.get();
+      if (epoll_ctl(epoll_fd.get(), EPOLL_CTL_ADD, stop_event_fd_.get(), &ev) ==
+          -1) {
+        LOG_ERROR("epoll_ctl(stop) failed: {}", strerror(errno));
         break;
       }
+    }
+
+    while (!stop_flag_) {
+      std::array<epoll_event, 2> events{};
+      const int nfds =
+          epoll_wait(epoll_fd.get(), events.data(), events.size(), -1);
+      if (nfds == -1) {
+        if (errno == EINTR) {
+          continue;
+        }
+        LOG_ERROR("epoll_wait failed: {}", strerror(errno));
+        break;
+      }
+
+      bool stop_requested = false;
+      bool data_ready = false;
+      for (int i = 0; i < nfds; ++i) {
+        if (stop_event_fd_.valid() &&
+            events.at(i).data.fd == stop_event_fd_.get()) {
+          stop_requested = true;
+        } else if (events.at(i).data.fd == fd.get()) {
+          data_ready = true;
+        }
+      }
+      if (stop_requested) {
+        break;
+      }
+      if (!data_ready) {
+        continue;
+      }
+
+      std::array<std::uint8_t, sizeof(inputReport01_t)> buffer{};
+      const ssize_t result = read(fd.get(), buffer.data(), buffer.size());
+      if (result < 0) {
+        if (errno == EINTR || errno == EAGAIN) {
+          continue;
+        }
+        LOG_ERROR("read failed: {}", strerror(errno));
+        break;
+      }
+      if (result == 0) {
+        continue;
+      }
+      const auto bytes_read = static_cast<size_t>(result);
 
       if (raw_dev_info.product == 0x02FD) {
         if (const auto report_id = buffer.at(0); report_id == 1) {
           inputReport01_t input_report01{};
-          std::memcpy(&input_report01, buffer.data(), sizeof(inputReport01_t));
+          std::memcpy(&input_report01, buffer.data(),
+                      std::min(sizeof(inputReport01_t), bytes_read));
           PrintInputReport1(input_report01);
         } else if (report_id == 2) {
           inputReport02_t input_report02{};
-          std::memcpy(&input_report02, buffer.data(), sizeof(inputReport02_t));
+          std::memcpy(&input_report02, buffer.data(),
+                      std::min(sizeof(inputReport02_t), bytes_read));
           PrintInputReport2(input_report02);
         } else if (report_id == 4) {
           inputReport04_t input_report04{};
-          std::memcpy(&input_report04, buffer.data(), sizeof(inputReport04_t));
+          std::memcpy(&input_report04, buffer.data(),
+                      std::min(sizeof(inputReport04_t), bytes_read));
           PrintInputReport4(input_report04);
         } else {
           LOG_ERROR("Unknown report id: {}", report_id);
@@ -144,10 +224,7 @@ InputReader::Task InputReader::read_input() {
     break;
   }
 
-  // fd is automatically closed by UniqueFd destructor
-  stop();
-
-  co_return;  // NOLINT(readability-static-accessed-through-instance)
+  // fd is automatically closed by UniqueFd destructor.
 }
 
 std::string InputReader::dpad_to_string(const Direction dpad) {

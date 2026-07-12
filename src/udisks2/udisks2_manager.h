@@ -38,6 +38,7 @@ class UDisks2Manager final
   static constexpr auto OBJECT_PATH = "/org/freedesktop/UDisks2";
 
   std::unique_ptr<UDisks2ManagerNvme> manager_nvme_;
+  std::mutex manager_nvme_mutex_;
 
   std::map<sdbus::ObjectPath, std::unique_ptr<UDisks2Block>> blocks_;
   std::mutex block_mutex_;

@@ -17,6 +17,7 @@
 
 #include <map>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -62,6 +63,11 @@ class ConnmanManagerClient final
       const std::vector<std::string>& removed) override;
 
  private:
+  // registerProxy() enables signal delivery on the async event-loop thread
+  // while the constructor still populates the maps on the calling thread, and
+  // onTechnology*/onServicesChanged mutate them from the event-loop thread.
+  // Guard all access with this mutex.
+  std::mutex maps_mutex_;
   std::map<sdbus::ObjectPath, std::unique_ptr<ConnmanTechnologyClient>>
       technologies_;
   std::map<sdbus::ObjectPath, std::unique_ptr<ConnmanServiceClient>> services_;

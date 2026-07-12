@@ -41,146 +41,80 @@ void UPowerDisplayDevice::onPropertiesChanged(
     const sdbus::InterfaceName& interfaceName,
     const std::map<sdbus::PropertyName, sdbus::Variant>& changedProperties,
     const std::vector<sdbus::PropertyName>& invalidatedProperties) {
-  if (const auto key = sdbus::MemberName("BatteryLevel");
-      changedProperties.contains(key)) {
-    properties_.battery_level = changedProperties.at(key).get<std::uint32_t>();
-  }
-  if (const auto key = sdbus::MemberName("Capacity");
-      changedProperties.contains(key)) {
-    properties_.capacity = changedProperties.at(key).get<double>();
-  }
-  if (const auto key = sdbus::MemberName("ChargeCycles");
-      changedProperties.contains(key)) {
-    properties_.charge_cycles = changedProperties.at(key).get<int>();
-  }
-  if (const auto key = sdbus::MemberName("ChargeEndThreshold");
-      changedProperties.contains(key)) {
-    properties_.charge_end_threshold =
-        changedProperties.at(key).get<std::uint32_t>();
-  }
-  if (const auto key = sdbus::MemberName("ChargeStartThreshold");
-      changedProperties.contains(key)) {
-    properties_.charge_start_threshold =
-        changedProperties.at(key).get<std::uint32_t>();
-  }
-  if (const auto key = sdbus::MemberName("ChargeThresholdEnabled");
-      changedProperties.contains(key)) {
-    properties_.charge_threshold_enabled =
-        changedProperties.at(key).get<bool>();
-  }
-  if (const auto key = sdbus::MemberName("ChargeThresholdSupported");
-      changedProperties.contains(key)) {
-    properties_.charge_threshold_supported =
-        changedProperties.at(key).get<bool>();
-  }
-  if (const auto key = sdbus::MemberName("Energy");
-      changedProperties.contains(key)) {
-    properties_.energy = changedProperties.at(key).get<double>();
-  }
-  if (const auto key = sdbus::MemberName("EnergyEmpty");
-      changedProperties.contains(key)) {
-    properties_.energy_empty = changedProperties.at(key).get<double>();
-  }
-  if (const auto key = sdbus::MemberName("EnergyFull");
-      changedProperties.contains(key)) {
-    properties_.energy_full = changedProperties.at(key).get<double>();
-  }
-  if (const auto key = sdbus::MemberName("EnergyFullDesign");
-      changedProperties.contains(key)) {
-    properties_.energy_full_design = changedProperties.at(key).get<double>();
-  }
-  if (const auto key = sdbus::MemberName("EnergyRate");
-      changedProperties.contains(key)) {
-    properties_.energy_rate = changedProperties.at(key).get<double>();
-  }
-  if (const auto key = sdbus::MemberName("HasHistory");
-      changedProperties.contains(key)) {
-    properties_.has_history = changedProperties.at(key).get<bool>();
-  }
-  if (const auto key = sdbus::MemberName("HasStatistics");
-      changedProperties.contains(key)) {
-    properties_.has_statistics = changedProperties.at(key).get<bool>();
-  }
-  if (const auto key = sdbus::MemberName("IconName");
-      changedProperties.contains(key)) {
-    properties_.icon_name = changedProperties.at(key).get<std::string>();
-  }
-  if (const auto key = sdbus::MemberName("IsPresent");
-      changedProperties.contains(key)) {
-    properties_.is_present = changedProperties.at(key).get<bool>();
-  }
-  if (const auto key = sdbus::MemberName("IsRechargeable");
-      changedProperties.contains(key)) {
-    properties_.is_rechargeable = changedProperties.at(key).get<bool>();
-  }
-  if (const auto key = sdbus::MemberName("Luminosity");
-      changedProperties.contains(key)) {
-    properties_.luminosity = changedProperties.at(key).get<double>();
-  }
-  if (const auto key = sdbus::MemberName("Model");
-      changedProperties.contains(key)) {
-    properties_.model = changedProperties.at(key).get<std::string>();
-  }
-  if (const auto key = sdbus::MemberName("NativePath");
-      changedProperties.contains(key)) {
-    properties_.native_path = changedProperties.at(key).get<std::string>();
-  }
-  if (const auto key = sdbus::MemberName("Online");
-      changedProperties.contains(key)) {
-    properties_.online = changedProperties.at(key).get<bool>();
-  }
-  if (const auto key = sdbus::MemberName("Percentage");
-      changedProperties.contains(key)) {
-    properties_.percentage = changedProperties.at(key).get<double>();
-  }
-  if (const auto key = sdbus::MemberName("PowerSupply");
-      changedProperties.contains(key)) {
-    properties_.power_supply = changedProperties.at(key).get<bool>();
-  }
-  if (const auto key = sdbus::MemberName("Serial");
-      changedProperties.contains(key)) {
-    properties_.serial = changedProperties.at(key).get<std::string>();
-  }
-  if (const auto key = sdbus::MemberName("State");
-      changedProperties.contains(key)) {
-    properties_.state = changedProperties.at(key).get<std::uint32_t>();
-  }
-  if (const auto key = sdbus::MemberName("Technology");
-      changedProperties.contains(key)) {
-    properties_.technology = changedProperties.at(key).get<std::uint32_t>();
-  }
-  if (const auto key = sdbus::MemberName("Temperature");
-      changedProperties.contains(key)) {
-    properties_.temperature = changedProperties.at(key).get<double>();
-  }
-  if (const auto key = sdbus::MemberName("TimeToEmpty");
-      changedProperties.contains(key)) {
-    properties_.time_to_empty = changedProperties.at(key).get<std::int64_t>();
-  }
-  if (const auto key = sdbus::MemberName("TimeToFull");
-      changedProperties.contains(key)) {
-    properties_.time_to_full = changedProperties.at(key).get<std::int64_t>();
-  }
-  if (const auto key = sdbus::MemberName("Type");
-      changedProperties.contains(key)) {
-    properties_.type = changedProperties.at(key).get<std::uint32_t>();
-  }
-  if (const auto key = sdbus::MemberName("UpdateTime");
-      changedProperties.contains(key)) {
-    properties_.update_time = changedProperties.at(key).get<std::uint64_t>();
-  }
-  if (const auto key = sdbus::MemberName("Vendor");
-      changedProperties.contains(key)) {
-    properties_.vendor = changedProperties.at(key).get<std::string>();
-  }
-  if (const auto key = sdbus::MemberName("Voltage");
-      changedProperties.contains(key)) {
-    properties_.voltage = changedProperties.at(key).get<double>();
-  }
-
-  if (const auto key = sdbus::MemberName("WarningLevel");
-      changedProperties.contains(key)) {
-    properties_.warning_level = changedProperties.at(key).get<std::uint32_t>();
+  // Iterate the changed properties once and dispatch on the key. A
+  // PropertiesChanged signal usually carries only a handful of properties,
+  // so this avoids scanning every known property (and the per-property map
+  // lookup + MemberName allocation) on every signal.
+  for (const auto& [key, value] : changedProperties) {
+    if (key == "BatteryLevel") {
+      properties_.battery_level = value.get<std::uint32_t>();
+    } else if (key == "Capacity") {
+      properties_.capacity = value.get<double>();
+    } else if (key == "ChargeCycles") {
+      properties_.charge_cycles = value.get<int>();
+    } else if (key == "ChargeEndThreshold") {
+      properties_.charge_end_threshold = value.get<std::uint32_t>();
+    } else if (key == "ChargeStartThreshold") {
+      properties_.charge_start_threshold = value.get<std::uint32_t>();
+    } else if (key == "ChargeThresholdEnabled") {
+      properties_.charge_threshold_enabled = value.get<bool>();
+    } else if (key == "ChargeThresholdSupported") {
+      properties_.charge_threshold_supported = value.get<bool>();
+    } else if (key == "Energy") {
+      properties_.energy = value.get<double>();
+    } else if (key == "EnergyEmpty") {
+      properties_.energy_empty = value.get<double>();
+    } else if (key == "EnergyFull") {
+      properties_.energy_full = value.get<double>();
+    } else if (key == "EnergyFullDesign") {
+      properties_.energy_full_design = value.get<double>();
+    } else if (key == "EnergyRate") {
+      properties_.energy_rate = value.get<double>();
+    } else if (key == "HasHistory") {
+      properties_.has_history = value.get<bool>();
+    } else if (key == "HasStatistics") {
+      properties_.has_statistics = value.get<bool>();
+    } else if (key == "IconName") {
+      properties_.icon_name = value.get<std::string>();
+    } else if (key == "IsPresent") {
+      properties_.is_present = value.get<bool>();
+    } else if (key == "IsRechargeable") {
+      properties_.is_rechargeable = value.get<bool>();
+    } else if (key == "Luminosity") {
+      properties_.luminosity = value.get<double>();
+    } else if (key == "Model") {
+      properties_.model = value.get<std::string>();
+    } else if (key == "NativePath") {
+      properties_.native_path = value.get<std::string>();
+    } else if (key == "Online") {
+      properties_.online = value.get<bool>();
+    } else if (key == "Percentage") {
+      properties_.percentage = value.get<double>();
+    } else if (key == "PowerSupply") {
+      properties_.power_supply = value.get<bool>();
+    } else if (key == "Serial") {
+      properties_.serial = value.get<std::string>();
+    } else if (key == "State") {
+      properties_.state = value.get<std::uint32_t>();
+    } else if (key == "Technology") {
+      properties_.technology = value.get<std::uint32_t>();
+    } else if (key == "Temperature") {
+      properties_.temperature = value.get<double>();
+    } else if (key == "TimeToEmpty") {
+      properties_.time_to_empty = value.get<std::int64_t>();
+    } else if (key == "TimeToFull") {
+      properties_.time_to_full = value.get<std::int64_t>();
+    } else if (key == "Type") {
+      properties_.type = value.get<std::uint32_t>();
+    } else if (key == "UpdateTime") {
+      properties_.update_time = value.get<std::uint64_t>();
+    } else if (key == "Vendor") {
+      properties_.vendor = value.get<std::string>();
+    } else if (key == "Voltage") {
+      properties_.voltage = value.get<double>();
+    } else if (key == "WarningLevel") {
+      properties_.warning_level = value.get<std::uint32_t>();
+    }
   }
   Utils::print_changed_properties(interfaceName, changedProperties,
                                   invalidatedProperties);

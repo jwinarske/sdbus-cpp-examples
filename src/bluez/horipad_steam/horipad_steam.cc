@@ -45,6 +45,7 @@ HoripadSteam::HoripadSteam(sdbus::IConnection& connection)
                               sub_system ? sub_system : "");
                     if (std::strcmp(sub_system, "hidraw") == 0) {
                       if (std::strcmp(action, "remove") == 0) {
+                        std::scoped_lock reader_lock(input_reader_mutex_);
                         if (input_reader_) {
                           input_reader_->stop();
                           input_reader_.reset();
@@ -155,6 +156,7 @@ void HoripadSteam::onInterfacesAdded(
         if (const std::string hidraw_device = FindHidDevice(hidraw_device_key);
             !hidraw_device.empty()) {
           LOG_INFO("Adding hidraw device: {}", hidraw_device_key);
+          std::scoped_lock reader_lock(input_reader_mutex_);
           if (!input_reader_) {
             input_reader_ = std::make_unique<InputReader>(hidraw_device);
             input_reader_->start();

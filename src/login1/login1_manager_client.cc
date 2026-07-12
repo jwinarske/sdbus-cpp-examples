@@ -27,27 +27,36 @@ Login1ManagerClient::Login1ManagerClient(sdbus::IConnection& connection)
         if (!error) {
           onPropertiesChanged(
               sdbus::InterfaceName(Manager_proxy::INTERFACE_NAME), values, {});
-          for (const auto seats = this->ListSeats();
-               const auto& value : seats) {
-            // [('seat0', '/org/freedesktop/login1/seat/seat0')]
-            const auto& name = value.get<0>();
-            const auto& path = value.get<1>();
-            onSeatNew(name, path);
-          }
-          for (const auto sessions = this->ListSessions();
-               const auto& value : sessions) {
-            // [('2', 1000, 'joel', 'seat0',
-            // '/org/freedesktop/login1/session/_32')]
-            const auto& user_name = value.get<2>();
-            const auto& path = value.get<4>();
-            onSessionNew(user_name, path);
-          }
-          for (const auto users = this->ListUsers();
-               const auto& value : users) {
-            // [(1000, 'joel', '/org/freedesktop/login1/user/_1000')]
-            auto id = value.get<0>();
-            const auto& path = value.get<2>();
-            onUserNew(id, path);
+          // ListSeats/ListSessions/ListUsers are synchronous D-Bus calls; a
+          // throw here would escape the async reply handler into the event
+          // loop and terminate the process, so contain it.
+          try {
+            for (const auto seats = this->ListSeats();
+                 const auto& value : seats) {
+              // [('seat0', '/org/freedesktop/login1/seat/seat0')]
+              const auto& name = value.get<0>();
+              const auto& path = value.get<1>();
+              onSeatNew(name, path);
+            }
+            for (const auto sessions = this->ListSessions();
+                 const auto& value : sessions) {
+              // [('2', 1000, 'joel', 'seat0',
+              // '/org/freedesktop/login1/session/_32')]
+              const auto& user_name = value.get<2>();
+              const auto& path = value.get<4>();
+              onSessionNew(user_name, path);
+            }
+            for (const auto users = this->ListUsers();
+                 const auto& value : users) {
+              // [(1000, 'joel', '/org/freedesktop/login1/user/_1000')]
+              auto id = value.get<0>();
+              const auto& path = value.get<2>();
+              onUserNew(id, path);
+            }
+          } catch (const sdbus::Error& e) {
+            LOG_ERROR("[{}] enumerate failed: {} - {}",
+                      Manager_proxy::INTERFACE_NAME, e.getName(),
+                      e.getMessage());
           }
         } else
           LOG_ERROR("[{}] {} - {}", Manager_proxy::INTERFACE_NAME,

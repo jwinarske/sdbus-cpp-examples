@@ -18,33 +18,43 @@
 #include "../utils/utils.h"
 
 int main() {
-  const auto connection = sdbus::createSystemBusConnection();
-  connection->enterEventLoopAsync();
+  try {
+    const auto connection = sdbus::createSystemBusConnection();
+    connection->enterEventLoopAsync();
 
-  {
-    PackageKitClient client(*connection);
-    std::promise<std::map<sdbus::PropertyName, sdbus::Variant>> promise;
-    auto future = promise.get_future();
+    {
+      PackageKitClient client(*connection);
+      std::promise<std::map<sdbus::PropertyName, sdbus::Variant>> promise;
+      auto future = promise.get_future();
 
-    client.GetAllAsync(
-        PackageKitClient::INTERFACE_NAME,
-        [&](std::optional<sdbus::Error> error,
-            std::map<sdbus::PropertyName, sdbus::Variant> values) {
-          if (!error) {
-            promise.set_value(std::move(values));
-          } else {
-            promise.set_exception(std::make_exception_ptr(std::move(*error)));
-          }
-        });
+      client.GetAllAsync(
+          PackageKitClient::INTERFACE_NAME,
+          [&](std::optional<sdbus::Error> error,
+              std::map<sdbus::PropertyName, sdbus::Variant> values) {
+            if (!error) {
+              promise.set_value(std::move(values));
+            } else {
+              promise.set_exception(std::make_exception_ptr(std::move(*error)));
+            }
+          });
 
-    const auto properties = future.get();
-    Utils::print_changed_properties(
-        sdbus::InterfaceName(PackageKitClient::INTERFACE_NAME), properties, {});
-    auto state = client.GetDaemonState();
-    LOG_INFO("Daemon {}", state);
+      const auto properties = future.get();
+      Utils::print_changed_properties(
+          sdbus::InterfaceName(PackageKitClient::INTERFACE_NAME), properties,
+          {});
+      auto state = client.GetDaemonState();
+      LOG_INFO("Daemon {}", state);
+    }
+
+    connection->leaveEventLoop();
+
+    return 0;
+
+  } catch (const sdbus::Error& e) {
+    LOG_ERROR("D-Bus error: {} - {}", e.getName(), e.getMessage());
+    return 1;
+  } catch (const std::exception& e) {
+    LOG_ERROR("Exception: {}", e.what());
+    return 1;
   }
-
-  connection->leaveEventLoop();
-
-  return 0;
 }

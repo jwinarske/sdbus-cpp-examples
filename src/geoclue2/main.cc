@@ -38,6 +38,11 @@ int main() {
         });
 
     const auto& client = manager.Client();
+    if (!client) {
+      LOG_ERROR("GeoClue2 did not return a client object; cannot continue");
+      connection->leaveEventLoop();
+      return 1;
+    }
 
     // `desktop id` must be set for Start to work
     client->DesktopId("org.example.geoclue2");

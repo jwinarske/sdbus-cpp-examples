@@ -17,7 +17,7 @@
 
 #include <array>
 #include <atomic>
-#include <coroutine>
+#include <thread>
 
 #include "../hidraw.hpp"
 #include "dual_sense_0ce6.h"
@@ -33,16 +33,6 @@ class InputReader {
   ~InputReader();
 
  private:
-  struct Task {
-    struct promise_type {
-      static Task get_return_object() { return {}; }
-      static std::suspend_never initial_suspend() { return {}; }
-      static std::suspend_never final_suspend() noexcept { return {}; }
-      static void return_void() {}
-      static void unhandled_exception() { std::terminate(); }
-    };
-  };
-
   struct CalibrationData {
     std::int32_t abs_code;
     std::int16_t bias;
@@ -57,12 +47,19 @@ class InputReader {
 
   std::string device_;
   std::atomic<bool> stop_flag_;
+  // eventfd used to interrupt the blocking read loop immediately on stop().
+  UniqueFd stop_event_fd_;
 
   ReportFeatureInMacAll controller_and_host_mac_{};
   ReportFeatureInVersion version_{};
   HardwareCalibrationData hw_cal_data_{};
 
-  Task read_input();
+  // Worker thread that owns the blocking read loop. Joined in the destructor
+  // before any other member is torn down, so the loop can never outlive this
+  // object (no use-after-free) and never blocks the D-Bus/main thread.
+  std::thread thread_;
+
+  void read_input();
 
   static std::string dpad_to_string(Direction dpad);
   static std::string power_state_to_string(PowerState state);

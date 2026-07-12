@@ -49,25 +49,21 @@ class LEAdvertisingManager1 final
       const sdbus::InterfaceName& interfaceName,
       const std::map<sdbus::PropertyName, sdbus::Variant>& changedProperties,
       const std::vector<sdbus::PropertyName>& invalidatedProperties) override {
-    if (const auto key = sdbus::MemberName("ActiveInstances");
-        changedProperties.contains(key)) {
-      properties_.active_instances =
-          changedProperties.at(key).get<std::uint8_t>();
-    }
-    if (const auto key = sdbus::MemberName("SupportedIncludes");
-        changedProperties.contains(key)) {
-      properties_.supported_includes =
-          changedProperties.at(key).get<std::vector<std::string>>();
-    }
-    if (const auto key = sdbus::MemberName("SupportedInstances");
-        changedProperties.contains(key)) {
-      properties_.supported_instances =
-          changedProperties.at(key).get<std::uint8_t>();
-    }
-    if (const auto key = sdbus::MemberName("SupportedSecondaryChannels");
-        changedProperties.contains(key)) {
-      properties_.supported_secondary_channels =
-          changedProperties.at(key).get<std::vector<std::string>>();
+    // Iterate the changed properties once and dispatch on the key. A
+    // PropertiesChanged signal usually carries only a handful of properties,
+    // so this avoids scanning every known property (and the per-property map
+    // lookup + MemberName allocation) on every signal.
+    for (const auto& [key, value] : changedProperties) {
+      if (key == "ActiveInstances") {
+        properties_.active_instances = value.get<std::uint8_t>();
+      } else if (key == "SupportedIncludes") {
+        properties_.supported_includes = value.get<std::vector<std::string>>();
+      } else if (key == "SupportedInstances") {
+        properties_.supported_instances = value.get<std::uint8_t>();
+      } else if (key == "SupportedSecondaryChannels") {
+        properties_.supported_secondary_channels =
+            value.get<std::vector<std::string>>();
+      }
     }
   }
 };

@@ -31,15 +31,17 @@ class GattDescriptor1 final
                   const sdbus::ObjectPath(&objectPath),
                   const std::map<sdbus::MemberName, sdbus::Variant>& properties)
       : ProxyInterfaces{connection, destination, objectPath} {
-    if (const auto key = sdbus::MemberName("Characteristic");
-        properties.contains(key)) {
-      properties_.characteristic = properties.at(key).get<sdbus::ObjectPath>();
-    }
-    if (const auto key = sdbus::MemberName("UUID"); properties.contains(key)) {
-      properties_.uuid = properties.at(key).get<std::string>();
-    }
-    if (const auto key = sdbus::MemberName("Value"); properties.contains(key)) {
-      properties_.value = properties.at(key).get<std::vector<std::uint8_t>>();
+    // Iterate the provided properties once and dispatch on the key. This avoids
+    // scanning every known property (and the per-property map lookup +
+    // MemberName allocation).
+    for (const auto& [key, value] : properties) {
+      if (key == "Characteristic") {
+        properties_.characteristic = value.get<sdbus::ObjectPath>();
+      } else if (key == "UUID") {
+        properties_.uuid = value.get<std::string>();
+      } else if (key == "Value") {
+        properties_.value = value.get<std::vector<std::uint8_t>>();
+      }
     }
   }
 

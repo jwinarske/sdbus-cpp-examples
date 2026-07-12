@@ -62,6 +62,10 @@ class XboxController final
   std::mutex upower_display_devices_mutex_;
   std::map<std::string, std::unique_ptr<UPowerClient>> upower_clients_;
 
+  // Guards input_reader_, which is created/started from onInterfacesAdded
+  // (D-Bus event-loop or main thread) and stopped/reset from the udev monitor
+  // worker thread.
+  std::mutex input_reader_mutex_;
   std::unique_ptr<InputReader> input_reader_;
 
   void onInterfacesAdded(
