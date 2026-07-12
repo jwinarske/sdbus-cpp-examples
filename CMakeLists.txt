@@ -14,6 +14,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 option(ENABLE_LTO "Enable Link Time Optimization" ON)
+option(SDBUS_CPP_EXAMPLES_BUILD_TESTS "Build the test targets" OFF)
+
+if (SDBUS_CPP_EXAMPLES_BUILD_TESTS)
+    enable_testing()
+endif ()
 
 #
 # Toolchain target
