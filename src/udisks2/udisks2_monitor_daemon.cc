@@ -16,24 +16,22 @@
 
 #include <array>
 #include <bit>
-#include <chrono>
 #include <functional>
 #include <iomanip>
 #include <iostream>
 #include <map>
 #include <memory>
 #include <mutex>
-#include <span>
 #include <sstream>
 #include <string>
 #include <string_view>
-#include <thread>
 #include <utility>
 #include <vector>
 
 #include "../proxy/org/freedesktop/UDisks2/Block/block_proxy.h"
+#include "../utils/event_loop.h"
 #include "../utils/logging.h"
-#include "../utils/signal_handler.h"
+#include "../utils/signal_source.h"
 
 // Forward declarations
 class RemovableDeviceMonitor;
@@ -505,30 +503,25 @@ int main() {
     LOG_INFO("This daemon monitors for removable device insertions");
     LOG_INFO("Press Ctrl+C to stop...\n");
 
+    // Single-threaded loop drives the D-Bus connection and signal delivery.
+    // Construct the SignalSource before any thread starts (e.g. spdlog's
+    // flush thread) so SIGINT/SIGTERM are blocked and delivered via the loop.
+    EventLoop loop;
+    SignalSource signals(loop);
+    loop.add(&signals);
+
     // Create the system bus connection
     const auto connection = sdbus::createSystemBusConnection();
-
-    // Enter the event loop asynchronously
-    connection->enterEventLoopAsync();
 
     // Create the monitor with the default callback
     // Users can replace printDeviceInformation with their own lambda
     RemovableDeviceMonitor monitor(*connection, printDeviceInformation);
 
-    // Keep running until interrupted by signal (e.g., Ctrl+C)
-    // The event loop runs in a separate thread handling D-Bus messages
-    // Note: In a production daemon, implement proper signal handling (SIGTERM,
-    // SIGINT) to gracefully shut down and call connection->leaveEventLoop()
-    installSignalHandlers();
-    auto result = monitorLoop(*connection);
-    if (result) {
-      LOG_ERROR("Monitor loop: {}", *result);
-    }
-    connection->leaveEventLoop();
+    const int rc = loop.run(*connection);
+    LOG_INFO("Shutting down...");
+    return rc;
   } catch (const std::exception& e) {
     LOG_ERROR("Fatal error: {}", e.what());
     return 1;
   }
-
-  return 0;
 }

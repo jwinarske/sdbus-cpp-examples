@@ -12,30 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "../utils/signal_handler.h"
+#include "../utils/event_loop.h"
+#include "../utils/signal_source.h"
 #include "networkmanager_client.h"
 
 int main() {
   try {
-    installSignalHandlers();
+    // Single-threaded loop drives the D-Bus connection and signal delivery.
+    // Construct the SignalSource before any thread starts (e.g. spdlog's
+    // flush thread) so SIGINT/SIGTERM are blocked and delivered via the loop.
+    EventLoop loop;
+    SignalSource signals(loop);
+    loop.add(&signals);
 
     const auto connection = sdbus::createSystemBusConnection();
-    connection->enterEventLoopAsync();
 
     NetworkManagerClient client(*connection);
 
     LOG_INFO("NetworkManager monitor daemon running - Press Ctrl+C to exit");
 
-    auto result = monitorLoop(*connection);
-
-    if (result) {
-      LOG_ERROR("Exiting due to: {}", *result);
-    } else {
-      LOG_INFO("Shutting down...");
-    }
-
-    connection->leaveEventLoop();
-    return result ? 1 : 0;
+    const int rc = loop.run(*connection);
+    LOG_INFO("Shutting down...");
+    return rc;
 
   } catch (const sdbus::Error& e) {
     LOG_ERROR("D-Bus error: {} - {}", e.getName(), e.getMessage());
