@@ -17,7 +17,9 @@
 
 #include <array>
 #include <cstdint>
+#include <expected>
 #include <string>
+#include <system_error>
 
 #include "../../utils/event_loop.h"
 #include "../../utils/unique_fd.h"
@@ -68,12 +70,15 @@ class InputReader final : public EventSource {
   static std::string light_brightness_to_string(LightBrightness state);
   static std::string light_fade_animation_to_string(LightFadeAnimation state);
 
-  static int GetControllerMacAll(int fd, ReportFeatureInMacAll& mac_all);
+  [[nodiscard]] static std::expected<void, std::error_code> GetControllerMacAll(
+      int fd,
+      ReportFeatureInMacAll& mac_all);
 
-  static int GetControllerVersion(int fd, ReportFeatureInVersion& version);
+  [[nodiscard]] static std::expected<void, std::error_code>
+  GetControllerVersion(int fd, ReportFeatureInVersion& version);
 
-  static int GetControllerCalibrationData(int fd,
-                                          HardwareCalibrationData& hw_cal_data);
+  [[nodiscard]] static std::expected<void, std::error_code>
+  GetControllerCalibrationData(int fd, HardwareCalibrationData& hw_cal_data);
 
   static void PrintCalibrationData(HardwareCalibrationData const& hw_cal_data);
   static void PrintControllerMacAll(
