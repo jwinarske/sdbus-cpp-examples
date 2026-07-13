@@ -31,11 +31,18 @@ The basics
 
 ## Updating proxy files
 
-Build this project once for artifact `sdbus-c++-xml2cpp`.
+The proxy classes in `src/proxy/` are generated ahead of time from the XML in
+`interfaces/` and committed to the repository. To regenerate them, build the
+`regenerate-proxies` target — it builds the `sdbus-c++-xml2cpp` tool as needed:
 
-    ./generate.sh
+    cmake -B build -GNinja
+    cmake --build build --target regenerate-proxies
 
-If you re-generate interfaces with a different version of sdbus-cpp, likely you will need to make source code changes.
+Regeneration is intentionally not part of the default build (it rewrites tracked
+source files). The interface-to-proxy mapping lives in `cmake/GenerateProxies.cmake`;
+add a new interface by appending a pair there.
+
+If you re-generate against a different version of sdbus-cpp, likely you will need to make source code changes.
 This is the primary reason for using sdbus-cpp as a submodule.
 
 ## Connecting to the system bus of a remote target
