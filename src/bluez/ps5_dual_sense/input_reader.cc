@@ -43,9 +43,8 @@ void InputReader::open_and_init() {
 
   // Raw Info
   hidraw_devinfo raw_dev_info{};
-  if (const auto res = ioctl(fd.get(), HIDIOCGRAWINFO, &raw_dev_info);
-      res < 0) {
-    LOG_ERROR("HIDIOCGRAWINFO");
+  if (auto r = sys::ioctl(fd.get(), HIDIOCGRAWINFO, &raw_dev_info); !r) {
+    LOG_ERROR("HIDIOCGRAWINFO failed: {}", r.error().message());
     return;
   }
   product_ = raw_dev_info.product;
@@ -55,18 +54,18 @@ void InputReader::open_and_init() {
 
   // Raw Name
   std::array<char, 256> buf{};
-  auto res = ioctl(fd.get(), HIDIOCGRAWNAME(buf.size()), buf.data());
-  if (res < 0) {
-    LOG_ERROR("HIDIOCGRAWNAME");
+  if (auto r = sys::ioctl(fd.get(), HIDIOCGRAWNAME(buf.size()), buf.data());
+      !r) {
+    LOG_ERROR("HIDIOCGRAWNAME failed: {}", r.error().message());
     return;
   }
   buf.back() = '\0';  // guarantee null-termination
   LOG_INFO("HID Name: {}", buf.data());
 
   // Raw Physical Location
-  res = ioctl(fd.get(), HIDIOCGRAWPHYS(buf.size()), buf.data());
-  if (res < 0) {
-    LOG_ERROR("HIDIOCGRAWPHYS");
+  if (auto r = sys::ioctl(fd.get(), HIDIOCGRAWPHYS(buf.size()), buf.data());
+      !r) {
+    LOG_ERROR("HIDIOCGRAWPHYS failed: {}", r.error().message());
     return;
   }
   buf.back() = '\0';  // guarantee null-termination
@@ -74,9 +73,8 @@ void InputReader::open_and_init() {
 
   // Report Descriptor Size
   int desc_size = 0;
-  res = ioctl(fd.get(), HIDIOCGRDESCSIZE, &desc_size);
-  if (res < 0) {
-    LOG_ERROR("HIDIOCGRDESCSIZE");
+  if (auto r = sys::ioctl(fd.get(), HIDIOCGRDESCSIZE, &desc_size); !r) {
+    LOG_ERROR("HIDIOCGRDESCSIZE failed: {}", r.error().message());
     return;
   }
   LOG_INFO("Report Descriptor Size: {}", desc_size);
@@ -90,9 +88,8 @@ void InputReader::open_and_init() {
   // Report Descriptor
   hidraw_report_descriptor rpt_desc{};
   rpt_desc.size = desc_size;
-  res = ioctl(fd.get(), HIDIOCGRDESC, &rpt_desc);
-  if (res < 0) {
-    LOG_ERROR("HIDIOCGRDESC");
+  if (auto r = sys::ioctl(fd.get(), HIDIOCGRDESC, &rpt_desc); !r) {
+    LOG_ERROR("HIDIOCGRDESC failed: {}", r.error().message());
     return;
   }
 
@@ -160,10 +157,10 @@ void InputReader::dispatch(const short revents) {
 int InputReader::GetControllerMacAll(const int fd,
                                      ReportFeatureInMacAll& mac_all) {
   mac_all.ReportID = 0x09;
-  if (const auto res =
-          ioctl(fd, HIDIOCGFEATURE(sizeof(ReportFeatureInMacAll)), &mac_all);
-      res < 0) {
-    LOG_ERROR("GetControllerMacAll failed: {}", strerror(errno));
+  if (auto r = sys::ioctl(fd, HIDIOCGFEATURE(sizeof(ReportFeatureInMacAll)),
+                          &mac_all);
+      !r) {
+    LOG_ERROR("GetControllerMacAll failed: {}", r.error().message());
     return 1;
   }
   if (mac_all.ReportID != 0x09 || mac_all.Hard08 != 0x08 ||
@@ -177,10 +174,10 @@ int InputReader::GetControllerMacAll(const int fd,
 int InputReader::GetControllerVersion(const int fd,
                                       ReportFeatureInVersion& version) {
   version.Data.ReportID = 0x20;
-  if (const auto res =
-          ioctl(fd, HIDIOCGFEATURE(sizeof(ReportFeatureInVersion)), &version);
-      res < 0) {
-    LOG_ERROR("GetControllerVersion failed: {}", strerror(errno));
+  if (auto r = sys::ioctl(fd, HIDIOCGFEATURE(sizeof(ReportFeatureInVersion)),
+                          &version);
+      !r) {
+    LOG_ERROR("GetControllerVersion failed: {}", r.error().message());
     return 1;
   }
   if (version.Data.ReportID != 0x20) {
@@ -200,10 +197,10 @@ int InputReader::GetControllerCalibrationData(
 
   ReportFeatureCalibrationData cal_data{};
   cal_data.Data.ReportID = 0x05;
-  if (const auto res = ioctl(
+  if (auto r = sys::ioctl(
           fd, HIDIOCGFEATURE(sizeof(ReportFeatureCalibrationData)), &cal_data);
-      res < 0) {
-    LOG_ERROR("GetControllerCalibrationData failed: {}", strerror(errno));
+      !r) {
+    LOG_ERROR("GetControllerCalibrationData failed: {}", r.error().message());
     return 1;
   }
   if (cal_data.Data.ReportID != 0x05) {

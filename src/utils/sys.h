@@ -21,6 +21,7 @@
 
 #include <fcntl.h>
 #include <sys/eventfd.h>
+#include <sys/ioctl.h>
 #include <sys/signalfd.h>
 #include <sys/stat.h>
 #include <sys/timerfd.h>
@@ -90,6 +91,19 @@ make_signalfd(const int fd, const sigset_t& mask, const int flags) noexcept {
     return std::unexpected(last_error());
   }
   return fd;
+}
+
+/// ioctl() with a single argument, returning the (non-negative) result or the
+/// errno as a std::error_code. `arg` is typically a pointer to the ioctl's
+/// in/out struct.
+template <typename Arg>
+[[nodiscard]] inline std::expected<int, std::error_code>
+ioctl(const int fd, const unsigned long request, Arg arg) noexcept {
+  const int rc = ::ioctl(fd, request, arg);
+  if (rc < 0) {
+    return std::unexpected(last_error());
+  }
+  return rc;
 }
 
 }  // namespace sys
