@@ -92,4 +92,9 @@ add_subdirectory(src/utils)
 
 add_subdirectory(third_party)
 
+# 'regenerate-proxies' target (opt-in, not part of the default build) that
+# regenerates src/proxy/ from interfaces/*.xml. Must follow third_party so the
+# sdbus-c++-xml2cpp tool target exists.
+include(GenerateProxies)
+
 include (packaging)
