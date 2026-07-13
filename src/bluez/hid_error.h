@@ -32,12 +32,10 @@ inline const std::error_category& error_category() noexcept {
   static const struct Category final : std::error_category {
     [[nodiscard]] const char* name() const noexcept override { return "hid"; }
     [[nodiscard]] std::string message(const int condition) const override {
-      switch (static_cast<Error>(condition)) {
-        case Error::kInvalidResponse:
-          return "invalid device response";
-        default:
-          return "unknown hid error";
+      if (static_cast<Error>(condition) == Error::kInvalidResponse) {
+        return "invalid device response";
       }
+      return "unknown hid error";
     }
   } category;
   return category;
