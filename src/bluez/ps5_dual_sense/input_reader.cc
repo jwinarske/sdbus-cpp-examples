@@ -23,6 +23,7 @@
 
 #include "../../utils/logging.h"
 #include "../../utils/sys.h"
+#include "../hid_error.h"
 #include "../hidraw.hpp"
 #include "input_reader.h"
 
@@ -98,11 +99,19 @@ void InputReader::open_and_init() {
   os << CustomHexdump<400, false>(std::data(rpt_desc.value), rpt_desc.size);
   LOG_INFO(os.str());
 
-  // Get Features
-  GetControllerCalibrationData(fd.get(),
-                               hw_cal_data_);  // enables extended report for BT
-  GetControllerMacAll(fd.get(), controller_and_host_mac_);
-  GetControllerVersion(fd.get(), version_);
+  // Feature reports are best-effort: the controller still streams input if they
+  // fail, so log and continue. GetControllerCalibrationData also enables the
+  // extended BT report as a side effect.
+  if (auto r = GetControllerCalibrationData(fd.get(), hw_cal_data_); !r) {
+    LOG_WARN("controller calibration data unavailable: {}",
+             r.error().message());
+  }
+  if (auto r = GetControllerMacAll(fd.get(), controller_and_host_mac_); !r) {
+    LOG_WARN("controller MAC unavailable: {}", r.error().message());
+  }
+  if (auto r = GetControllerVersion(fd.get(), version_); !r) {
+    LOG_WARN("controller version unavailable: {}", r.error().message());
+  }
 
   // Initialisation succeeded: keep the fd so the loop can poll it.
   fd_ = std::move(fd);
@@ -154,40 +163,38 @@ void InputReader::dispatch(const short revents) {
   }
 }
 
-int InputReader::GetControllerMacAll(const int fd,
-                                     ReportFeatureInMacAll& mac_all) {
+std::expected<void, std::error_code> InputReader::GetControllerMacAll(
+    const int fd,
+    ReportFeatureInMacAll& mac_all) {
   mac_all.ReportID = 0x09;
   if (auto r = sys::ioctl(fd, HIDIOCGFEATURE(sizeof(ReportFeatureInMacAll)),
                           &mac_all);
       !r) {
-    LOG_ERROR("GetControllerMacAll failed: {}", r.error().message());
-    return 1;
+    return std::unexpected(r.error());
   }
   if (mac_all.ReportID != 0x09 || mac_all.Hard08 != 0x08 ||
       mac_all.Hard25 != 0x25 || mac_all.Hard00 != 0x00) {
-    LOG_ERROR("GetControllerMacAll invalid response");
-    return 1;
+    return std::unexpected(hid::make_error_code(hid::Error::kInvalidResponse));
   }
-  return 0;
+  return {};
 }
 
-int InputReader::GetControllerVersion(const int fd,
-                                      ReportFeatureInVersion& version) {
+std::expected<void, std::error_code> InputReader::GetControllerVersion(
+    const int fd,
+    ReportFeatureInVersion& version) {
   version.Data.ReportID = 0x20;
   if (auto r = sys::ioctl(fd, HIDIOCGFEATURE(sizeof(ReportFeatureInVersion)),
                           &version);
       !r) {
-    LOG_ERROR("GetControllerVersion failed: {}", r.error().message());
-    return 1;
+    return std::unexpected(r.error());
   }
   if (version.Data.ReportID != 0x20) {
-    LOG_ERROR("GetControllerVersion invalid response");
-    return 1;
+    return std::unexpected(hid::make_error_code(hid::Error::kInvalidResponse));
   }
-  return 0;
+  return {};
 }
 
-int InputReader::GetControllerCalibrationData(
+std::expected<void, std::error_code> InputReader::GetControllerCalibrationData(
     const int fd,
     HardwareCalibrationData& hw_cal_data) {
   static constexpr auto ACC_RES_PER_G = 8192;
@@ -200,12 +207,10 @@ int InputReader::GetControllerCalibrationData(
   if (auto r = sys::ioctl(
           fd, HIDIOCGFEATURE(sizeof(ReportFeatureCalibrationData)), &cal_data);
       !r) {
-    LOG_ERROR("GetControllerCalibrationData failed: {}", r.error().message());
-    return 1;
+    return std::unexpected(r.error());
   }
   if (cal_data.Data.ReportID != 0x05) {
-    LOG_ERROR("GetControllerCalibrationData invalid response");
-    return 1;
+    return std::unexpected(hid::make_error_code(hid::Error::kInvalidResponse));
   }
 
   // Set gyroscope calibration and normalization parameters.
@@ -285,7 +290,7 @@ int InputReader::GetControllerCalibrationData(
     i++;
   }
 
-  return 0;
+  return {};
 }
 
 std::string InputReader::dpad_to_string(const Direction dpad) {
